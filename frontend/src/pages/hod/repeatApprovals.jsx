@@ -102,7 +102,11 @@ const HodRepeatApprovals = () => {
                               </div>
                               <div>
                                 <p className="font-semibold text-slate-900">{student.name || 'Student'}</p>
-                                <p className="text-xs text-slate-400 uppercase tracking-[0.14em]">{student.studentId || student._id}</p>
+                                <p className="text-xs text-slate-400 uppercase tracking-[0.14em] mb-1.5">{student.studentId || student._id}</p>
+                                <div className="flex items-center gap-1.5 px-2 py-0.5 bg-indigo-50 text-indigo-600 rounded-lg border border-indigo-100/50 w-fit">
+                                  <div className="h-1 w-1 bg-indigo-400 rounded-full animate-pulse"></div>
+                                  <span className="text-[8px] font-black uppercase tracking-widest leading-none">Stage 2: Review</span>
+                                </div>
                               </div>
                             </div>
                           </td>
@@ -111,8 +115,33 @@ const HodRepeatApprovals = () => {
                             <p className="text-xs uppercase tracking-[0.14em] text-slate-400">{subject.code || registration.subjectCode}</p>
                           </td>
                           <td className="px-6 py-5 max-w-[220px] text-slate-600 text-sm leading-relaxed">
-                            {registration.reason || registration.notes || 'No reason provided.'}
+                            <div className="font-bold text-slate-800 uppercase text-[10px] tracking-widest mb-1 italic opacity-60">Basis</div>
+                            <p className="font-semibold text-indigo-700 underline decoration-indigo-200 decoration-4 underline-offset-4 mb-2">{registration.repeatReason?.replace('_', ' ') || 'FAILED'}</p>
+                            {registration.additionalComments && (
+                              <>
+                                <div className="font-bold text-slate-400 uppercase text-[9px] tracking-widest mt-3 mb-1 italic">Student Context</div>
+                                <p className="text-xs font-medium text-slate-500 italic">"{registration.additionalComments}"</p>
+                              </>
+                            )}
+
+                            {/* Previous Workflow Details (Lecturer) */}
+                            {registration.lecturerReviewStatus && registration.lecturerReviewStatus !== 'PENDING' && (
+                              <div className="mt-4 pt-4 border-t border-slate-100 bg-slate-50/50 p-3 rounded-2xl">
+                                <div className="flex items-center justify-between mb-2">
+                                  <div className="font-bold text-slate-400 uppercase text-[8px] tracking-[0.2em] italic">Lecturer Decision</div>
+                                  <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest ${registration.lecturerReviewStatus === 'APPROVED' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>
+                                    {registration.lecturerReviewStatus}
+                                  </span>
+                                </div>
+                                {registration.lecturerReviewComments ? (
+                                  <p className="text-[11px] font-bold text-slate-600 italic leading-snug">"{registration.lecturerReviewComments}"</p>
+                                ) : (
+                                  <p className="text-[10px] font-medium text-slate-400 italic">No comments provided</p>
+                                )}
+                              </div>
+                            )}
                           </td>
+
                           <td className="px-6 py-5">
                             <span className="inline-flex rounded-full bg-amber-100 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-amber-700">
                               {registration.previousAttempt?.grade || registration.previousGrade || 'N/A'}

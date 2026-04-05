@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/Authcontext';
+import { useLocation } from 'react-router-dom';
+import queryString from 'query-string';
+
 import api from '../../services/api';
 import Loader from '../../components/common/loader';
 import { FiFile, FiDownload, FiClock, FiUser, FiBook, FiSearch, FiFilter } from 'react-icons/fi';
@@ -7,11 +10,13 @@ import { saveAs } from 'file-saver';
 
 const StudentFiles = () => {
   const { user } = useAuth();
+  const location = useLocation();
   const [files, setFiles] = useState([]);
   const [filteredFiles, setFilteredFiles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedSubject, setSelectedSubject] = useState('all');
+
   const [subjects, setSubjects] = useState([]);
   const [selectedYear, setSelectedYear] = useState(user?.yearOfStudy || '1st Year');
   const [selectedSemester, setSelectedSemester] = useState(user?.semester || 1);
@@ -22,6 +27,14 @@ const StudentFiles = () => {
   useEffect(() => {
     fetchData();
   }, [selectedYear, selectedSemester]);
+
+  useEffect(() => {
+    const params = queryString.parse(location.search);
+    if (params.subject) {
+      setSelectedSubject(params.subject);
+    }
+  }, [location.search]);
+
 
   useEffect(() => {
     filterFiles();

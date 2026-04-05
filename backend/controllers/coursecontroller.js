@@ -35,15 +35,21 @@ const getRoleBasedQuery = async (req, baseQuery = {}) => {
 
   // Filter based on user role
   if (req.user.role === 'student') {
-    // Students see subjects for their current year and semester
+    // Students see subjects for their current year and semester by default
+    // but can filter if baseQuery provides them
     const yearMap = {
       1: '1st Year',
       2: '2nd Year',
       3: '3rd Year',
       4: '4th Year'
     };
-    query.year = yearMap[req.user.currentYear] || '1st Year';
-    query.semester = req.user.currentSemester || 1;
+    
+    if (!query.year) {
+      query.year = yearMap[req.user.currentYear] || '1st Year';
+    }
+    if (!query.semester) {
+      query.semester = req.user.currentSemester || 1;
+    }
     query.department = req.user.department;
   } else if (req.user.role === 'lecturer') {
     // Lecturers only see assigned subjects

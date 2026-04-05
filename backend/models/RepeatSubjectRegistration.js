@@ -52,8 +52,10 @@ const repeatSubjectRegistrationSchema = new mongoose.Schema({
       enum: ['F', 'E', 'D', 'D+', 'C-', 'C', 'C+', 'B-', 'B', 'B+', 'A', 'A+'],
       required: true
     },
-    gpa: Number
+    gpa: Number,
+    attendancePercentage: Number // Added for lecturer approval criteria
   },
+
 
   // ===== CURRENT REGISTRATION =====
   academicYear: {
@@ -82,13 +84,28 @@ const repeatSubjectRegistrationSchema = new mongoose.Schema({
   // ===== APPROVAL WORKFLOW =====
   registrationStatus: {
     type: String,
-    enum: ['DRAFT', 'SUBMITTED', 'HOD_APPROVED', 'REGISTRAR_APPROVED', 'EXAM_OFFICER_REVIEW', 'ADMIN_APPROVED', 'FEE_ALLOCATED', 'PAYMENT_PENDING', 'PAYMENT_SUBMITTED', 'PAYMENT_VERIFIED', 'EXAM_SCHEDULED', 'COMPLETED', 'REJECTED'],
+    enum: ['DRAFT', 'SUBMITTED', 'LECTURER_APPROVED', 'HOD_APPROVED', 'REGISTRAR_APPROVED', 'EXAM_OFFICER_APPROVED', 'ADMIN_APPROVED', 'FEE_ALLOCATED', 'PAYMENT_PENDING', 'PAYMENT_SUBMITTED', 'PAYMENT_VERIFIED', 'EXAM_SCHEDULED', 'COMPLETED', 'REJECTED'],
     default: 'DRAFT',
     index: true
   },
 
+
   // === Student Request Status ===
   studentSubmittedAt: Date,
+
+  // === Lecturer Review ===
+  lecturerReviewStatus: {
+    type: String,
+    enum: ['PENDING', 'APPROVED', 'REJECTED'],
+    default: 'PENDING'
+  },
+  lecturerReviewedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  },
+  lecturerReviewedAt: Date,
+  lecturerReviewComments: String,
+
 
   // === HOD Review ===
   hodReviewStatus: {

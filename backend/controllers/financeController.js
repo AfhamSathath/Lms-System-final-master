@@ -1,5 +1,6 @@
 const Finance = require('../models/finance');
 const User = require('../models/user');
+const RepeatSubjectRegistration = require('../models/RepeatSubjectRegistration');
 const emailService = require('../utils/emailService');
 
 // @desc    Get All Finances (Admin/Registrar)
@@ -126,6 +127,23 @@ exports.recordPayment = async (req, res, next) => {
     const totalPaid = finance.paymentHistory.reduce((sum, p) => sum + (p.amount || 0), 0);
     if (totalPaid >= finance.amount) {
       finance.status = 'paid';
+      
+      // Sync with link records (e.g. Repeat Registration)
+      if (finance.relatedRecordId && finance.relatedRecordType === 'RepeatRegistration') {
+        const registration = await RepeatSubjectRegistration.findById(finance.relatedRecordId);
+        if (registration) {
+           registration.registrationStatus = 'COMPLETED';
+           registration.feeStatus = 'PAID';
+           registration.workflowHistory.push({
+             stage: 'COMPLETED',
+             status: 'COMPLETED',
+             timestamp: new Date(),
+             actedBy: req.user.id,
+             comments: 'Bursar verified the linked finance record and finalized registration'
+           });
+           await registration.save();
+        }
+      }
     }
 
     await finance.save();
@@ -184,6 +202,59 @@ exports.bulkCreateFinance = async (req, res, next) => {
       const s = await User.findById(record.student);
       if (s) emailService.sendFinanceNotification(s, record).catch(console.error);
     }
+  } catch (error) {
+    next(error);
+  }
+};
+// @desc    Submit Payment Slip (Student)
+// @route   PUT /api/finance/:id/submit-slip
+// @access  Private (Student)
+exports.submitPaymentSlip = async (req, res, next) => {
+  try {
+    const { transactionId } = req.body;
+    const paymentSlip = req.file ? req.file.path : null;
+
+    if (!paymentSlip) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please upload a payment slip.'
+      });
+    }
+
+    const finance = await Finance.findById(req.params.id);
+
+    if (!finance) {
+      return res.status(404).json({
+        success: false,
+        message: 'Finance record not found.'
+      });
+    }
+
+    if (finance.student.toString() !== req.user.id) {
+       return res.status(403).json({
+         success: false,
+         message: 'Access denied. You can only submit slips for your own records.'
+       });
+    }
+
+    finance.status = 'payment_submitted';
+    finance.paymentSlip = paymentSlip;
+    
+    // Optionally add a placeholder history record
+    finance.paymentHistory.push({
+      amount: 0, // Not verified yet
+      transactionId: transactionId || 'PENDING-' + Date.now(),
+      paymentMethod: 'Bank Deposit',
+      paymentDate: new Date()
+    });
+
+    await finance.save();
+
+    res.json({
+      success: true,
+      message: 'Payment slip submitted successfully. Awaiting verification.',
+      finance
+    });
   } catch (error) {
     next(error);
   }

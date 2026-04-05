@@ -41,8 +41,9 @@ exports.getEligibleSubjectsForRepeat = async (req, res, next) => {
 
     // Filter results that are eligible for repeat
     const eligibleSubjects = studentResults.filter(result => {
-      const repeatableGrades = ['F', 'E', 'D', 'D+', 'C-'];
-      return repeatableGrades.includes(result.grade);
+      if (!result.grade) return false;
+      const repeatableGrades = ['F', 'E', 'D', 'D+', 'C-', 'C'];
+      return repeatableGrades.includes(result.grade.toUpperCase().trim());
     });
 
     // Get already registered repeats to avoid duplicates
@@ -55,20 +56,30 @@ exports.getEligibleSubjectsForRepeat = async (req, res, next) => {
 
     const alreadyRegisteredSubjectIds = alreadyRegistered.map(reg => reg.subject.toString());
 
-    // Filter out already registered subjects
-    const finalEligibleSubjects = eligibleSubjects.filter(result =>
-      !alreadyRegisteredSubjectIds.includes(result.subject._id.toString())
-    );
+    // Filter out already registered subjects and map to frontend structure
+    const subjects = eligibleSubjects
+      .filter(result => result.subject && !alreadyRegisteredSubjectIds.includes(result.subject._id.toString()))
+      .map(result => ({
+        subjectId: result.subject._id,
+        subjectCode: result.subject.code,
+        subjectName: result.subject.name,
+        credits: result.subject.credits,
+        previousGrade: result.grade,
+        semester: result.semester,
+        academicYear: result.year
+      }));
 
     res.status(200).json({
       success: true,
-      count: finalEligibleSubjects.length,
-      data: finalEligibleSubjects
+      count: subjects.length,
+      subjects: subjects
     });
   } catch (error) {
     next(error);
   }
 };
+
+
 
 /**
  * @desc    Create repeat subject registration (draft)
@@ -78,7 +89,21 @@ exports.getEligibleSubjectsForRepeat = async (req, res, next) => {
  */
 exports.createRepeatRegistration = async (req, res, next) => {
   try {
-    const { subject, reason, academicYear } = req.body;
+    const { subject, reason, academicYear, additionalComments } = req.body;
+
+    // Fetch student and subject details for automatic population
+    const [studentUser, targetSubject, previousResult] = await Promise.all([
+      User.findById(req.user.id),
+      Subject.findById(subject),
+      Result.findOne({ student: req.user.id, subject: subject }).sort({ createdAt: -1 })
+    ]);
+
+    if (!studentUser || !targetSubject) {
+      return res.status(404).json({
+        success: false,
+        message: 'Student or Subject not found'
+      });
+    }
 
     // Check if student already has a registration for this subject in current year
     const existingRegistration = await RepeatSubjectRegistration.findOne({
@@ -95,15 +120,41 @@ exports.createRepeatRegistration = async (req, res, next) => {
       });
     }
 
-    const registration = await RepeatSubjectRegistration.create({
-      student: req.user.id,
-      subject: subject,
-      reason: reason,
-      academicYear: academicYear || '2025-2026',
-      registrationStatus: 'DRAFT'
-    });
+    // Map frontend reason to Model enum
+    const reasonMapper = {
+      'FAIL': 'FAILED',
+      'IMPROVE': 'GRADE_IMPROVEMENT',
+      'ABSENT': 'INCOMPLETE',
+      'OTHER': 'FAILED'
+    };
 
-    await registration.populate(['student', 'subject']);
+    const registrationData = {
+      student: req.user.id,
+      studentIndex: studentUser.studentId || studentUser.registrationNumber || req.user.studentId || 'NOT-SET',
+      studentName: studentUser.name || req.user.name,
+      department: studentUser.department || studentUser.specialization || 'N/A',
+      
+      subject: subject,
+      subjectCode: targetSubject.code,
+      subjectName: targetSubject.name,
+      credits: targetSubject.credits,
+
+      previousAttempt: {
+        year: previousResult?.year || targetSubject.year || academicYear || '2024',
+        semester: previousResult?.semester || targetSubject.semester,
+        grade: previousResult?.grade || 'F',
+        marks: previousResult?.marks || 0,
+        attendancePercentage: 0 // Placeholder, can be updated later by lecturer
+      },
+
+      academicYear: academicYear || '2025-2026',
+      semester: targetSubject.semester || 1,
+      repeatReason: reasonMapper[reason] || 'FAILED',
+      additionalComments: additionalComments,
+      registrationStatus: 'DRAFT'
+    };
+
+    const registration = await RepeatSubjectRegistration.create(registrationData);
 
     res.status(201).json({
       success: true,
@@ -113,6 +164,7 @@ exports.createRepeatRegistration = async (req, res, next) => {
     next(error);
   }
 };
+
 
 /**
  * @desc    Submit repeat subject registration for approval
@@ -126,7 +178,7 @@ exports.submitRepeatRegistration = async (req, res, next) => {
       _id: req.params.id,
       student: req.user.id,
       registrationStatus: 'DRAFT'
-    });
+    }).populate('subject');
 
     if (!registration) {
       return res.status(404).json({
@@ -142,19 +194,166 @@ exports.submitRepeatRegistration = async (req, res, next) => {
       stage: 'SUBMITTED',
       status: 'COMPLETED',
       timestamp: new Date(),
-      performedBy: req.user.id,
-      comments: 'Student submitted registration for approval'
+      actedBy: req.user.id,
+      comments: 'Student submitted registration for lecturer approval'
     });
 
     await registration.save();
-    await registration.populate(['student', 'subject']);
-
-    // Send email notification to HOD
-    await emailService.sendRepeatRegistrationSubmissionNotification(registration);
+    
+    // Notify the subject lecturer
+    if (registration.subject && registration.subject.lecturer) {
+      const lecturer = await User.findById(registration.subject.lecturer);
+      if (lecturer) {
+        await emailService.sendRepeatSubjectSubmissionToLecturer(lecturer, registration);
+      }
+    }
 
     res.status(200).json({
       success: true,
-      message: 'Registration submitted successfully for HOD approval',
+      message: 'Registration submitted successfully for Lecturer approval',
+      data: registration
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+// ================================
+// 2. LECTURER WORKFLOW
+// ================================
+
+/**
+ * @desc    Get pending registrations for Lecturer review
+ * @route   GET /api/repeat-registration/lecturer/pending
+ * @access  Private/Lecturer
+ */
+exports.getPendingLecturerReviews = async (req, res, next) => {
+  try {
+    const lecturer = await User.findById(req.user.id);
+    const subjects = await Subject.find({ lecturer: req.user.id });
+    const subjectIds = subjects.map(s => s._id);
+
+    // Initial query: Registrations for subjects where this user is the lecturer
+    let query = {
+      registrationStatus: 'SUBMITTED',
+      lecturerReviewStatus: 'PENDING',
+      subject: { $in: subjectIds }
+    };
+
+    // Fallback: If no registrations found for specific subjects, 
+    // or if the lecturer has no subjects assigned yet, 
+    // show all pending in their department
+    let registrations = await RepeatSubjectRegistration.find(query)
+      .populate('student', 'name studentId department')
+      .populate('subject', 'name code')
+      .sort({ studentSubmittedAt: -1 });
+
+    if (registrations.length === 0) {
+      registrations = await RepeatSubjectRegistration.find({
+        registrationStatus: 'SUBMITTED',
+        lecturerReviewStatus: 'PENDING',
+        department: lecturer.department
+      })
+      .populate('student', 'name studentId department')
+      .populate('subject', 'name code')
+      .sort({ studentSubmittedAt: -1 });
+    }
+
+    res.status(200).json({
+      success: true,
+      count: registrations.length,
+      data: registrations
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+/**
+ * @desc    Lecturer reviews and approves/rejects registration
+ * @route   PUT /api/repeat-registration/:id/lecturer-review
+ * @access  Private/Lecturer
+ */
+exports.lecturerReviewApplication = async (req, res, next) => {
+  try {
+    const { action, comments } = req.body; // action: 'APPROVE' or 'REJECT'
+
+    const registration = await RepeatSubjectRegistration.findById(req.params.id).populate('subject');
+
+    if (!registration || registration.registrationStatus !== 'SUBMITTED') {
+      return res.status(404).json({
+        success: false,
+        message: 'Registration not found or already reviewed'
+      });
+    }
+
+    const lecturerUser = await User.findById(req.user.id);
+    if (!lecturerUser) {
+      return res.status(401).json({
+        success: false,
+        message: 'Lecturer account not found'
+      });
+    }
+
+    const isSubjectLecturer = registration.subject && registration.subject.lecturer && 
+                             registration.subject.lecturer.toString() === req.user.id;
+    const isDeptLecturer = lecturerUser.department && registration.department && 
+                           lecturerUser.department === registration.department;
+
+    if (!isSubjectLecturer && !isDeptLecturer) {
+      return res.status(403).json({
+        success: false,
+        message: 'You are not authorized to review this registration'
+      });
+    }
+
+
+    if (action === 'APPROVE') {
+      registration.registrationStatus = 'LECTURER_APPROVED';
+      registration.lecturerReviewStatus = 'APPROVED';
+      registration.workflowHistory.push({
+        stage: 'LECTURER_APPROVED',
+        status: 'COMPLETED',
+        timestamp: new Date(),
+        actedBy: req.user.id,
+        comments: comments || 'Lecturer approved based on attendance and previous result'
+      });
+    } else {
+      registration.registrationStatus = 'REJECTED';
+      registration.lecturerReviewStatus = 'REJECTED';
+      registration.workflowHistory.push({
+        stage: 'LECTURER_REJECTED',
+        status: 'COMPLETED',
+        timestamp: new Date(),
+        actedBy: req.user.id,
+        comments: comments || 'Lecturer rejected the application'
+      });
+    }
+
+    registration.lecturerReviewedBy = req.user.id;
+    registration.lecturerReviewedAt = new Date();
+    registration.lecturerReviewComments = comments;
+
+    await registration.save();
+    
+    // Notify student and HOD if approved
+    const student = await User.findById(registration.student);
+    if (action === 'APPROVE') {
+      await emailService.sendRepeatApplicationLecturerApproved(student, registration);
+      // Also notify HOD of its department
+      const hod = await User.findOne({ role: 'hod', department: student.department });
+      if (hod) {
+        await emailService.sendRepeatSubjectSubmissionToHOD(hod, registration);
+      }
+    } else {
+      await emailService.sendRepeatApplicationRejected(student, registration, comments);
+    }
+
+    res.status(200).json({
+      success: true,
+      message: `Registration ${action.toLowerCase()}d by Lecturer`,
       data: registration
     });
   } catch (error) {
@@ -163,18 +362,16 @@ exports.submitRepeatRegistration = async (req, res, next) => {
 };
 
 // ================================
-// 2. HOD WORKFLOW
+// 3. HOD WORKFLOW
 // ================================
 
 /**
  * @desc    Get pending registrations for HOD review
  * @route   GET /api/repeat-registration/hod/pending
  * @access  Private/HOD
- * @scenario HOD logs in and sees registrations from their department students
  */
 exports.getPendingHODReviews = async (req, res, next) => {
   try {
-    // Get HOD's department
     const hod = await User.findById(req.user.id);
     if (!hod || hod.role !== 'hod') {
       return res.status(403).json({
@@ -184,16 +381,16 @@ exports.getPendingHODReviews = async (req, res, next) => {
     }
 
     const registrations = await RepeatSubjectRegistration.find({
-      registrationStatus: 'SUBMITTED',
+      registrationStatus: 'LECTURER_APPROVED',
       hodReviewStatus: 'PENDING'
     })
     .populate('student', 'name studentId department')
     .populate('subject', 'name code')
-    .sort({ studentSubmittedAt: -1 });
+    .sort({ lecturerReviewedAt: -1 });
 
-    // Filter by HOD's department
     const departmentRegistrations = registrations.filter(reg =>
-      reg.student.department === hod.department
+      reg.student && reg.student.department && hod.department && 
+      reg.student.department.toLowerCase().trim() === hod.department.toLowerCase().trim()
     );
 
     res.status(200).json({
@@ -206,6 +403,7 @@ exports.getPendingHODReviews = async (req, res, next) => {
   }
 };
 
+
 /**
  * @desc    HOD reviews and approves/rejects registration
  * @route   PUT /api/repeat-registration/:id/hod-review
@@ -214,11 +412,11 @@ exports.getPendingHODReviews = async (req, res, next) => {
  */
 exports.hodReviewApplication = async (req, res, next) => {
   try {
-    const { action, comments } = req.body; // action: 'APPROVE' or 'REJECT'
+    const { action, comments } = req.body;
 
     const registration = await RepeatSubjectRegistration.findOne({
       _id: req.params.id,
-      registrationStatus: 'SUBMITTED',
+      registrationStatus: 'LECTURER_APPROVED',
       hodReviewStatus: 'PENDING'
     });
 
@@ -229,15 +427,33 @@ exports.hodReviewApplication = async (req, res, next) => {
       });
     }
 
-    // Verify HOD belongs to student's department
     const hod = await User.findById(req.user.id);
-    const student = await User.findById(registration.student);
-    if (hod.department !== student.department) {
-      return res.status(403).json({
+    if (!hod) {
+      return res.status(401).json({
         success: false,
-        message: 'You can only review registrations from your department'
+        message: 'HOD account not found'
       });
     }
+
+    const student = await User.findById(registration.student);
+    
+    if (!student) {
+      return res.status(404).json({
+        success: false,
+        message: 'Student account not found'
+      });
+    }
+
+    const hodDept = (hod.department || 'N/A').toString().toLowerCase().trim();
+    const studentDept = (student.department || registration.department || 'N/A').toString().toLowerCase().trim();
+
+    if (hodDept !== studentDept && hodDept !== 'n/a') {
+      return res.status(403).json({
+        success: false,
+        message: `HOD authorization conflict. Required: ${studentDept}, Provided: ${hodDept}`
+      });
+    }
+
 
     if (action === 'APPROVE') {
       registration.registrationStatus = 'HOD_APPROVED';
@@ -246,17 +462,17 @@ exports.hodReviewApplication = async (req, res, next) => {
         stage: 'HOD_APPROVED',
         status: 'COMPLETED',
         timestamp: new Date(),
-        performedBy: req.user.id,
+        actedBy: req.user.id,
         comments: comments || 'HOD approved the registration'
       });
-    } else if (action === 'REJECT') {
+    } else {
       registration.registrationStatus = 'REJECTED';
       registration.hodReviewStatus = 'REJECTED';
       registration.workflowHistory.push({
         stage: 'HOD_REJECTED',
         status: 'COMPLETED',
         timestamp: new Date(),
-        performedBy: req.user.id,
+        actedBy: req.user.id,
         comments: comments || 'HOD rejected the registration'
       });
     }
@@ -266,13 +482,11 @@ exports.hodReviewApplication = async (req, res, next) => {
     registration.hodReviewComments = comments;
 
     await registration.save();
-    await registration.populate(['student', 'subject', 'hodReviewedBy']);
-
-    // Send email notification
+    
     if (action === 'APPROVE') {
-      await emailService.sendRepeatApplicationHODApproved(registration);
+      await emailService.sendRepeatApplicationHODApproved(student, registration);
     } else {
-      await emailService.sendRepeatApplicationRejected(registration, 'HOD', comments);
+      await emailService.sendRepeatApplicationRejected(student, registration, comments);
     }
 
     res.status(200).json({
@@ -284,6 +498,7 @@ exports.hodReviewApplication = async (req, res, next) => {
     next(error);
   }
 };
+
 
 // ================================
 // 3. REGISTRAR WORKFLOW
@@ -353,7 +568,7 @@ exports.registrarApproveApplication = async (req, res, next) => {
         stage: 'REGISTRAR_APPROVED',
         status: 'COMPLETED',
         timestamp: new Date(),
-        performedBy: req.user.id,
+        actedBy: req.user.id,
         comments: reason || 'Registrar approved the registration'
       });
     } else if (action === 'REJECT') {
@@ -363,7 +578,7 @@ exports.registrarApproveApplication = async (req, res, next) => {
         stage: 'REGISTRAR_REJECTED',
         status: 'COMPLETED',
         timestamp: new Date(),
-        performedBy: req.user.id,
+        actedBy: req.user.id,
         comments: reason || 'Registrar rejected the registration'
       });
     }
@@ -400,7 +615,6 @@ exports.registrarApproveApplication = async (req, res, next) => {
  * @desc    Get pending registrations for Exam Officer review
  * @route   GET /api/repeat-registration/exam-officer/pending
  * @access  Private/Exam Officer
- * @scenario Exam Officer sees registrations approved by Registrar
  */
 exports.getPendingExamOfficerReviews = async (req, res, next) => {
   try {
@@ -412,14 +626,12 @@ exports.getPendingExamOfficerReviews = async (req, res, next) => {
     }
 
     const registrations = await RepeatSubjectRegistration.find({
-      registrationStatus: 'REGISTRAR_APPROVED',
+      registrationStatus: 'HOD_APPROVED',
       examOfficerReviewStatus: 'PENDING'
     })
     .populate('student', 'name studentId department')
     .populate('subject', 'name code')
-    .populate('hodReviewedBy', 'name')
-    .populate('registrarApprovedBy', 'name')
-    .sort({ registrarApprovedAt: -1 });
+    .sort({ hodReviewedAt: -1 });
 
     res.status(200).json({
       success: true,
@@ -435,15 +647,14 @@ exports.getPendingExamOfficerReviews = async (req, res, next) => {
  * @desc    Exam Officer reviews registration
  * @route   PUT /api/repeat-registration/:id/exam-officer-review
  * @access  Private/Exam Officer
- * @scenario Exam Officer reviews and forwards to Admin
  */
 exports.examOfficerReviewApplication = async (req, res, next) => {
   try {
-    const { action, comments } = req.body; // action: 'APPROVE' or 'REJECT'
+    const { action, comments } = req.body;
 
     const registration = await RepeatSubjectRegistration.findOne({
       _id: req.params.id,
-      registrationStatus: 'REGISTRAR_APPROVED',
+      registrationStatus: 'HOD_APPROVED',
       examOfficerReviewStatus: 'PENDING'
     });
 
@@ -455,23 +666,23 @@ exports.examOfficerReviewApplication = async (req, res, next) => {
     }
 
     if (action === 'APPROVE') {
-      registration.registrationStatus = 'EXAM_OFFICER_REVIEW';
+      registration.registrationStatus = 'EXAM_OFFICER_APPROVED';
       registration.examOfficerReviewStatus = 'APPROVED';
       registration.workflowHistory.push({
-        stage: 'EXAM_OFFICER_REVIEW',
+        stage: 'EXAM_OFFICER_APPROVED',
         status: 'COMPLETED',
         timestamp: new Date(),
-        performedBy: req.user.id,
-        comments: comments || 'Exam Officer reviewed and forwarded to Admin'
+        actedBy: req.user.id,
+        comments: comments || 'Exam Officer approved and forwarded to Bursar for fee allocation'
       });
-    } else if (action === 'REJECT') {
+    } else {
       registration.registrationStatus = 'REJECTED';
       registration.examOfficerReviewStatus = 'REJECTED';
       registration.workflowHistory.push({
         stage: 'EXAM_OFFICER_REJECTED',
         status: 'COMPLETED',
         timestamp: new Date(),
-        performedBy: req.user.id,
+        actedBy: req.user.id,
         comments: comments || 'Exam Officer rejected the registration'
       });
     }
@@ -481,13 +692,12 @@ exports.examOfficerReviewApplication = async (req, res, next) => {
     registration.examOfficerReviewComments = comments;
 
     await registration.save();
-    await registration.populate(['student', 'subject', 'examOfficerReviewedBy']);
-
-    // Send email notification
+    
+    const student = await User.findById(registration.student);
     if (action === 'APPROVE') {
-      await emailService.sendRepeatApplicationExamOfficerReviewed(registration);
+      await emailService.sendRepeatApplicationExamOfficerApproved(student, registration);
     } else {
-      await emailService.sendRepeatApplicationRejected(registration, 'Exam Officer', comments);
+      await emailService.sendRepeatApplicationRejected(student, registration, comments);
     }
 
     res.status(200).json({
@@ -499,6 +709,7 @@ exports.examOfficerReviewApplication = async (req, res, next) => {
     next(error);
   }
 };
+
 
 // ================================
 // 5. ADMIN WORKFLOW
@@ -520,7 +731,7 @@ exports.getPendingAdminApprovals = async (req, res, next) => {
     }
 
     const registrations = await RepeatSubjectRegistration.find({
-      registrationStatus: 'EXAM_OFFICER_REVIEW',
+      registrationStatus: 'EXAM_OFFICER_APPROVED',
       adminApprovalStatus: 'PENDING'
     })
     .populate('student', 'name studentId department')
@@ -552,7 +763,7 @@ exports.adminApproveApplication = async (req, res, next) => {
 
     const registration = await RepeatSubjectRegistration.findOne({
       _id: req.params.id,
-      registrationStatus: 'EXAM_OFFICER_REVIEW',
+      registrationStatus: 'EXAM_OFFICER_APPROVED',
       adminApprovalStatus: 'PENDING'
     });
 
@@ -570,7 +781,7 @@ exports.adminApproveApplication = async (req, res, next) => {
         stage: 'ADMIN_APPROVED',
         status: 'COMPLETED',
         timestamp: new Date(),
-        performedBy: req.user.id,
+        actedBy: req.user.id,
         comments: reason || 'Admin approved the registration'
       });
     } else if (action === 'REJECT') {
@@ -580,7 +791,7 @@ exports.adminApproveApplication = async (req, res, next) => {
         stage: 'ADMIN_REJECTED',
         status: 'COMPLETED',
         timestamp: new Date(),
-        performedBy: req.user.id,
+        actedBy: req.user.id,
         comments: reason || 'Admin rejected the registration'
       });
     }
@@ -613,28 +824,31 @@ exports.adminApproveApplication = async (req, res, next) => {
 // 6. EXAM OFFICER FEE ALLOCATION
 // ================================
 
+// ================================
+// 5. BURSAR WORKFLOW
+// ================================
+
 /**
- * @desc    Get registrations ready for fee allocation
- * @route   GET /api/repeat-registration/exam-officer/fee-pending
- * @access  Private/Exam Officer
- * @scenario Exam Officer sees approved registrations ready for fee allocation
+ * @desc    Get registrations pending fee allocation
+ * @route   GET /api/repeat-registration/bursar/pending
+ * @access  Private/Bursar
  */
-exports.getPendingFeeAllocations = async (req, res, next) => {
+exports.getPendingBursarReviews = async (req, res, next) => {
   try {
-    if (req.user.role !== 'exam_officer') {
+    if (req.user.role !== 'bursar') {
       return res.status(403).json({
         success: false,
-        message: 'Access denied. Exam Officer role required.'
+        message: 'Access denied. Bursar role required.'
       });
     }
 
     const registrations = await RepeatSubjectRegistration.find({
-      registrationStatus: 'ADMIN_APPROVED',
+      registrationStatus: 'EXAM_OFFICER_APPROVED',
       feeAllocationStatus: 'PENDING'
     })
     .populate('student', 'name studentId department email')
     .populate('subject', 'name code')
-    .sort({ adminApprovedAt: -1 });
+    .sort({ examOfficerReviewedAt: -1 });
 
     res.status(200).json({
       success: true,
@@ -647,37 +861,35 @@ exports.getPendingFeeAllocations = async (req, res, next) => {
 };
 
 /**
- * @desc    Exam Officer allocates fees for repeat examination
- * @route   PUT /api/repeat-registration/:id/allocate-fees
- * @access  Private/Exam Officer
- * @scenario Exam Officer sets the fee amount and notifies student
+ * @desc    Bursar allocates fees for repeat examination
+ * @route   PUT /api/repeat-registration/:id/bursar-allocate-fees
+ * @access  Private/Bursar
  */
-exports.allocateRepeatFees = async (req, res, next) => {
+exports.bursarAllocateFees = async (req, res, next) => {
   try {
-    const { feeAmount, comments } = req.body;
+    const { amount, comments } = req.body;
 
     const registration = await RepeatSubjectRegistration.findOne({
       _id: req.params.id,
-      registrationStatus: 'ADMIN_APPROVED',
+      registrationStatus: 'EXAM_OFFICER_APPROVED',
       feeAllocationStatus: 'PENDING'
-    });
+    }).populate('subject');
 
     if (!registration) {
       return res.status(404).json({
         success: false,
-        message: 'Registration not found or not ready for fee allocation'
+        message: 'Registration not found or already processed'
       });
     }
 
-    // Generate invoice number
-    const invoiceNumber = `REP-${Date.now()}-${registration._id.toString().slice(-6).toUpperCase()}`;
+    const invoiceNumber = `REP-${Date.now()}-${registration._id.toString().slice(-4).toUpperCase()}`;
 
     registration.registrationStatus = 'FEE_ALLOCATED';
     registration.feeAllocationStatus = 'ALLOCATED';
     registration.feeAllocatedBy = req.user.id;
     registration.feeAllocatedAt = new Date();
     registration.feeAllocationComments = comments;
-    registration.repeatFeeAmount = feeAmount || 2500;
+    registration.repeatFeeAmount = amount || 2000;
     registration.invoiceNumber = invoiceNumber;
     registration.feeStatus = 'PENDING';
 
@@ -685,25 +897,40 @@ exports.allocateRepeatFees = async (req, res, next) => {
       stage: 'FEE_ALLOCATED',
       status: 'COMPLETED',
       timestamp: new Date(),
-      performedBy: req.user.id,
-      comments: `Fee allocated: LKR ${feeAmount || 2500}, Invoice: ${invoiceNumber}`
+      actedBy: req.user.id,
+      comments: `Bursar allocated fee: LKR ${amount || 2000}. Invoice: ${invoiceNumber}`
+    });
+
+    // Create Finance record so it shows up in Student Fees page
+    await Finance.create({
+      student: registration.student,
+      title: 'exam_fee',
+      amount: amount || 2000,
+      dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
+      semester: registration.semester,
+      academicYear: registration.academicYear,
+      description: `Repeat examination registration fee for ${registration.subjectName} (${registration.subjectCode}). Invoice: ${invoiceNumber}`,
+      createdBy: req.user.id,
+      relatedRecordId: registration._id,
+      relatedRecordType: 'RepeatRegistration'
     });
 
     await registration.save();
-    await registration.populate(['student', 'subject', 'feeAllocatedBy']);
-
-    // Send email notification to student with fee details
-    await emailService.sendRepeatFeeDueNotification(registration);
+    
+    const student = await User.findById(registration.student);
+    await emailService.sendRepeatApplicationFeeAllocated(student, registration);
 
     res.status(200).json({
       success: true,
-      message: 'Fees allocated successfully. Student notified.',
+      message: 'Fees allocated successfully and student notified',
       data: registration
     });
   } catch (error) {
     next(error);
   }
 };
+
+
 
 // ================================
 // 7. STUDENT PAYMENT
@@ -744,7 +971,7 @@ exports.submitPaymentProof = async (req, res, next) => {
       stage: 'PAYMENT_SUBMITTED',
       status: 'COMPLETED',
       timestamp: new Date(),
-      performedBy: req.user.id,
+      actedBy: req.user.id,
       comments: `Payment proof submitted. Reference: ${paymentReference}`
     });
 
@@ -809,62 +1036,51 @@ exports.getPendingPaymentVerifications = async (req, res, next) => {
  */
 exports.verifyPayment = async (req, res, next) => {
   try {
-    const { action, comments } = req.body; // action: 'APPROVE' or 'REJECT'
+    const { action, comments } = req.body; // action: 'VERIFY' or 'REJECT'
 
-    const registration = await RepeatSubjectRegistration.findOne({
-      _id: req.params.id,
-      registrationStatus: 'PAYMENT_SUBMITTED',
-      feeStatus: 'PAYMENT_SUBMITTED'
-    });
+    const registration = await RepeatSubjectRegistration.findById(req.params.id);
 
-    if (!registration) {
+    if (!registration || registration.registrationStatus !== 'PAYMENT_SUBMITTED') {
       return res.status(404).json({
         success: false,
-        message: 'Registration not found or payment already verified'
+        message: 'Payment submission not found for verification'
       });
     }
 
-    if (action === 'APPROVE') {
-      registration.registrationStatus = 'PAYMENT_VERIFIED';
-      registration.feeStatus = 'PAYMENT_VERIFIED';
-      registration.paymentVerifiedAt = new Date();
-      registration.paymentVerifiedBy = req.user.id;
-      registration.paymentVerificationComments = comments;
-
+    if (action === 'VERIFY') {
+      registration.registrationStatus = 'COMPLETED';
+      registration.feeStatus = 'PAID';
       registration.workflowHistory.push({
-        stage: 'PAYMENT_VERIFIED',
+        stage: 'COMPLETED',
         status: 'COMPLETED',
         timestamp: new Date(),
-        performedBy: req.user.id,
-        comments: comments || 'Payment verified successfully'
+        actedBy: req.user.id,
+        comments: comments || 'Exam Officer verified payment and finalized registration'
       });
-
-      // Send email notification to student
-      await emailService.sendRepeatPaymentVerifiedNotification(registration);
-
-    } else if (action === 'REJECT') {
-      registration.registrationStatus = 'PAYMENT_PENDING';
+      
+      const student = await User.findById(registration.student);
+      await emailService.sendRepeatFinalApprovalNotification(student, registration);
+    } else {
+      registration.registrationStatus = 'REJECTED';
       registration.feeStatus = 'PAYMENT_REJECTED';
-      registration.paymentVerificationComments = comments;
-
       registration.workflowHistory.push({
         stage: 'PAYMENT_REJECTED',
         status: 'COMPLETED',
         timestamp: new Date(),
-        performedBy: req.user.id,
-        comments: comments || 'Payment verification failed'
+        actedBy: req.user.id,
+        comments: comments || 'Exam Officer rejected the payment proof'
       });
-
-      // Send email notification to student
-      await emailService.sendRepeatPaymentRejectedNotification(registration, comments);
     }
 
+    registration.paymentVerifiedBy = req.user.id;
+    registration.paymentVerifiedAt = new Date();
+    registration.paymentVerificationComments = comments;
+
     await registration.save();
-    await registration.populate(['student', 'subject', 'paymentVerifiedBy']);
 
     res.status(200).json({
       success: true,
-      message: `Payment ${action.toLowerCase()}d`,
+      message: `Payment ${action.toLowerCase()}ied successfully`,
       data: registration
     });
   } catch (error) {
@@ -948,7 +1164,7 @@ exports.allocateExamSlot = async (req, res, next) => {
       stage: 'EXAM_SCHEDULED',
       status: 'COMPLETED',
       timestamp: new Date(),
-      performedBy: req.user.id,
+      actedBy: req.user.id,
       comments: `Exam scheduled: ${examDate} ${examTime} at ${venue}, Code: ${examCode}`
     });
 

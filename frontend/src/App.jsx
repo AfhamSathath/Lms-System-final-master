@@ -92,12 +92,19 @@ import RegistrarDashboard from './pages/registrar/dashboard';
 import RegistrarEnrollment from './pages/registrar/enrollment';
 
 // Bursary Pages
-import BursarDashboard from './pages/bursar/dashboard';
-import BursarRevenue from './pages/bursar/revenue';
-
-// Exam Officer Pages
 import ExamOfficerDashboard from './pages/examOfficer/dashboard';
 import ExamOfficerCertification from './pages/examOfficer/certification';
+import ExamOfficerRepeatApprovals from './pages/examOfficer/repeatApprovals';
+import ExamOfficerVerifyPayments from './pages/examOfficer/verifyPayments';
+
+// Bursar Pages
+import BursarDashboard from './pages/bursar/dashboard';
+import BursarRevenue from './pages/bursar/revenue';
+import BursarRepeatFees from './pages/bursar/repeatExamFees';
+
+// Additional Pages
+import LecturerRepeatApprovals from './pages/lecturer/repeatApprovals';
+
 
 
 function App() {
@@ -193,7 +200,9 @@ function MainRoutes() {
         <Route path="attendance" element={<LecturerAttendance />} />
         <Route path="assignments" element={<LecturerAssignmentsPage />} />
         <Route path="results" element={<LecturerResults />} />
+        <Route path="repeats" element={<LecturerRepeatApprovals />} />
       </Route>
+
 
       {/* Admin Routes */}
       <Route path="admin" element={<PrivateRoute role="admin" />}>
@@ -244,15 +253,20 @@ function MainRoutes() {
       <Route path="bursar" element={<PrivateRoute role="bursar" />}>
         <Route path="dashboard" element={<BursarDashboard />} />
         <Route path="revenue" element={<BursarRevenue />} />
+        <Route path="repeats" element={<BursarRepeatFees />} />
         <Route path="profile" element={<AdminProfile />} />
       </Route>
+
 
       {/* Exam Officer Routes */}
       <Route path="exam_officer" element={<PrivateRoute role="exam_officer" />}>
         <Route path="dashboard" element={<ExamOfficerDashboard />} />
         <Route path="certification" element={<ExamOfficerCertification />} />
+        <Route path="repeats" element={<ExamOfficerRepeatApprovals />} />
+        <Route path="verify-payments" element={<ExamOfficerVerifyPayments />} />
         <Route path="profile" element={<AdminProfile />} />
       </Route>
+
 
       {/* Catch all */}
       <Route path="*" element={<Navigate to="/" />} />

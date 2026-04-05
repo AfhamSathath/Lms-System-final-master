@@ -41,7 +41,7 @@ exports.registerRepeat = async (req, res, next) => {
     // Automatically trigger a finance record (Repeat Fee)
     await Finance.create({
       student: req.user.id || req.user._id,
-      title: 'repeat_fee',
+      title: 'exam_fee',
       description: `Repeat Exam Fee: ${courseData?.name || course}`,
       amount: 100, // Hardcoded for simulation
       dueDate: new Date(Date.now() + (7 * 24 * 60 * 60 * 1000)), // 7 days from now

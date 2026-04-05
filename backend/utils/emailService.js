@@ -576,7 +576,6 @@ class EmailService {
   }
 
 
-
   /**
    * Send to HOD for application review
    */
@@ -615,6 +614,119 @@ class EmailService {
 
     return await this.sendEmail({ email: hod.email, subject: `HOD Review Required: ${registration.studentName} - ${registration.subjectCode}`, html });
   }
+
+  /**
+   * Send to Lecturer for application review
+   */
+  async sendRepeatSubjectSubmissionToLecturer(lecturer, registration) {
+    const html = `
+      <h2 style="font-size: 22px; font-weight: 900; color: #1e40af; margin-top: 0;">Action Required: Repeat Subject Approval</h2>
+      <p>Dear ${lecturer.name},</p>
+      <p>A student has submitted a repeat registration for <strong>${registration.subjectName} (${registration.subjectCode})</strong>. Your professional assessment based on attendance and previous performance is required.</p>
+      
+      <div style="background: #f1f5f9; border: 1px solid #cbd5e1; padding: 20px; margin: 20px 0; border-radius: 8px;">
+        <p style="margin: 0; font-size: 14px; font-weight: bold; color: #1e3a8a;">Student Details:</p>
+        <p style="margin: 8px 0;">
+          <strong>Name:</strong> ${registration.studentName}<br/>
+          <strong>Index:</strong> ${registration.studentIndex}<br/>
+          <strong>Previous Grade:</strong> ${registration.previousAttempt.grade}<br/>
+          <strong>Attendance:</strong> ${registration.previousAttempt.attendancePercentage}%
+        </p>
+      </div>
+
+      <a href="${process.env.FRONTEND_URL}/lecturer/repeat-applications/${registration._id}" style="display: inline-block; background: #1e40af; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; margin-top: 15px;">Review & Approve</a>
+    `;
+
+    return await this.sendEmail({ email: lecturer.email, subject: `Lecturer Approval Required: Repeat Exam - ${registration.studentName}`, html });
+  }
+
+  /**
+   * Send to student when Lecturer approves
+   */
+  async sendRepeatApplicationLecturerApproved(student, registration) {
+    const html = `
+      <h2 style="font-size: 22px; font-weight: 900; color: #059669; margin-top: 0;">Lecturer Approval Granted ✓</h2>
+      <p>Dear <strong>${student.name}</strong>,</p>
+      <p>Your subject lecturer has approved your repeat application for <strong>${registration.subjectCode}</strong>. It has now been forwarded to the Head of Department (HOD) for the next stage of approval.</p>
+      <div style="background: #f0fdf4; border: 1px solid #86efac; padding: 15px; margin: 20px 0; border-radius: 8px;">
+        <p style="margin: 0; color: #166534;"><strong>Status:</strong> Awaiting HOD Approval</p>
+      </div>
+    `;
+
+    return await this.sendEmail({ email: student.email, subject: 'Repeat Application Update: Lecturer Approved', html });
+  }
+
+  /**
+   * Send to student when Exam Officer approves
+   */
+  async sendRepeatApplicationExamOfficerApproved(student, registration) {
+    const html = `
+      <h2 style="font-size: 22px; font-weight: 900; color: #059669; margin-top: 0;">Exam Officer Authorization ✓</h2>
+      <p>Dear <strong>${student.name}</strong>,</p>
+      <p>The Examination Office has authorized your repeat registration. Your application is now with the Bursar/Finance Office for fee allocation.</p>
+      <p>You will be notified once the required fees are posted to your dashboard.</p>
+    `;
+
+    return await this.sendEmail({ email: student.email, subject: 'Repeat Application Update: Exam Officer Authorized', html });
+  }
+
+  /**
+   * Send to student when Bursar allocates fees
+   */
+  async sendRepeatApplicationFeeAllocated(student, registration) {
+    const html = `
+      <h2 style="font-size: 22px; font-weight: 900; color: #1e3a8a; margin-top: 0;">Fee Allocation Notice</h2>
+      <p>Dear <strong>${student.name}</strong>,</p>
+      <p>Repeat examination fees have been allocated for <strong>${registration.subjectCode}</strong>. Please visit your Fees Management dashboard to settle the payment.</p>
+      <div style="background: #f1f5f9; padding: 20px; border-radius: 12px; margin: 20px 0; border: 1px solid #e2e8f0;">
+         <p style="margin: 0 0 10px 0;"><strong>Invoice ID:</strong> ${registration.invoiceNumber}</p>
+         <p style="margin: 0;"><strong>Total Amount:</strong> <span style="font-family: monospace; color: #1e3a8a; font-weight: 800;">LKR ${registration.repeatFeeAmount.toFixed(2)}</span></p>
+      </div>
+      <a href="${process.env.FRONTEND_URL}/student/fees" style="display: inline-block; background-color: #1e3a8a; color: white; padding: 14px 40px; text-decoration: none; border-radius: 8px; font-weight: 800; font-size: 14px; text-transform: uppercase;">Pay Fees Now</a>
+    `;
+
+    return await this.sendEmail({ email: student.email, subject: 'Action Required: Repeat Fees Allocated', html });
+  }
+
+  /**
+   * Send to Exam Officer after card payment
+   */
+  async sendRepeatPaymentVoucherToExamOfficer(examOfficer, student, registration) {
+    const html = `
+      <h2 style="font-size: 20px; font-weight: 900; color: #1e40af; margin-top: 0;">Payment Verification Required</h2>
+      <p>Exam Officer,</p>
+      <p>Student <strong>${student.name}</strong> has completed a card payment for a repeat examination. A digital payment voucher has been generated and attached for your verification.</p>
+      <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 25px; border-radius: 12px; margin: 30px 0;">
+         <p style="margin: 0 0 10px 0;"><strong>Student:</strong> ${student.name} (${student.studentId})</p>
+         <p style="margin: 0;"><strong>Subject:</strong> ${registration.subjectCode} - ${registration.subjectName}</p>
+      </div>
+    `;
+
+    return await this.sendEmail({ 
+      email: examOfficer.email, 
+      subject: `Payment Verification: Repeat Exam - ${student.studentId}`, 
+      html,
+      // Note: Real PDF attachment logic would go here
+    });
+  }
+
+  /**
+   * Final approval notification to student
+   */
+  async sendRepeatFinalApprovalNotification(student, registration) {
+    const html = `
+      <h2 style="font-size: 24px; font-weight: 900; color: #059669; margin-top: 0;">Application Finalized ✓</h2>
+      <p>Dear <strong>${student.name}</strong>,</p>
+      <p>Your repeat examination registration for <strong>${registration.subjectCode} - ${registration.subjectName}</strong> has been successfully verified and fully approved.</p>
+      <p>You are now officially registered for this examination session. Please monitor the timetable for scheduling details.</p>
+      <div style="background: #f0fdf4; border: 2px solid #86efac; padding: 15px; border-radius: 12px; margin: 30px 0; text-align: center;">
+         <p style="margin: 0; font-weight: 800; color: #166534;">REGISTRATION STATUS: AUTHORIZED & COMPLETED</p>
+      </div>
+    `;
+
+    return await this.sendEmail({ email: student.email, subject: 'Confirmed: Repeat Examination Registration Finalized', html });
+  }
+
 
   /**
    * Send to student when HOD approves

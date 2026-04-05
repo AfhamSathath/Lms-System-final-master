@@ -50,6 +50,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         { name: 'Progress', path: 'progress', icon: FiTrendingUp },
         { name: 'Exam Schedule', path: 'timetable', icon: FiCalendar },
         { name: 'Student Results', path: 'results', icon: FiBarChart2 },
+        { name: 'Repeat Approvals', path: 'repeats', icon: FiRefreshCw },
         { name: 'Notifications', path: 'notifications', icon: FiBell },
         { name: 'My Profile', path: 'profile', icon: FiUser }
         ];
@@ -96,6 +97,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         return [...common,
         { name: 'Revenue', path: 'revenue', icon: FiDollarSign },
         { name: 'Student Accounts', path: 'accounts', icon: FiTrendingUp },
+        { name: 'Repeat Fees', path: 'repeats', icon: FiRefreshCw },
         { name: 'Refunds', path: 'refunds', icon: FiActivity },
         { name: 'My Profile', path: 'profile', icon: FiUser }
         ];
@@ -103,6 +105,8 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         return [...common,
         { name: 'Result Processing', path: 'results', icon: FiAward },
         { name: 'Timetables', path: 'timetables', icon: FiCalendar },
+        { name: 'Repeat Approvals', path: 'repeats', icon: FiRefreshCw },
+        { name: 'Verify Payments', path: 'verify-payments', icon: FiCheckSquare },
         { name: 'Certificates', path: 'certification', icon: FiFile },
         { name: 'My Profile', path: 'profile', icon: FiUser }
         ];

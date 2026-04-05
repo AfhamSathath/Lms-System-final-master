@@ -28,8 +28,12 @@ const financeSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['pending', 'paid', 'overdue', 'partially_paid', 'cancelled'],
+    enum: ['pending', 'paid', 'overdue', 'partially_paid', 'cancelled', 'payment_submitted'],
     default: 'pending'
+  },
+  paymentSlip: {
+    type: String,
+    trim: true
   },
   paymentHistory: [{
     amount: Number,
@@ -52,6 +56,13 @@ const financeSchema = new mongoose.Schema({
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
+  },
+  relatedRecordId: {
+    type: mongoose.Schema.Types.ObjectId
+  },
+  relatedRecordType: {
+    type: String,
+    enum: ['RepeatRegistration', 'Enrollment', 'Other']
   }
 }, {
   timestamps: true
