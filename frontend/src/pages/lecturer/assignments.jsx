@@ -21,7 +21,7 @@ const LecturerAssignments = () => {
 
   useEffect(() => {
     if (!subjectId) {
-      navigate('/lecturer/subjects');
+      navigate('/lecturer/dashboard');
       return;
     }
     fetchStudents();
@@ -74,7 +74,7 @@ const LecturerAssignments = () => {
             onClick={() => navigate(-1)}
             className="flex items-center text-slate-400 hover:text-rose-500 font-bold text-xs uppercase tracking-widest mb-4 transition-colors"
           >
-            <FiArrowLeft className="mr-1" /> Back to Subjects
+            <FiArrowLeft className="mr-1" /> Back to Dashboard
           </button>
           <h1 className="text-4xl font-extrabold text-slate-800 tracking-tight leading-none uppercase">Academic Grading</h1>
           <p className="text-slate-500 mt-2 font-black uppercase tracking-widest text-[10px]">{subjectName}</p>

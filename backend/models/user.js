@@ -35,6 +35,10 @@ const userSchema = new mongoose.Schema({
     uppercase: true,
     trim: true
   },
+  batch: {
+    type: String,
+    trim: true
+  },
   // Staff specific fields
   lecturerId: {
     type: String,
@@ -44,6 +48,10 @@ const userSchema = new mongoose.Schema({
     trim: true
   },
   department: {
+    type: String,
+    trim: true
+  },
+  faculty: {
     type: String,
     trim: true
   },
@@ -100,6 +108,12 @@ const userSchema = new mongoose.Schema({
   emailNotifications: {
     type: Boolean,
     default: true
+  },
+  bankDetails: {
+    bankName: { type: String, trim: true },
+    branchName: { type: String, trim: true },
+    accountHolderName: { type: String, trim: true },
+    accountNumber: { type: String, trim: true }
   }
 }, {
   timestamps: true
@@ -134,4 +148,4 @@ userSchema.set('toJSON', {
   }
 });
 
-module.exports = mongoose.model('User', userSchema);
+module.exports = mongoose.models.User || mongoose.model('User', userSchema);

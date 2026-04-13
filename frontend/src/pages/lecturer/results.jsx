@@ -54,7 +54,7 @@ const LecturerResults = () => {
             onClick={() => navigate(-1)}
             className="flex items-center text-slate-400 hover:text-indigo-600 font-bold text-xs uppercase tracking-widest mb-3 transition-colors"
           >
-            <FiArrowLeft className="mr-2" /> Back to Subjects
+            <FiArrowLeft className="mr-2" /> Back to Dashboard
           </button>
           <h1 className="text-4xl font-black text-slate-900 uppercase tracking-tight">Student Results</h1>
           <p className="text-sm uppercase tracking-[0.32em] text-slate-500 mt-2">{subjectName || 'All published results for your courses'}</p>
@@ -134,10 +134,10 @@ const LecturerResults = () => {
           <div className="bg-white rounded-[3rem] shadow-2xl border border-slate-100 p-6">
             <h3 className="text-lg font-bold text-slate-900 mb-3">Quick actions</h3>
             <button
-              onClick={() => navigate('/lecturer/subjects')}
+              onClick={() => navigate('/lecturer/dashboard')}
               className="w-full text-left bg-slate-900 text-white py-4 rounded-3xl font-black uppercase tracking-[0.2em] hover:bg-indigo-600 transition-colors flex items-center justify-between gap-3"
             >
-              <span>Back to subject board</span>
+              <span>Back to dashboard</span>
               <FiChevronRight />
             </button>
           </div>

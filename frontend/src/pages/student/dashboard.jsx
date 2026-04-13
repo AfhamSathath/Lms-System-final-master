@@ -219,6 +219,21 @@ const StudentDashboard = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      {/* Enrollment Alert */}
+      {stats.subjects.length === 0 && (
+        <div className="bg-amber-50 border-l-4 border-amber-500 rounded-lg p-6 mb-8 shadow-sm">
+          <div className="flex items-center gap-4">
+             <div className="bg-amber-100 p-3 rounded-2xl text-amber-600 text-2xl animate-pulse">
+                <FiAlertCircle />
+             </div>
+             <div>
+                <h3 className="text-lg font-black text-amber-800 uppercase tracking-tight">Subject Enrollment Pending</h3>
+                <p className="text-amber-700 font-medium text-sm">You are not currently enrolled in any academic subjects. Please contact your lecturer or HOD to complete your semester enrollment and gain access to course materials.</p>
+             </div>
+          </div>
+        </div>
+      )}
+
       {/* Welcome Section */}
       <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl shadow-xl p-8 mb-8 text-white">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between">

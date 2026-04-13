@@ -40,6 +40,8 @@ exports.protect = async (req, res, next) => {
       }
 
       req.user = user;
+      // Add id property for consistency (Mongoose uses _id)
+      req.user.id = user._id.toString();
       
       if (user.role === 'dean') {
         const Faculty = require('../models/Faculty');

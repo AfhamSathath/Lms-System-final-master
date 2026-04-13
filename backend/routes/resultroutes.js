@@ -3,7 +3,7 @@ const router = express.Router();
 const multer = require('multer');
 
 const { protect, authorize } = require('../middleware/auth');
-const resultcontroller = require('../controllers/resultcontroller');
+const resultController = require('../controllers/resultController');
 
 const {
   getResults,
@@ -20,7 +20,7 @@ const {
   bulkDeleteResults,
   bulkCreateResults,
   getResult,
-} = resultcontroller;
+} = resultController;
 
 // ================= MULTER SETUP =================
 // Store file in memory (best for Excel processing)
@@ -38,7 +38,7 @@ router.get('/student/:studentId', protect, getStudentResults);
 router.get('/transcript/:studentId', getTranscript);
 
 // ================= PDF DOWNLOAD ROUTE =================
-router.get('/download/:fileName', protect, resultcontroller.downloadResultPDF);
+router.get('/download/:fileName', protect, resultController.downloadResultPDF);
 
 // ================= ADMIN STATISTICS ROUTES =================
 router.get('/department/stats', authorize('admin'), getDepartmentStats);

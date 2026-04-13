@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const connectDB = require('../config/database');
-const User = require('../models/User');
+const User = require('../models/user');
 const Subject = require('../models/course');
 const LecturerAssignment = require('../models/LecturerAssignment');
 

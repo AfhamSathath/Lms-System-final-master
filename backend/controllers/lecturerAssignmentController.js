@@ -111,24 +111,67 @@ exports.getLecturerSubjects = async (req, res, next) => {
     const { lecturerId } = req.params;
     const { semester, academicYear } = req.query;
 
-    // ensure lecturer only sees their own data unless admin
-    if (req.user.role !== 'admin' && req.user.id !== lecturerId && req.user._id.toString() !== lecturerId) {
+    // ensure lecturer only sees their own data unless admin/hod
+    if (req.user.role !== 'admin' && req.user.role !== 'hod' && req.user.id !== lecturerId && req.user._id.toString() !== lecturerId) {
       return res.status(403).json({ success: false, message: 'Not authorized' });
     }
 
-    // Build filter
+    // 1. Find all subjects in the Subject collection assigned to this lecturer
+    const Course = mongoose.model('Subject');
+    const primarySubjects = await Course.find({ 
+      lecturer: lecturerId,
+      isActive: true 
+    });
+
+    // 2. Build filter for tracking assignments
     const filter = {
       lecturer: lecturerId,
       isActive: true
     };
-
     if (semester) filter.semester = semester;
     if (academicYear) filter.academicYear = academicYear;
 
-    // Get assignments
-    const assignments = await LecturerAssignment.find(filter)
-      .populate('subject', 'name code credits semester')
+    // 3. Get existing assignments
+    let assignments = await LecturerAssignment.find(filter)
+      .populate('subject', 'name code credits semester year department category')
       .sort({ createdAt: -1 });
+
+    // 4. SELF-HEALING: Check if any primary subjects are missing from tracking assignments
+    const trackedSubjectIds = assignments.map(a => a.subject?._id?.toString() || a.subject?.toString());
+    const missingSubjects = primarySubjects.filter(s => !trackedSubjectIds.includes(s._id.toString()));
+
+    if (missingSubjects.length > 0) {
+      console.log(`Self-healing: Creating ${missingSubjects.length} missing assignment records for lecturer ${lecturerId}`);
+      for (const sub of missingSubjects) {
+        try {
+          const newAssign = await LecturerAssignment.create({
+            lecturer: lecturerId,
+            subject: sub._id,
+            department: sub.department,
+            academicYear: sub.year,
+            semester: sub.semester,
+            startDate: new Date(),
+            endDate: new Date(new Date().setMonth(new Date().getMonth() + 4)),
+            curriculum: {
+              totalLectures: 30,
+              totalPracticals: sub.category === 'Practical' ? 15 : 0,
+              totalAssignments: 5
+            },
+            qualifications: {
+              minimumQualification: 'B.Sc'
+            },
+            status: 'active',
+            isActive: true
+          });
+          
+          // Re-fetch or add to list
+          const populated = await LecturerAssignment.findById(newAssign._id).populate('subject', 'name code credits semester year department category');
+          assignments.unshift(populated);
+        } catch (err) {
+          console.error(`Failed to heal assignment for subject ${sub.code}:`, err.message);
+        }
+      }
+    }
 
     res.status(200).json({
       success: true,
@@ -368,7 +411,6 @@ exports.getAllAssignments = async (req, res, next) => {
     const assignments = await LecturerAssignment.find(filter)
       .populate('lecturer', 'name email lecturerId department')
       .populate('subject', 'name code credits')
-      .populate('department', 'name')
       .skip(skip)
       .limit(parseInt(limit))
       .sort({ createdAt: -1 });
@@ -386,6 +428,76 @@ exports.getAllAssignments = async (req, res, next) => {
     res.status(500).json({
       success: false,
       message: 'Error fetching assignments',
+      error: error.message
+    });
+  }
+};
+
+/* =====================================================
+   Update Assignment Details
+===================================================== */
+exports.updateAssignment = async (req, res, next) => {
+  try {
+    const { assignmentId } = req.params;
+    const { 
+      startDate, 
+      endDate, 
+      curriculum, 
+      qualifications, 
+      notes,
+      lecturerId,
+      status
+    } = req.body;
+
+    const assignment = await LecturerAssignment.findById(assignmentId);
+    if (!assignment) {
+      return res.status(404).json({ success: false, message: 'Assignment not found' });
+    }
+
+    // Update basic info
+    if (startDate) assignment.startDate = startDate;
+    if (endDate) assignment.endDate = endDate;
+    if (notes !== undefined) assignment.notes = notes;
+    if (status) assignment.status = status;
+    if (lecturerId) assignment.lecturer = lecturerId;
+
+    // Update curriculum
+    if (curriculum) {
+      if (curriculum.totalLectures !== undefined) assignment.curriculum.totalLectures = Number(curriculum.totalLectures);
+      if (curriculum.totalPracticals !== undefined) assignment.curriculum.totalPracticals = Number(curriculum.totalPracticals);
+      if (curriculum.totalAssignments !== undefined) assignment.curriculum.totalAssignments = Number(curriculum.totalAssignments);
+      
+      // Re-calculate progress percentage
+      const totalItems = assignment.curriculum.totalLectures +
+        assignment.curriculum.totalPracticals +
+        assignment.curriculum.totalAssignments;
+      const completedItems = assignment.curriculum.lecturesCompleted +
+        assignment.curriculum.practicalsCompleted +
+        assignment.curriculum.assignmentsCompleted;
+      assignment.curriculum.progressPercentage = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
+    }
+
+    // Update qualifications
+    if (qualifications) {
+      if (qualifications.minimumQualification) assignment.qualifications.minimumQualification = qualifications.minimumQualification;
+    }
+
+    await assignment.save();
+    
+    const updated = await LecturerAssignment.findById(assignmentId)
+      .populate('lecturer', 'name email lecturerId department')
+      .populate('subject', 'name code credits');
+
+    res.status(200).json({
+      success: true,
+      message: 'Assignment updated successfully',
+      data: updated
+    });
+  } catch (error) {
+    console.error('Error updating assignment:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error updating assignment',
       error: error.message
     });
   }

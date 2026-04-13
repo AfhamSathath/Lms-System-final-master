@@ -2,7 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const { body } = require('express-validator');
-const userController = require('../controllers/usercontroller');
+const userController = require('../controllers/userController');
 const { protect, authorize } = require('../middleware/auth');
 const path = require('path');
 const multer = require('multer');
@@ -48,8 +48,7 @@ router.post(
     body('studentId').if(body('role').equals('student')).notEmpty().withMessage('Student ID is required for students'),
     body('lecturerId').if(body('role').isIn(['lecturer', 'hod', 'dean', 'registrar', 'bursar', 'exam_officer', 'librarian'])).notEmpty().withMessage('Employee ID is required for staff roles'),
     body('department').if(body('role').not().equals('admin')).notEmpty().withMessage('Department is required'),
-    body('semester').if(body('role').equals('student')).isInt({ min: 1, max: 8 }).withMessage('Semester must be between 1-8'),
-    body('yearOfStudy').if(body('role').equals('student')).isInt({ min: 1, max: 5 }).withMessage('Year of study must be between 1-5'),
+
     body('qualifications').optional().isString().withMessage('Qualifications must be a string'),
     body('specialization').optional().isString().withMessage('Specialization must be a string'),
     body('gender').optional().isIn(['male', 'female', 'other']).withMessage('Gender must be male, female, or other'),
@@ -75,7 +74,7 @@ router.post(
 router.post(
   '/',
   protect,
-  authorize('admin'),
+  authorize('admin', 'registrar'),
   [
     body('name').notEmpty().withMessage('Name is required'),
     body('email').isEmail().withMessage('Please enter a valid email'),
@@ -84,8 +83,10 @@ router.post(
     body('studentId').if(body('role').equals('student')).notEmpty().withMessage('Student ID is required for students'),
     body('lecturerId').if(body('role').isIn(['lecturer', 'hod', 'dean', 'registrar', 'bursar', 'exam_officer', 'librarian'])).notEmpty().withMessage('Employee ID is required for staff roles'),
     body('department').if(body('role').not().equals('admin')).notEmpty().withMessage('Department is required'),
-    body('semester').if(body('role').equals('student')).isInt({ min: 1, max: 8 }).withMessage('Semester must be between 1-8'),
-    body('yearOfStudy').if(body('role').equals('student')).isInt({ min: 1, max: 5 }).withMessage('Year of study must be between 1-5'),
+    body('batch').if(body('role').equals('student')).notEmpty().withMessage('Batch is required for students'),
+    body('yearOfStudy').if(body('role').equals('student')).optional().isInt({ min: 1, max: 5 }).withMessage('Year of study must be between 1-5'),
+    body('semester').if(body('role').equals('student')).optional().isInt({ min: 1, max: 8 }).withMessage('Semester must be between 1-8'),
+
     body('qualifications').optional().isString().withMessage('Qualifications must be a string'),
     body('specialization').optional().isString().withMessage('Specialization must be a string'),
     body('gender').optional().isIn(['male', 'female', 'other']).withMessage('Gender must be male, female, or other'),
@@ -98,25 +99,25 @@ router.post(
 );
 
 // Static Routes first to avoid shadowing by /:id
-router.get('/users', protect, authorize('admin'), userController.getUsers);
+router.get('/users', protect, authorize('admin', 'dean', 'hod'), userController.getUsers);
 router.put('/profile', protect, userController.updateProfile);
 router.post('/profile/picture', protect, uploadProfile.single('profilePicture'), userController.updateProfilePicture);
 router.delete('/profile/picture', protect, userController.deleteProfilePicture);
-router.get('/', protect, authorize('admin'), userController.getUserByRole);
+router.get('/', protect, authorize('admin', 'dean', 'hod', 'registrar'), userController.getUserByRole);
 
 // Parameter Routes
 router.delete('/:id', protect, authorize('admin'), userController.deleteUser);
-router.put('/:id', protect, authorize('admin'), userController.updateUser);
+router.put('/:id', protect, authorize('admin', 'dean', 'hod'), userController.updateUser);
 router.put('/:id/admin-reset-password', protect, authorize('admin'), userController.adminResetPassword);
 router.put('/:id/update-profile', protect, userController.updateProfile);
 router.put('/:id/update-password', protect, userController.updatePassword);
-router.put('/:id/toggle-status', protect, authorize('admin'), userController.toggleUserStatus);
-router.post('/:id/reset-password', protect, authorize('admin'), userController.resetPassword);
+router.put('/:id/toggle-status', protect, authorize('admin', 'dean', 'hod', 'registrar'), userController.toggleUserStatus);
+router.post('/:id/reset-password', protect, authorize('admin', 'dean', 'hod', 'registrar'), userController.resetPassword);
 
 // Bulk import & CSV export
-router.post('/bulk-import', protect, authorize('admin'), upload.single('file'), userController.bulkImportUsers);
-router.get('/export/csv', protect, authorize('admin'), userController.exportUsersCSV);
-router.delete('/bulk', protect, authorize('admin'), userController.bulkDeleteUsers);
+router.post('/bulk-import', protect, authorize('admin', 'registrar'), upload.single('file'), userController.bulkImportUsers);
+router.get('/export/csv', protect, authorize('admin', 'registrar'), userController.exportUsersCSV);
+router.delete('/bulk', protect, authorize('admin', 'registrar'), userController.bulkDeleteUsers);
 
 // ---------------- PRIVATE USER ROUTES ----------------
 router.use(protect);
@@ -142,8 +143,7 @@ router.post(
     body('studentId').if(body('role').equals('student')).notEmpty(),
     body('lecturerId').if(body('role').equals('lecturer')).notEmpty(),
     body('department').if(body('role').not().equals('admin')).notEmpty(),
-    body('semester').if(body('role').equals('student')).isInt({ min: 1, max: 8 }),
-    body('yearOfStudy').if(body('role').equals('student')).isInt({ min: 1, max: 5 }),
+
     body('qualifications').if(body('role').equals('lecturer')).notEmpty(),
     body('specialization').if(body('role').equals('lecturer')).notEmpty(),
     body('gender').isIn(['male', 'female', 'other'])

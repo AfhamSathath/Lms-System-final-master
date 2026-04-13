@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/Authcontext';
 import { FiMail, FiLock, FiEye, FiEyeOff } from 'react-icons/fi';
@@ -10,8 +10,15 @@ const Login = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
-  const navigate = useNavigate();
+   const { login, user, loading: authLoading } = useAuth();
+   const navigate = useNavigate();
+ 
+   useEffect(() => {
+     if (user && !authLoading) {
+       const rolePath = user.role === 'admin' ? 'registrar' : user.role;
+       navigate(`/${rolePath}/dashboard`);
+     }
+   }, [user, authLoading, navigate]);
 
   const handleChange = (e) => {
     setFormData({
@@ -26,7 +33,8 @@ const Login = () => {
     const result = await login(formData.email, formData.password);
     setLoading(false);
     if (result.success) {
-      navigate(`/${result.role}/dashboard`);
+      const rolePath = result.role === 'admin' ? 'registrar' : result.role;
+      navigate(`/${rolePath}/dashboard`);
     }
   };
 

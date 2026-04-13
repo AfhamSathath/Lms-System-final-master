@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const timetableController = require('../controllers/timetablecontroller');
+const timetableController = require('../controllers/timetableController');
 
 // Middleware for authentication (assuming you have one)
 const { protect } = require('../middleware/auth');

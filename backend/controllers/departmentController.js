@@ -166,17 +166,22 @@ exports.getDepartment = async (req, res, next) => {
       .populate('headOfDepartment', 'name email employeeId lecturerRank');
 
     if (!department) {
-      return res.status(404).json({
-        success: false,
-        message: 'Department not found'
-      });
-    }
-
-    // Check access
-    if (req.user.role === 'hod' && !hodDepartmentMatches(req.user.department, department)) {
-      return res.status(403).json({
-        success: false,
-        message: 'Access denied. You can only view your own department.'
+      // Return a virtual department object if not found in DB
+      return res.json({
+        success: true,
+        department: {
+          name: departmentId,
+          code: departmentId.substring(0, 3).toUpperCase(),
+          virtual: true
+        },
+        stats: {
+          students: await User.countDocuments({ department: departmentId, role: 'student', isActive: true }),
+          lecturers: await User.countDocuments({ department: departmentId, role: 'lecturer', isActive: true }),
+          courses: await Course.countDocuments({ department: departmentId, isActive: true }),
+          activeCourses: await Course.countDocuments({ department: departmentId, isActive: true })
+        },
+        recentCourses: [],
+        recentStaff: []
       });
     }
 
@@ -735,27 +740,28 @@ exports.getDepartmentCourses = async (req, res, next) => {
 
     // Resolve department from id/name/code
     const department = await Department.findOne(resolveDepartmentIdentifier(id));
-    if (!department) {
-      return res.status(404).json({ success: false, message: 'Department not found' });
+    
+    // Check access for HOD and dean if department object exists
+    if (department) {
+      if (req.user.role === 'hod' && !hodDepartmentMatches(req.user.department, department)) {
+        return res.status(403).json({
+          success: false,
+          message: 'Access denied. You can only view your own department courses.'
+        });
+      }
+
+      if (req.user.role === 'dean' && department.faculty?.toString() !== req.user.facultyManaged?.toString()) {
+        return res.status(403).json({
+          success: false,
+          message: 'Access denied. You can only view departments in your faculty.'
+        });
+      }
     }
 
-    // Check access for HOD and dean
-    if (req.user.role === 'hod' && !hodDepartmentMatches(req.user.department, department)) {
-      return res.status(403).json({
-        success: false,
-        message: 'Access denied. You can only view your own department courses.'
-      });
-    }
-
-    if (req.user.role === 'dean' && department.faculty?.toString() !== req.user.facultyManaged?.toString()) {
-      return res.status(403).json({
-        success: false,
-        message: 'Access denied. You can only view departments in your faculty.'
-      });
-    }
+    const searchDept = department ? [department.name, department._id, department._id.toString()] : [id];
 
     let query = {
-      department: { $in: [department.name, department._id, department._id.toString()] },
+      department: { $in: searchDept },
       isActive
     };
 
@@ -798,27 +804,28 @@ exports.getDepartmentStaff = async (req, res, next) => {
 
     // Resolve department from id/name/code
     const department = await Department.findOne(resolveDepartmentIdentifier(id));
-    if (!department) {
-      return res.status(404).json({ success: false, message: 'Department not found' });
+    
+    // Check access for HOD and dean if department object exists
+    if (department) {
+      if (req.user.role === 'hod' && !hodDepartmentMatches(req.user.department, department)) {
+        return res.status(403).json({
+          success: false,
+          message: 'Access denied. You can only view your own department staff.'
+        });
+      }
+
+      if (req.user.role === 'dean' && department.faculty?.toString() !== req.user.facultyManaged?.toString()) {
+        return res.status(403).json({
+          success: false,
+          message: 'Access denied. You can only view departments in your faculty.'
+        });
+      }
     }
 
-    // Check access for HOD and dean
-    if (req.user.role === 'hod' && !hodDepartmentMatches(req.user.department, department)) {
-      return res.status(403).json({
-        success: false,
-        message: 'Access denied. You can only view your own department staff.'
-      });
-    }
-
-    if (req.user.role === 'dean' && department.faculty?.toString() !== req.user.facultyManaged?.toString()) {
-      return res.status(403).json({
-        success: false,
-        message: 'Access denied. You can only view departments in your faculty.'
-      });
-    }
+    const searchDept = department ? [department.name, department._id, department._id.toString()] : [id];
 
     let query = {
-      department: { $in: [department.name, department._id, department._id.toString()] },
+      department: { $in: searchDept },
       isActive
     };
 

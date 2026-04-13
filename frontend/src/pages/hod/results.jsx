@@ -14,6 +14,7 @@ const HodResults = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedSubjectId, setSelectedSubjectId] = useState('');
+  const [selectedBatch, setSelectedBatch] = useState('');
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [studentResults, setStudentResults] = useState({});
   const [studentLoading, setStudentLoading] = useState(false);
@@ -43,14 +44,18 @@ const HodResults = () => {
     }
   };
 
-  const getStudentCards = () => {
+  const getStudentCards = (resultsData) => {
     const studentsMap = new Map();
-    results.forEach((result) => {
+    resultsData.forEach((result) => {
       if (result.student?._id) {
         studentsMap.set(result.student._id, result.student);
       }
     });
     return Array.from(studentsMap.values());
+  };
+
+  const getBatches = () => {
+    return ['2024/2025', '2023/2024', '2022/2023', '2021/2022', 'Repeat Batch (All)'];
   };
 
   const calculateOverallGPA = (groupedResults) => {
@@ -94,15 +99,6 @@ const HodResults = () => {
     }
   };
 
-  const studentCards = getStudentCards();
-  const filteredStudentCards = studentCards.filter((student) => {
-    if (!searchTerm) return true;
-    return (
-      student.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      student.studentId?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  });
-
   const filteredResults = results.filter((result) => {
     const matchesSearch = searchTerm
       ? result.student?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -110,6 +106,21 @@ const HodResults = () => {
         result.subject?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         result.subject?.code?.toLowerCase().includes(searchTerm.toLowerCase())
       : true;
+
+    const matchesBatch = selectedBatch 
+      ? result.year === selectedBatch || result.academicYear === selectedBatch // Try both
+      : true;
+
+    return matchesSearch && matchesBatch;
+  });
+
+  const studentCards = getStudentCards(filteredResults);
+  const filteredStudentCards = studentCards.filter((student) => {
+    const matchesSearch = !searchTerm || (
+      student.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      student.studentId?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    
     return matchesSearch;
   });
 
@@ -173,6 +184,18 @@ const HodResults = () => {
                     <option key={subject._id} value={subject._id}>
                       {subject.code ? `${subject.code} - ${subject.name}` : subject.name}
                     </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <select
+                  value={selectedBatch}
+                  onChange={(e) => setSelectedBatch(e.target.value)}
+                  className="w-full md:w-[320px] rounded-3xl border border-slate-200 px-4 py-3 bg-white focus:ring-2 focus:ring-indigo-100 focus:border-indigo-300"
+                >
+                  <option value="">All Batches</option>
+                  {getBatches().map((batch) => (
+                    <option key={batch} value={batch}>{batch}</option>
                   ))}
                 </select>
               </div>

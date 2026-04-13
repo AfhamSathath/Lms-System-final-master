@@ -11,11 +11,19 @@ const PrivateRoute = ({ role }) => {
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" />;
+    return <Navigate to="/login" replace />;
   }
 
-  if (role && user?.role !== role) {
-    return <Navigate to={`/${user?.role}/dashboard`} />;
+  // Check if user has required role (role can be a string or an array of strings)
+  const hasRole = !role || (Array.isArray(role) ? role.includes(user?.role) : user?.role === role);
+
+  if (!hasRole) {
+    const targetDashboard = `/${user?.role}/dashboard`;
+    // Prevent infinite loops if the user is already on their dashboard but doesn't have permissions
+    if (window.location.pathname.startsWith(targetDashboard)) {
+      return <Navigate to="/login" replace />;
+    }
+    return <Navigate to={targetDashboard} replace />;
   }
 
   return <Outlet />;

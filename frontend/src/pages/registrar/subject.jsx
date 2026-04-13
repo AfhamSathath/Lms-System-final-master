@@ -8,6 +8,7 @@ import {
   FiCheckCircle, FiXCircle, FiAlertCircle, FiRefreshCw, FiChevronDown
 } from 'react-icons/fi';
 import toast from 'react-hot-toast';
+import { useAuth } from '../../context/Authcontext';
 
 // Subject data based on curriculum
 const subjectOptions = {
@@ -223,7 +224,8 @@ const subjectOptions = {
   }
 };
 
-const AdminSubjects = () => {
+const RegistrarSubjects = () => {
+  const { user } = useAuth();
   const [subjects, setSubjects] = useState([]);
   const [groupedSubjects, setGroupedSubjects] = useState({});
   const [filteredSubjects, setFilteredSubjects] = useState([]);
@@ -256,12 +258,12 @@ const AdminSubjects = () => {
     credits: '',
     year: '',
     semester: '',
-    department: 'Computer Science',
     category: 'Lecture',
     hasPractical: false,
     practicalCode: '',
     lecturer: '',
     description: '',
+    department: user.department || 'Computer Science'
   });
   const [departmentLocked, setDepartmentLocked] = useState(false);
 
@@ -297,13 +299,19 @@ const AdminSubjects = () => {
     try {
       setLoading(true);
       const [subjectsRes, lecturersRes, statsRes] = await Promise.all([
-        api.get('api/subjects'),
-        api.get('api/users?role=lecturer'),
-        api.get('api/subjects/stats/by-year')
+        api.get('/api/subjects'),
+        api.get('/api/auth/users?role=lecturer'),
+        api.get('/api/subjects/stats/by-year')
       ]);
 
-      setSubjects(subjectsRes.data.subjects);
-      setFilteredSubjects(subjectsRes.data.subjects);
+      let subjectsList = subjectsRes.data.subjects;
+      // Filter by department if user is HOD
+      if (user.role === 'hod' && user.department) {
+        subjectsList = subjectsList.filter(s => s.department === user.department);
+      }
+      
+      setSubjects(subjectsList);
+      setFilteredSubjects(subjectsList);
       setLecturers(lecturersRes.data.users);
       setStats(statsRes.data.stats);
     } catch (error) {
@@ -840,7 +848,8 @@ const AdminSubjects = () => {
                 value={formData.department}
                 onChange={handleInputChange}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                disabled={departmentLocked || user.role === 'hod'}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:bg-gray-100"
               >
                 {departments.map(dept => <option key={dept} value={dept}>{dept}</option>)}
               </select>
@@ -1050,7 +1059,8 @@ const AdminSubjects = () => {
                 value={formData.department}
                 onChange={handleInputChange}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                disabled={user.role === 'hod'}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:bg-gray-100"
               >
                 {departments.map(dept => <option key={dept} value={dept}>{dept}</option>)}
               </select>
@@ -1546,4 +1556,4 @@ const AdminSubjects = () => {
   );
 };
 
-export default AdminSubjects;
+export default RegistrarSubjects;

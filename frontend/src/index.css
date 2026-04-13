@@ -59,6 +59,21 @@
   .blurred-panel {
     backdrop-filter: blur(18px);
   }
+
+  .minimal-scrollbar::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+  .minimal-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .minimal-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(148,163,184,0.3);
+    border-radius: 9999px;
+  }
+  .minimal-scrollbar:hover::-webkit-scrollbar-thumb {
+    background: rgba(148,163,184,0.5);
+  }
 }
 
 /* Custom scrollbar */

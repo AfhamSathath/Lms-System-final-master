@@ -8,6 +8,7 @@ const {
   updateAssignmentStatus,
   verifyQualification,
   getAllAssignments,
+  updateAssignment,
   deleteAssignment,
   bulkDeleteAssignments
 } = require('../controllers/lecturerAssignmentController');
@@ -23,8 +24,8 @@ router.post('/assign', protect, authorize('admin', 'hod'), (req, res, next) => {
   next();
 }, assignLecturerToSubject);
 
-// Get all assignments (admin only)
-router.get('/all', protect, authorize('admin'), getAllAssignments);
+// Get all assignments
+router.get('/all', protect, authorize('admin', 'hod', 'dean'), getAllAssignments);
 
 // Get lecturer's assigned subjects
 router.get('/lecturer/:lecturerId', protect, getLecturerSubjects);
@@ -41,8 +42,11 @@ router.put('/:assignmentId/status', protect, authorize('admin', 'hod'), updateAs
 // Verify lecturer qualification
 router.put('/:assignmentId/qualification', protect, authorize('admin'), verifyQualification);
 
+// Update assignment details
+router.put('/:assignmentId', protect, authorize('admin', 'hod', 'dean'), updateAssignment);
+
 // Delete assignment
-router.delete('/bulk', protect, authorize('admin'), bulkDeleteAssignments);
-router.delete('/:assignmentId', protect, authorize('admin'), deleteAssignment);
+router.delete('/bulk', protect, authorize('admin', 'hod', 'dean'), bulkDeleteAssignments);
+router.delete('/:assignmentId', protect, authorize('admin', 'hod', 'dean'), deleteAssignment);
 
 module.exports = router;

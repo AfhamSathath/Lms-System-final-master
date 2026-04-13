@@ -33,22 +33,10 @@ exports.registerUser = async (req, res, next) => {
     }
 
     const {
-      email,
-      password,
-      name,
-      role,
-      studentId,
-      lecturerId,
-      gender,
-      dateOfBirth,
-      department,
-      semester,
-      yearOfStudy,
-      phone,
-      address,
       emergencyContact,
       qualifications,
-      specialization
+      specialization,
+      batch
     } = req.body;
 
     // Check if user exists
@@ -102,11 +90,15 @@ exports.registerUser = async (req, res, next) => {
       userData.studentId = studentId;
       userData.semester = semester ? parseInt(semester) : undefined;
       userData.yearOfStudy = yearOfStudy ? parseInt(yearOfStudy) : undefined;
+      userData.batch = batch;
     } else if (staffRoles.includes(role)) {
       userData.lecturerId = lecturerId;
       userData.qualifications = qualifications;
       userData.specialization = specialization;
     }
+
+    if (userData.gender === '' || !userData.gender) delete userData.gender;
+    if (userData.department === '') delete userData.department;
 
     // Create user
     const user = await User.create(userData);
@@ -131,6 +123,7 @@ exports.registerUser = async (req, res, next) => {
         department: user.department,
         semester: user.semester,
         yearOfStudy: user.yearOfStudy,
+        batch: user.batch,
         gender: user.gender,
         phone: user.phone,
         address: user.address,
@@ -254,6 +247,7 @@ exports.loginUser = async (req, res, next) => {
         department: user.department,
         semester: user.semester,
         yearOfStudy: user.yearOfStudy,
+        batch: user.batch,
         isActive: user.isActive,
         profilePicture: user.profilePicture,
         lastLogin: user.lastLogin
@@ -291,6 +285,7 @@ exports.getMe = async (req, res, next) => {
         department: user.department,
         semester: user.semester,
         yearOfStudy: user.yearOfStudy,
+        batch: user.batch,
         phone: user.phone,
         address: user.address,
         qualifications: user.qualifications,

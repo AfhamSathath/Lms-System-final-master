@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const connectDB = require('../config/database');
 // register Subject model for populates
 require('../models/course');
-const User = require('../models/User');
+const User = require('../models/user');
 const Result = require('../models/result');
 
 (async () => {

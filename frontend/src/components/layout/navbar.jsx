@@ -57,9 +57,15 @@ const Navbar = () => {
   const getDashboardPath = () => {
     if (!user) return '/';
     switch (user.role) {
-      case 'admin': return '/admin/dashboard';
+      case 'admin':
+      case 'registrar':
+        return '/registrar/dashboard';
       case 'lecturer': return '/lecturer/dashboard';
       case 'student': return '/student/dashboard';
+      case 'bursar': return '/bursar/dashboard';
+      case 'exam_officer': return '/exam_officer/dashboard';
+      case 'dean': return '/dean/dashboard';
+      case 'hod': return '/hod/dashboard';
       default: return '/';
     }
   };
@@ -67,10 +73,12 @@ const Navbar = () => {
   const getProfilePath = () => {
     if (!user) return '/';
     switch (user.role) {
-      case 'admin': return '/admin/profile';
+      case 'admin':
+      case 'registrar':
+        return '/registrar/profile';
       case 'lecturer': return '/lecturer/profile';
       case 'student': return '/student/profile';
-      default: return '/profile';
+      default: return `/${user.role}/profile`;
     }
   };
 

@@ -15,14 +15,7 @@ const enrollmentSchema = new mongoose.Schema({
   },
   academicYear: {
     type: String,
-    required: [true, 'Academic year is required'],
-    validate: {
-      validator: function(v) {
-        // Validate format like "2023-2024"
-        return /^\d{4}-\d{4}$/.test(v);
-      },
-      message: 'Academic year must be in format YYYY-YYYY'
-    }
+    required: [true, 'Academic year is required']
   },
   semester: {
     type: Number,
@@ -117,7 +110,25 @@ const enrollmentSchema = new mongoose.Schema({
       type: Date,
       default: Date.now
     },
-    remarks: String
+    remarks: String,
+    // Student confirmation fields
+    studentConfirmed: {
+      type: Boolean,
+      default: false
+    },
+    studentConfirmedAt: {
+      type: Date
+    },
+    studentRemarks: String,
+    // HOD/Admin updates
+    updatedByHOD: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    },
+    hodUpdatedAt: {
+      type: Date
+    },
+    hodRemarks: String
   }],
   attendancePercentage: {
     type: Number,

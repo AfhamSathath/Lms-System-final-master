@@ -55,8 +55,13 @@ const HodDashboard = () => {
           dept = departmentRes.data.department || null;
         } catch (err) {
           console.warn('Secondary fallback department lookup failed', err);
-          dept = null;
         }
+      }
+      
+      // If Department document doesn't exist in MongoDB but the user has a department string,
+      // create a mock object to proceed to string-based endpoints.
+      if (!dept && user?.department) {
+        dept = { name: user.department };
       }
 
       setDepartment(dept);

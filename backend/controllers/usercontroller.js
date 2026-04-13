@@ -19,18 +19,25 @@ exports.registerUser = async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
 
-    const { email, password, name, role, studentId, lecturerId, gender, dateOfBirth, department, semester, yearOfStudy, phone, address, emergencyContact, emergencyContactPhone, qualifications, specialization } = req.body;
+    const { email, password, name, role, studentId, lecturerId, gender, dateOfBirth, department, semester, yearOfStudy, phone, address, emergencyContact, emergencyContactPhone, qualifications, specialization, batch } = req.body;
 
     const existingUser = await User.findOne({ email });
     if (existingUser) return res.status(400).json({ message: 'User already exists' });
 
-    const userData = { name, email, password, role, gender, dateOfBirth, department, semester, yearOfStudy, phone, address, emergencyContact, emergencyContactPhone, qualifications, specialization, isActive: true };
+    const userData = { name, email, password, role, gender, dateOfBirth, department, semester, yearOfStudy, batch, phone, address, emergencyContact, emergencyContactPhone, qualifications, specialization, isActive: true };
 
     if (role === 'student' && studentId && studentId.trim() !== '') userData.studentId = studentId;
     if (['lecturer', 'hod', 'dean'].includes(role) && lecturerId && lecturerId.trim() !== '') userData.lecturerId = lecturerId;
+    
+    if (userData.gender === '' || !userData.gender) delete userData.gender;
+    if (userData.department === '') delete userData.department;
+    
+    // Cleanup optional numeric fields that might be empty strings
+    if (userData.semester === '') delete userData.semester;
+    if (userData.yearOfStudy === '') delete userData.yearOfStudy;
 
     const user = await User.create(userData);
-    
+
     // Send welcome email
     try {
       await emailService.sendWelcomeEmail(user, password);
@@ -66,9 +73,9 @@ exports.login = async (req, res, next) => {
     res.json({ success: true, token, user });
 
     // Login alert
-    emailService.sendLoginAlertEmail(user, { 
-      ip: req.ip, 
-      location: req.headers['x-forwarded-for'] || 'Local Access' 
+    emailService.sendLoginAlertEmail(user, {
+      ip: req.ip,
+      location: req.headers['x-forwarded-for'] || 'Local Access'
     }).catch(console.error);
   } catch (error) { next(error); }
 };
@@ -120,7 +127,7 @@ exports.getMe = async (req, res, next) => {
 exports.updateProfile = async (req, res, next) => {
   try {
     const user = await User.findByIdAndUpdate(req.user.id, req.body, { new: true, runValidators: true }).select('-password');
-    
+
     // Notify of profile update
     emailService.sendProfileUpdateEmail(user, Object.keys(req.body)).catch(console.error);
 
@@ -200,7 +207,7 @@ exports.updatePassword = async (req, res, next) => {
 exports.getUsers = async (req, res, next) => {
   try {
     const users = await User.find().select('-password');
-    
+
     // For non-admins, return only counts, no data
     if (req.user && req.user.role !== 'admin') {
       const counts = {
@@ -210,11 +217,11 @@ exports.getUsers = async (req, res, next) => {
         dean: users.filter(u => u.role === 'dean').length,
         student: users.filter(u => u.role === 'student').length
       };
-      
-      return res.json({ 
-        success: true, 
-        count: users.length, 
-        counts, 
+
+      return res.json({
+        success: true,
+        count: users.length,
+        counts,
         users: [] // Ensure data is hidden
       });
     }
@@ -239,9 +246,13 @@ exports.createUser = async (req, res, next) => {
     const userData = { ...req.body };
     if (!userData.studentId || userData.studentId.trim() === '') delete userData.studentId;
     if (!userData.lecturerId || userData.lecturerId.trim() === '') delete userData.lecturerId;
+    if (userData.semester === '') delete userData.semester;
+    if (userData.yearOfStudy === '') delete userData.yearOfStudy;
+    if (userData.gender === '' || !userData.gender) delete userData.gender;
+    if (userData.department === '') delete userData.department;
 
     const user = await User.create(userData);
-    
+
     // Send welcome email
     emailService.sendWelcomeEmail(user, req.body.password || 'password123').catch(console.error);
 
@@ -275,9 +286,9 @@ exports.deleteUser = async (req, res, next) => {
   try {
     const user = await User.findById(req.params.id);
     if (!user) return res.status(404).json({ message: 'User not found' });
-    
+
     await user.deleteOne();
-    
+
     // Notify of deletion
     emailService.sendAccountDeletionEmail(user).catch(console.error);
 
@@ -294,7 +305,7 @@ exports.bulkDeleteUsers = async (req, res, next) => {
 
     // Do not allow deleting self
     const filteredIds = userIds.filter(id => id !== req.user.id);
-    
+
     await User.deleteMany({ _id: { $in: filteredIds } });
 
     res.json({
@@ -380,9 +391,12 @@ exports.bulkImportUsers = async (req, res, next) => {
               // Handle sparse constraints with empty strings
               if (!userData.studentId || userData.studentId.trim() === '') delete userData.studentId;
               if (!userData.lecturerId || userData.lecturerId.trim() === '') delete userData.lecturerId;
+              if (userData.semester === '') delete userData.semester;
+              if (userData.yearOfStudy === '') delete userData.yearOfStudy;
+              if (userData.batch === '') delete userData.batch;
 
               const user = await User.create(userData);
-              
+
               // Email welcome for each imported user
               emailService.sendWelcomeEmail(user, userData.password).catch(console.error);
 
@@ -416,9 +430,9 @@ exports.bulkImportUsers = async (req, res, next) => {
 
 exports.exportUsersCSV = async (req, res, next) => {
   const users = await User.find().select('-password');
-  let csv = 'name,email,role,studentId,lecturerId,department,semester,yearOfStudy,phone,isActive,lastLogin,createdAt\n';
+  let csv = 'name,email,role,studentId,lecturerId,department,batch,semester,yearOfStudy,phone,isActive,lastLogin,createdAt\n';
   users.forEach(u => {
-    csv += `${u.name},${u.email},${u.role},${u.studentId || ''},${u.lecturerId || ''},${u.department || ''},${u.semester || ''},${u.yearOfStudy || ''},${u.phone || ''},${u.isActive},${u.lastLogin || ''},${u.createdAt}\n`;
+    csv += `${u.name},${u.email},${u.role},${u.studentId || ''},${u.lecturerId || ''},${u.department || ''},${u.batch || ''},${u.semester || ''},${u.yearOfStudy || ''},${u.phone || ''},${u.isActive},${u.lastLogin || ''},${u.createdAt}\n`;
   });
   res.setHeader('Content-Type', 'text/csv');
   res.setHeader('Content-Disposition', 'attachment; filename=users.csv');

@@ -1,7 +1,7 @@
 // quick script to inspect student results
 const mongoose = require('mongoose');
 const connectDB = require('../backend/config/database');
-const User = require('../backend/models/User');
+const User = require('../backend/models/user');
 const Result = require('../backend/models/result');
 
 (async () => {

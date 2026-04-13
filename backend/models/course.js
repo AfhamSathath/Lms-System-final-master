@@ -56,7 +56,7 @@ const subjectSchema = new mongoose.Schema({
       validator: async function (v) {
         if (!v) return true;
         const user = await mongoose.model('User').findById(v);
-        return user && user.role === 'lecturer';
+        return user && (user.role === 'lecturer' || user.role === 'hod');
       },
       message: 'Invalid lecturer',
     },

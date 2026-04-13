@@ -9,7 +9,7 @@ import api from '../../services/api';
 import Loader from '../../components/common/loader';
 import Modal from '../../components/common/model';
 
-const AdminTimetables = () => {
+const RegistrarTimetables = () => {
   const [loading, setLoading] = useState(true);
   const [timetables, setTimetables] = useState([]);
   const [filteredTimetables, setFilteredTimetables] = useState([]);
@@ -379,4 +379,4 @@ const TimetableForm = ({ formData, handleInputChange, handleSubjectChange, handl
   </form>
 );
 
-export default AdminTimetables;
+export default RegistrarTimetables;

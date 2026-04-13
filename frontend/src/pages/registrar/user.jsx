@@ -29,15 +29,23 @@ import {
 } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 
-const AdminUsers = () => {
+const RegistrarUsers = () => {
   const { user } = useAuth();
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState(null);
 
-  // Define departments
-  const departments = ['Computer Science', 'Software Engineering', 'Information Technology'];
+  // Define faculties and departments
+  const facultyData = {
+    'Technological Studies': ['Computer Science', 'Software Engineering', 'Information Technology'],
+    'Applied Science': ['Physical Science', 'Computer Science', 'Mathematics', 'Physics', 'Chemistry', 'Biology'],
+    'Business Administration': ['Finance', 'Accounting', 'Management', 'Marketing']
+  };
+
+  const faculties = Object.keys(facultyData);
+  const departments = [...new Set(Object.values(facultyData).flat())];
+  const [availableDepartments, setAvailableDepartments] = useState([]);
 
   // Filters
   const [searchTerm, setSearchTerm] = useState('');
@@ -65,8 +73,10 @@ const AdminUsers = () => {
     password: '',
     role: 'student',
     studentId: '',
+    batch: '',
     lecturerId: '',
     department: '',
+    faculty: '',
     yearOfStudy: '',
     semester: '',
     phone: '',
@@ -90,7 +100,7 @@ const AdminUsers = () => {
     { value: 'bursar', label: 'Bursar', icon: '💰', color: 'bg-orange-100 text-orange-800' },
     { value: 'exam_officer', label: 'Exam Officer', icon: '🧾', color: 'bg-teal-100 text-teal-800' },
     { value: 'librarian', label: 'Librarian', icon: '📚', color: 'bg-pink-100 text-pink-800' },
-    { value: 'admin', label: 'Admin', icon: '👨‍💻', color: 'bg-red-100 text-red-800' }
+    { value: 'admin', label: 'Registrar', icon: '👨‍💻', color: 'bg-red-100 text-red-800' }
   ];
   const genders = ['male', 'female', 'other'];
 
@@ -102,6 +112,15 @@ const AdminUsers = () => {
   useEffect(() => {
     filterUsers();
   }, [searchTerm, selectedRole, selectedYear, selectedSemester, selectedDepartment, selectedStatus, users]);
+
+  // Update departments when faculty changes
+  useEffect(() => {
+    if (formData.faculty) {
+      setAvailableDepartments(facultyData[formData.faculty] || []);
+    } else {
+      setAvailableDepartments([]);
+    }
+  }, [formData.faculty]);
 
   const fetchUsers = async () => {
     try {
@@ -260,6 +279,7 @@ const AdminUsers = () => {
       password: '',
       role: 'student',
       studentId: '',
+      batch: '',
       lecturerId: '',
       department: '',
       yearOfStudy: '',
@@ -289,23 +309,23 @@ const AdminUsers = () => {
       return;
     }
 
+    if (formData.role === 'student' && !formData.batch) {
+      toast.error('Batch is required for students');
+      return;
+    }
+
     if (['lecturer', 'hod', 'dean', 'registrar', 'bursar', 'exam_officer', 'librarian'].includes(formData.role) && !formData.lecturerId) {
       toast.error('Employee ID is required for staff');
       return;
     }
 
-    if (formData.role === 'student' && (!formData.yearOfStudy || !formData.semester)) {
-      toast.error('Year and semester are required for students');
-      return;
-    }
-
-    if (formData.role !== 'admin' && !formData.department) {
-      toast.error('Department is required');
+    if (!['admin', 'registrar', 'bursar', 'exam_officer', 'librarian'].includes(formData.role) && (!formData.department || !formData.faculty)) {
+      toast.error('Faculty and Department are required for this role');
       return;
     }
 
     try {
-      await api.post('/api/users/users', formData);
+      await api.post('/api/users', formData);
       toast.success('User added successfully');
       setShowAddModal(false);
       resetForm();
@@ -324,8 +344,10 @@ const AdminUsers = () => {
       password: '',
       role: u.role || 'student',
       studentId: u.studentId || '',
+      batch: u.batch || '',
       lecturerId: u.lecturerId || '',
       department: u.department || '',
+      faculty: u.faculty || '',
       yearOfStudy: u.yearOfStudy || '',
       semester: u.semester || '',
       phone: u.phone || '',
@@ -566,9 +588,9 @@ const AdminUsers = () => {
       <div className="bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl shadow-xl p-6 mb-8 text-white">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div className="flex-1">
-            <h1 className="text-2xl md:text-3xl font-bold">User Management</h1>
+            <h1 className="text-2xl md:text-3xl font-bold">Registrar Management</h1>
             <p className="text-purple-100 mt-1">
-              Manage students, lecturers, HODs, deans, and administrators
+              Manage students, lecturers, HODs, deans, and university personnel
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
@@ -590,25 +612,25 @@ const AdminUsers = () => {
               <FiUpload className="mr-2" /> Bulk Upload
             </button>
             <button
-               onClick={() => {
-                 resetForm();
-                 setShowAddModal(true);
-               }}
-               className="bg-white text-purple-600 px-6 py-2 rounded-lg hover:bg-purple-50 transition-colors flex items-center shadow-lg"
-             >
-               <FiUserPlus className="mr-2" />
-               Add User
-             </button>
-             {selectedUserIds.length > 0 && (
-               <button
-                 onClick={handleBulkDelete}
-                 className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors flex items-center shadow-lg"
-               >
-                 <FiTrash2 className="mr-2" />
-                 Delete ({selectedUserIds.length})
-               </button>
-             )}
-           </div>
+              onClick={() => {
+                resetForm();
+                setShowAddModal(true);
+              }}
+              className="bg-white text-purple-600 px-6 py-2 rounded-lg hover:bg-purple-50 transition-colors flex items-center shadow-lg"
+            >
+              <FiUserPlus className="mr-2" />
+              Add User
+            </button>
+            {selectedUserIds.length > 0 && (
+              <button
+                onClick={handleBulkDelete}
+                className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors flex items-center shadow-lg"
+              >
+                <FiTrash2 className="mr-2" />
+                Delete ({selectedUserIds.length})
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
@@ -842,7 +864,7 @@ const AdminUsers = () => {
                   Department
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Year/Semester
+                  Faculty
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Contact
@@ -899,25 +921,8 @@ const AdminUsers = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {u.department || '-'}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {u.role === 'student' ? (
-                        <div className="flex flex-wrap gap-1">
-                          {u.yearOfStudy && (
-                            <span className={`px-2 py-1 text-xs font-semibold rounded-full ${getYearBadge(u.yearOfStudy)}`}>
-                              Year {u.yearOfStudy}
-                            </span>
-                          )}
-                          {u.semester && (
-                            <span className="px-2 py-1 text-xs bg-gray-100 text-gray-800 rounded-full">
-                              Sem {u.semester}
-                            </span>
-                          )}
-                        </div>
-                      ) : u.role === 'lecturer' && u.qualifications ? (
-                        <span className="text-xs text-gray-600">{u.qualifications}</span>
-                      ) : (
-                        <span className="text-gray-400">-</span>
-                      )}
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {u.faculty || '-'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {u.phone || '-'}
@@ -1014,7 +1019,8 @@ const AdminUsers = () => {
           roles={roles}
           academicYears={academicYears}
           semesters={semesters}
-          departments={departments}
+          faculties={faculties}
+          availableDepartments={availableDepartments}
           genders={genders}
           submitText="Create User"
           isEdit={false}
@@ -1037,7 +1043,8 @@ const AdminUsers = () => {
           roles={roles}
           academicYears={academicYears}
           semesters={semesters}
-          departments={departments}
+          faculties={faculties}
+          availableDepartments={availableDepartments}
           genders={genders}
           submitText="Update User"
           isEdit={true}
@@ -1176,7 +1183,8 @@ const UserForm = ({
   roles,
   academicYears,
   semesters,
-  departments,
+  faculties,
+  availableDepartments,
   genders,
   submitText,
   isEdit = false
@@ -1189,6 +1197,7 @@ const UserForm = ({
       ...prev,
       role,
       studentId: '',
+      batch: '',
       lecturerId: '',
       yearOfStudy: '',
       semester: ''
@@ -1276,7 +1285,7 @@ const UserForm = ({
       </div>
 
       {/* Role-specific fields */}
-      {(formData.role === 'student' || ['lecturer', 'hod', 'dean'].includes(formData.role)) && (
+      {(formData.role !== 'admin') && (
         <div>
           <h3 className="text-lg font-medium text-gray-900 mb-4">
             {formData.role === 'student' ? 'Student Information' : 'Staff Information'}
@@ -1300,41 +1309,27 @@ const UserForm = ({
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Year of Study <span className="text-red-500">*</span>
+                    Batch <span className="text-red-500">*</span>
                   </label>
                   <select
-                    name="yearOfStudy"
-                    value={formData.yearOfStudy}
+                    name="batch"
+                    value={formData.batch}
                     onChange={handleInputChange}
                     required
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                   >
-                    <option value="">Select Year</option>
-                    {academicYears.map(year => (
-                      <option key={year} value={year}>Year {year}</option>
-                    ))}
+                    <option value="">Select Batch</option>
+                    <option value="2024/2025">2024/2025</option>
+                    <option value="2023/2024">2023/2024</option>
+                    <option value="2022/2023">2022/2023</option>
+                    <option value="2021/2022">2021/2022</option>
+                    <option value="Repeat Batch (All)">Repeat Batch (All)</option>
                   </select>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Semester <span className="text-red-500">*</span>
-                  </label>
-                  <select
-                    name="semester"
-                    value={formData.semester}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  >
-                    <option value="">Select Semester</option>
-                    {semesters.map(sem => (
-                      <option key={sem} value={sem}>Semester {sem}</option>
-                    ))}
-                  </select>
-                </div>
+
               </>
             )}
-            {['lecturer', 'hod', 'dean'].includes(formData.role) && (
+            {['lecturer', 'hod', 'dean', 'registrar', 'bursar', 'exam_officer', 'librarian'].includes(formData.role) && (
               <>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -1378,6 +1373,26 @@ const UserForm = ({
                 </div>
               </>
             )}
+            
+            {!['registrar', 'bursar', 'exam_officer', 'librarian'].includes(formData.role) && (
+              <>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Faculty <span className="text-red-500">*</span>
+              </label>
+              <select
+                name="faculty"
+                value={formData.faculty}
+                onChange={handleInputChange}
+                required
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+              >
+                <option value="">Select Faculty</option>
+                {faculties.map(f => (
+                  <option key={f} value={f}>{f}</option>
+                ))}
+              </select>
+            </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Department <span className="text-red-500">*</span>
@@ -1387,14 +1402,17 @@ const UserForm = ({
                 value={formData.department}
                 onChange={handleInputChange}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                disabled={!formData.faculty}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:bg-gray-100"
               >
-                <option value="">Select Department</option>
-                {departments.map(dept => (
+                <option value="">{formData.faculty ? 'Select Department' : 'Select Faculty First'}</option>
+                {availableDepartments.map(dept => (
                   <option key={dept} value={dept}>{dept}</option>
                 ))}
               </select>
             </div>
+            </>
+            )}
           </div>
         </div>
       )}
@@ -1553,6 +1571,12 @@ const UserProfile = ({ user, roles, onEdit, onToggleStatus, onClose, getRoleBadg
                 {user.studentId || user.lecturerId || 'N/A'}
               </span>
             </div>
+            {user.faculty && (
+              <div className="flex justify-between">
+                <span className="text-sm text-gray-600">Faculty:</span>
+                <span className="text-sm font-medium text-gray-900">{user.faculty}</span>
+              </div>
+            )}
             {user.department && (
               <div className="flex justify-between">
                 <span className="text-sm text-gray-600">Department:</span>
@@ -1710,4 +1734,4 @@ const UserProfile = ({ user, roles, onEdit, onToggleStatus, onClose, getRoleBadg
   );
 };
 
-export default AdminUsers;
+export default RegistrarUsers;

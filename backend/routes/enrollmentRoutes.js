@@ -11,12 +11,17 @@ const {
   bulkEnrollStudents,
   updateGrades,
   updateAttendance,
+  bulkUpdateAttendance,
+  enrollBatchStudents,
   getStudentEnrollments,
   getCourseEnrollments,
   withdrawStudent,
   registerCourse,
   generateGradeSheet,
-  certifyResult
+  certifyResult,
+  confirmStudentAttendance,
+  reviewAttendanceByHOD,
+  getAttendanceDetails
 } = require('../controllers/enrollmentController');
 
 // All routes require authentication
@@ -39,6 +44,13 @@ router.get(
   generateGradeSheet
 );
 
+// Bulk Update Course Attendance
+router.put(
+  '/course/:courseId/bulk-attendance',
+  authorize('lecturer', 'hod', 'admin'),
+  bulkUpdateAttendance
+);
+
 // Get all enrollments
 router.get('/', getEnrollments);
 
@@ -52,7 +64,7 @@ router.get('/:id', getEnrollment);
 // Create enrollment
 router.post(
   '/',
-  authorize('admin', 'registrar', 'hod'),
+  authorize('admin', 'registrar', 'hod', 'lecturer'),
   validateEnrollment,
   createEnrollment
 );
@@ -62,6 +74,13 @@ router.post(
   '/bulk',
   authorize('admin', 'registrar'),
   bulkEnrollStudents
+);
+
+// Enroll by batch
+router.post(
+  '/enroll-batch',
+  authorize('admin', 'hod', 'lecturer'),
+  enrollBatchStudents
 );
 
 // Self registration
@@ -102,7 +121,7 @@ router.put(
 // Delete enrollment
 router.delete(
   '/:id',
-  authorize('admin'),
+  authorize('admin', 'lecturer'),
   deleteEnrollment
 );
 
@@ -111,6 +130,27 @@ router.put(
   '/:id/certify',
   authorize('exam_officer', 'admin'),
   certifyResult
+);
+
+// Student confirms attendance
+router.put(
+  '/:id/confirm-attendance',
+  authorize('student'),
+  confirmStudentAttendance
+);
+
+// HOD reviews attendance
+router.put(
+  '/:id/review-attendance',
+  authorize('hod', 'admin'),
+  reviewAttendanceByHOD
+);
+
+// Get detailed attendance information
+router.get(
+  '/:id/attendance-details',
+  authorize('student', 'lecturer', 'hod', 'admin', 'dean'),
+  getAttendanceDetails
 );
 
 module.exports = router;

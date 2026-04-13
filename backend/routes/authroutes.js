@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { body } = require('express-validator');
-const authController = require('../controllers/authcontroller');
+const authController = require('../controllers/authController');
 const { protect, authorize } = require('../middleware/auth');
 
 // Validation rules for registration
@@ -36,11 +36,11 @@ router.use(protect);
 // User profile routes
 router.get('/me', authController.getMe);
 
-// Admin, HOD, Dean, and Registrar routes
-router.get('/users', authorize('admin', 'hod', 'dean', 'registrar'), authController.getAllUsers);
-router.get('/users/:id', authorize('admin'), authController.getUserById);
-router.put('/users/:id', authorize('admin'), authController.updateUser);
-router.put('/users/:id/toggle-status', authorize('admin', 'registrar'), authController.toggleUserStatus);
+// Admin, HOD, Dean, Registrar, and Lecturer routes
+router.get('/users', authorize('admin', 'hod', 'dean', 'registrar', 'lecturer'), authController.getAllUsers);
+router.get('/users/:id', authorize('admin', 'dean', 'hod', 'registrar', 'lecturer'), authController.getUserById);
+router.put('/users/:id', authorize('admin', 'dean', 'hod', 'registrar'), authController.updateUser);
+router.put('/users/:id/toggle-status', authorize('admin', 'dean', 'hod', 'registrar'), authController.toggleUserStatus);
 router.delete('/users/:id', authorize('admin'), authController.deleteUser);
 
 module.exports = router;

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/Authcontext';
 import { 
@@ -23,6 +23,8 @@ const Register = () => {
     studentId: '',
     lecturerId: '',
     department: '',
+    faculty: '',
+    batch: '',
     semester: '',
     yearOfStudy: '',
     qualifications: '',
@@ -31,8 +33,14 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { register } = useAuth();
+  const { register, user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user && !authLoading) {
+      navigate(`/${user.role}/dashboard`);
+    }
+  }, [user, authLoading, navigate]);
 
   const handleChange = (e) => {
     setFormData({
@@ -417,6 +425,26 @@ const Register = () => {
                 )}
 
                 <div>
+                  <label htmlFor="reg-faculty" className="block text-sm font-medium text-white mb-2">
+                    Faculty
+                  </label>
+                  <select
+                    id="reg-faculty"
+                    name="faculty"
+                    autoComplete="off"
+                    value={formData.faculty}
+                    onChange={handleChange}
+                    required={formData.role !== 'admin'}
+                    className="block w-full px-4 py-3 border border-white border-opacity-20 rounded-lg bg-white bg-opacity-10 text-white focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent"
+                  >
+                    <option value="" className="bg-gray-800">Select Faculty</option>
+                    {['Computing', 'Engineering', 'Business', 'Science', 'Humanities'].map(f => (
+                      <option key={f} value={f} className="bg-gray-800">{f}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
                   <label htmlFor="reg-department" className="block text-sm font-medium text-white mb-2">
                     Department
                   </label>
@@ -437,6 +465,24 @@ const Register = () => {
                     ))}
                   </select>
                 </div>
+
+                {formData.role === 'student' && (
+                  <div>
+                    <label htmlFor="reg-batch" className="block text-sm font-medium text-white mb-2">
+                      Batch
+                    </label>
+                    <input
+                      id="reg-batch"
+                      name="batch"
+                      type="text"
+                      required
+                      value={formData.batch}
+                      onChange={handleChange}
+                      className="block w-full px-4 py-3 border border-white border-opacity-20 rounded-lg bg-white bg-opacity-10 text-white placeholder-white placeholder-opacity-60 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent"
+                      placeholder="e.g. 2024.1"
+                    />
+                  </div>
+                )}
               </div>
             )}
 

@@ -1,5 +1,6 @@
 const Subject = require('../models/course');
 const User = require('../models/user');
+const Enrollment = require('../models/Enrollment');
 const LecturerAssignment = require('../models/LecturerAssignment');
 const { getDepartmentSubjects, getAllSubjectsForSeeding } = require('../utils/subjectData');
 const fs = require('fs');
@@ -18,9 +19,6 @@ const formatYear = (y) => {
   return yearMap[y] || y;
 };
 
-
-
-
 // Helper function to get subjects assigned to a lecturer
 const getAssignedSubjectIds = async (lecturerId) => {
   const assignments = await LecturerAssignment.find({
@@ -35,22 +33,14 @@ const getRoleBasedQuery = async (req, baseQuery = {}) => {
 
   // Filter based on user role
   if (req.user.role === 'student') {
-    // Students see subjects for their current year and semester by default
-    // but can filter if baseQuery provides them
-    const yearMap = {
-      1: '1st Year',
-      2: '2nd Year',
-      3: '3rd Year',
-      4: '4th Year'
-    };
+    // Only show subjects the student is enrolled in
+    const studentEnrollments = await Enrollment.find({
+      student: req.user.id,
+      enrollmentStatus: 'enrolled'
+    });
     
-    if (!query.year) {
-      query.year = yearMap[req.user.currentYear] || '1st Year';
-    }
-    if (!query.semester) {
-      query.semester = req.user.currentSemester || 1;
-    }
-    query.department = req.user.department;
+    const enrolledSubjectIds = studentEnrollments.map(e => e.course);
+    query._id = { $in: enrolledSubjectIds };
   } else if (req.user.role === 'lecturer') {
     // Lecturers only see assigned subjects
     const assignedIds = await getAssignedSubjectIds(req.user.id);
@@ -386,12 +376,12 @@ exports.assignLecturer = async (req, res, next) => {
 
     const lecturer = await User.findOne({
       _id: lecturerId,
-      role: 'lecturer',
+      role: { $in: ['lecturer', 'hod'] },
       isActive: true,
     });
 
     if (!lecturer) {
-      return res.status(404).json({ message: 'Lecturer not found' });
+      return res.status(404).json({ message: 'Lecturer not found or invalid role' });
     }
 
     const subject = await Subject.findByIdAndUpdate(
@@ -402,6 +392,47 @@ exports.assignLecturer = async (req, res, next) => {
 
     if (!subject) {
       return res.status(404).json({ message: 'Subject not found' });
+    }
+
+    // Also create/update LecturerAssignment record for management visibility
+    try {
+      // Check for existing assignment
+      let assignment = await LecturerAssignment.findOne({
+        subject: subject._id,
+        isActive: true
+      });
+
+      if (assignment) {
+        assignment.lecturer = lecturerId;
+        assignment.department = subject.department;
+        assignment.academicYear = subject.year;
+        assignment.semester = subject.semester;
+        await assignment.save();
+      } else {
+        await LecturerAssignment.create({
+          lecturer: lecturerId,
+          subject: subject._id,
+          department: subject.department,
+          academicYear: subject.year,
+          semester: subject.semester,
+          startDate: new Date(),
+          endDate: new Date(new Date().setMonth(new Date().getMonth() + 4)),
+          curriculum: {
+            totalLectures: 30,
+            totalPracticals: subject.category === 'Practical' ? 15 : 0,
+            totalAssignments: 5
+          },
+          qualifications: {
+            minimumQualification: 'B.Sc'
+          },
+          status: 'active',
+          isActive: true
+        });
+      }
+    } catch (assignError) {
+      console.error('Failed to create/update LecturerAssignment:', assignError.message);
+      // We don't bubble this up to keep the Subject update intact, 
+      // but we should probably inform the user or fix the underlying issue.
     }
 
     res.json({

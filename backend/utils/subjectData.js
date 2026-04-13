@@ -1,4 +1,4 @@
-// Computer Science Department Subjects (from your images)
+// Computer Science Department Subjects
 const computerScienceSubjects = {
   '1st Year': {
     semester1: [
@@ -259,9 +259,6 @@ const getAllSubjectsForSeeding = () => {
 
 // Export using CommonJS syntax
 module.exports = {
-  computerScienceSubjects,
-  softwareEngineeringSubjects,
-  informationTechnologySubjects,
   getDepartmentSubjects,
   getAllSubjectsForSeeding
 };

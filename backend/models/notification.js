@@ -34,7 +34,14 @@ const notificationSchema = new mongoose.Schema(
         'assignment',
         'ENROLLMENT',
         'enrollment',
-        'repeat_approval'
+        'repeat_approval',
+        'ATTENDANCE_DISCREPANCY',
+        'ATTENDANCE_REVIEW',
+        'ATTENDANCE_REVIEWED',
+        'MEDICAL_SUBMITTED',
+        'MEDICAL_REVIEWED',
+        'assessment_approval',
+        'attendance_approval'
       ],
       default: 'GENERAL',
     },

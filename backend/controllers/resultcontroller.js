@@ -1,7 +1,7 @@
 // controllers/resultsController.js
 const Result = require('../models/result');
 const Subject = require('../models/course');
-const User = require('../models/user');
+const User = require('../models/User');
 const Notification = require('../models/notification');
 const LecturerAssignment = require('../models/LecturerAssignment');
 const emailService = require('../utils/emailService');

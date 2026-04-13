@@ -35,6 +35,11 @@ const repeatSubjectRegistrationRoutes = require('./routes/repeatSubjectRegistrat
 const dashboardRoutes = require('./routes/dashboardRoutes');
 const examOfficerDashboardRoutes = require('./routes/examOfficerDashboardRoutes');
 const bursarDashboardRoutes = require('./routes/bursarDashboardRoutes');
+const medicalRoutes = require('./routes/medicalRoutes');
+const mahapolaRoutes = require('./routes/mahapolaRoutes');
+const assessmentRoutes = require('./routes/assessmentRoutes');
+const attendanceSessionRoutes = require('./routes/attendanceSessionRoutes');
+const claimRoutes = require('./routes/claimRoutes');
 
 const app = express();
 
@@ -104,6 +109,11 @@ app.use('/api/repeat-registration', repeatSubjectRegistrationRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/exam-officer', examOfficerDashboardRoutes);
 app.use('/api/bursar', bursarDashboardRoutes);
+app.use('/api/medicals', medicalRoutes);
+app.use('/api/mahapola', mahapolaRoutes);
+app.use('/api/assessments', assessmentRoutes);
+app.use('/api/attendance-sessions', attendanceSessionRoutes);
+app.use('/api/claims', claimRoutes);
 
 // Error handler
 const errorHandler = require('./middleware/error');
@@ -112,13 +122,13 @@ app.use(errorHandler);
 const PORT = process.env.PORT || 5001;
 
 const server = app.listen(PORT, () => {
-    console.log(`\n==================================================`);
-    console.log(`🚀 Server Status: RUNNING`);
-    console.log(`==================================================`);
-    console.log(`📡 Environment: ${process.env.NODE_ENV}`);
-    console.log(`🌐 Port: ${PORT}`);
-    console.log(`📚 API Base URL: http://localhost:${PORT}/api`);
-    console.log(`==================================================\n`);
+  console.log(`\n==================================================`);
+  console.log(`🚀 Server Status: RUNNING`);
+  console.log(`==================================================`);
+  console.log(`📡 Environment: ${process.env.NODE_ENV}`);
+  console.log(`🌐 Port: ${PORT}`);
+  console.log(`📚 API Base URL: http://localhost:${PORT}/api`);
+  console.log(`==================================================\n`);
 });
 
 // Handle unhandled promise rejections

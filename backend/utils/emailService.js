@@ -25,6 +25,26 @@ class EmailService {
     });
   }
 
+  async sendAttendanceFinalizationNotification(student, enrollment) {
+    const html = `
+      <div style="text-align: center; margin-bottom: 30px;">
+         <div style="display: inline-block; background: #059669; color: white; padding: 12px 24px; border-radius: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; font-size: 12px;">
+            Attendance Finalized
+         </div>
+      </div>
+      <h2 style="font-size: 20px; font-weight: 900; color: #1e293b; margin-top: 0; text-align: center;">Attendance Records Finalized</h2>
+      <p>Dear ${student.name},</p>
+      <p>Your attendance records for <strong>${enrollment.course.courseName}</strong> have been finalized and certified by the academic office.</p>
+      <div style="background: #f0fdf4; border: 1px solid #bbf7d0; padding: 20px; border-radius: 12px; margin: 20px 0;">
+         <p style="margin: 0 0 10px 0;"><strong>Final Attendance Percentage:</strong> <span style="color: #166534; font-weight: bold; font-size: 18px;">${enrollment.attendancePercentage.toFixed(1)}%</span></p>
+         <p style="margin: 0;"><strong>Status:</strong> ${enrollment.attendancePercentage >= 75 ? 'Eligible for Final Examination' : 'Below Required Threshold'}</p>
+      </div>
+      <p>Your attendance records are now permanent and cannot be modified. If you have any concerns about these records, please contact your course lecturer or department office immediately.</p>
+    `;
+
+    return await this.sendEmail({ email: student.email, subject: 'Attendance Finalized: Official Notification', html });
+  }
+
   async sendEmail(options) {
     try {
       const mailOptions = {
@@ -264,6 +284,72 @@ class EmailService {
     `;
 
     return await this.sendEmail({ email: student.email, subject: 'URGENT: Academic Compliance Alert - Low Attendance', html });
+  }
+
+  async sendAttendanceDiscrepancyNotification(student, enrollment, date) {
+    const html = `
+      <div style="text-align: center; margin-bottom: 30px;">
+         <div style="display: inline-block; background: #fef3c7; color: #d97706; padding: 12px 24px; rounded: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; font-size: 12px; border: 1px solid #fcd34d;">
+            Attendance Discrepancy
+         </div>
+      </div>
+      <h2 style="font-size: 20px; font-weight: 900; color: #1e293b; margin-top: 0; text-align: center;">Attendance Confirmation Submitted</h2>
+      <p>Dear ${student.name},</p>
+      <p>You have confirmed your attendance for <strong>${enrollment.course.courseName}</strong> on <strong>${new Date(date).toDateString()}</strong>, but our records show you were marked as absent.</p>
+      <div style="background: #fef3c7; border: 1px solid #fcd34d; padding: 20px; border-radius: 12px; margin: 20px 0;">
+         <p style="margin: 0; font-weight: bold; color: #92400e;">This discrepancy has been automatically flagged for review by your Head of Department.</p>
+         <p style="margin: 10px 0 0 0; color: #92400e;">You will be notified once the review is complete.</p>
+      </div>
+      <p>If you have any additional information or documentation to support your attendance claim, please contact your course lecturer or department office.</p>
+    `;
+
+    return await this.sendEmail({ email: student.email, subject: 'Attendance Discrepancy Reported - Under Review', html });
+  }
+
+  async sendAttendanceReviewToHOD(hod, student, enrollment, date) {
+    const html = `
+      <div style="text-align: center; margin-bottom: 30px;">
+         <div style="display: inline-block; background: #fee2e2; color: #dc2626; padding: 12px 24px; rounded: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; font-size: 12px; border: 1px solid #fca5a5;">
+            Urgent Review Required
+         </div>
+      </div>
+      <h2 style="font-size: 20px; font-weight: 900; color: #1e293b; margin-top: 0; text-align: center;">Attendance Discrepancy Review</h2>
+      <p>Dear HOD <strong>${hod.name}</strong>,</p>
+      <p>A student has reported an attendance discrepancy that requires your immediate attention:</p>
+      <div style="background: #fef2f2; border: 1px solid #fecaca; padding: 20px; border-radius: 12px; margin: 20px 0;">
+         <p style="margin: 0 0 10px 0;"><strong>Student:</strong> ${student.name} (${student.studentId})</p>
+         <p style="margin: 0 0 10px 0;"><strong>Course:</strong> ${enrollment.course.courseName} (${enrollment.course.courseCode})</p>
+         <p style="margin: 0 0 10px 0;"><strong>Date:</strong> ${new Date(date).toDateString()}</p>
+         <p style="margin: 0;"><strong>Issue:</strong> Student confirms attendance but was marked absent by lecturer</p>
+      </div>
+      <p>Please review this case through the HOD dashboard and take appropriate action.</p>
+    `;
+
+    return await this.sendEmail({ email: hod.email, subject: `URGENT: Attendance Review Required - ${student.name}`, html });
+  }
+
+  async sendAttendanceReviewResult(student, enrollment, date, oldStatus, newStatus, hodRemarks) {
+    const statusColor = newStatus === 'present' ? '#10b981' : '#ef4444';
+    const statusText = newStatus === oldStatus ? 'No Change' : `Changed from ${oldStatus} to ${newStatus}`;
+
+    const html = `
+      <div style="text-align: center; margin-bottom: 30px;">
+         <div style="display: inline-block; background: #f0fdf4; color: #166534; padding: 12px 24px; rounded: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; font-size: 12px; border: 1px solid #bbf7d0;">
+            Review Complete
+         </div>
+      </div>
+      <h2 style="font-size: 20px; font-weight: 900; color: #1e293b; margin-top: 0; text-align: center;">Attendance Review Decision</h2>
+      <p>Dear ${student.name},</p>
+      <p>Your attendance discrepancy for <strong>${enrollment.course.courseName}</strong> on <strong>${new Date(date).toDateString()}</strong> has been reviewed by the Head of Department.</p>
+      <div style="background: #f0fdf4; border: 1px solid #bbf7d0; padding: 20px; border-radius: 12px; margin: 20px 0;">
+         <p style="margin: 0 0 10px 0;"><strong>Final Status:</strong> <span style="color: ${statusColor}; font-weight: bold;">${newStatus.toUpperCase()}</span></p>
+         <p style="margin: 0 0 10px 0;"><strong>Decision:</strong> ${statusText}</p>
+         ${hodRemarks ? `<p style="margin: 0;"><strong>HOD Remarks:</strong> ${hodRemarks}</p>` : ''}
+      </div>
+      <p>Your attendance percentage has been updated accordingly.</p>
+    `;
+
+    return await this.sendEmail({ email: student.email, subject: `Attendance Review Complete - ${newStatus.toUpperCase()}`, html });
   }
 
   async sendEnrollmentConfirmation(student, course) {
@@ -710,8 +796,83 @@ class EmailService {
     });
   }
 
+  // --- MEDICAL NOTIFICATIONS ---
+  async sendMedicalSubmissionToHOD(hod, student, medical) {
+    const html = `
+      <h2 style="font-size: 22px; font-weight: 900; color: #1e40af; margin-top: 0;">Action Required: New Medical Certificate Submission</h2>
+      <p>Dear ${hod.name},</p>
+      <p>A student has submitted a Medical Certificate that requires your review and approval.</p>
+      
+      <div style="background: #f1f5f9; border: 1px solid #cbd5e1; padding: 20px; margin: 20px 0; border-radius: 8px;">
+        <p style="margin: 0; font-size: 14px; font-weight: bold; color: #1e3a8a;">Student Details:</p>
+        <p style="margin: 8px 0;">
+          <strong>Name:</strong> ${student.name}<br/>
+          <strong>Registration:</strong> ${medical.registrationNumber}<br/>
+        </p>
+      </div>
+
+      <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 20px; margin: 20px 0; border-radius: 8px;">
+        <p style="margin: 0; font-size: 14px; font-weight: bold; color: #1e293b;">Leave Details:</p>
+        <p style="margin: 8px 0;">
+          <strong>Illness:</strong> ${medical.illness}<br/>
+          <strong>Start Date:</strong> ${new Date(medical.startDate).toDateString()}<br/>
+          <strong>End Date:</strong> ${new Date(medical.endDate).toDateString()}
+        </p>
+      </div>
+
+      <a href="${process.env.FRONTEND_URL}/hod/dashboard" style="display: inline-block; background: #1e40af; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; margin-top: 15px;">Review Application</a>
+    `;
+    return await this.sendEmail({ email: hod.email, subject: `HOD Action Required: Medical Leave - ${student.name}`, html });
+  }
+
+  async sendMedicalToAdmin(student, medical) {
+    // Assuming there's a central admin email or we broadcast to admins via DB in the controller
+    const html = `
+      <h2 style="font-size: 20px; font-weight: 900; color: #1e40af; margin-top: 0;">Medical Processing Required</h2>
+      <p>System Administrator,</p>
+      <p>HOD has approved the medical certificate for <strong>${student.name}</strong>. It requires final admin approval and processing.</p>
+      <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 25px; border-radius: 12px; margin: 30px 0;">
+         <p style="margin: 0 0 10px 0;"><strong>Student:</strong> ${student.name} (${medical.registrationNumber})</p>
+         <p style="margin: 0;"><strong>Illness:</strong> ${medical.illness}</p>
+      </div>
+       <a href="${process.env.FRONTEND_URL}/admin/medical" style="display: inline-block; background: #1e40af; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; margin-top: 15px;">Review Application</a>
+    `;
+    // We expect the controller to pass appropriate admin email(s) into this if they call sendEmail directly, 
+    // but here we just accept options. Wait, we should accept adminEmail as parameter.
+  }
+
+  async sendMedicalToAdminAction(adminEmail, student, medical) {
+     const html = `
+      <h2 style="font-size: 20px; font-weight: 900; color: #1e40af; margin-top: 0;">Medical Processing Required</h2>
+      <p>System Administrator,</p>
+      <p>HOD has approved the medical certificate for <strong>${student.name}</strong>. It requires final admin approval and processing.</p>
+      <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 25px; border-radius: 12px; margin: 30px 0;">
+         <p style="margin: 0 0 10px 0;"><strong>Student:</strong> ${student.name} (${medical.registrationNumber})</p>
+         <p style="margin: 0;"><strong>Illness:</strong> ${medical.illness}</p>
+      </div>
+       <a href="${process.env.FRONTEND_URL}/admin/medical" style="display: inline-block; background: #1e40af; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; margin-top: 15px;">Review Application</a>
+     `;
+     return await this.sendEmail({ email: adminEmail, subject: `Admin Action Required: Medical Processing - ${student.name}`, html });
+  }
+
+  async sendMedicalDecision(student, status, remarks) {
+    const isApproved = status.includes('APPROVED');
+    const color = isApproved ? '#059669' : '#dc2626';
+    const statusText = isApproved ? 'APPROVED' : 'REJECTED';
+    const html = `
+       <h2 style="color: ${color}; font-size: 24px; font-weight: 900; margin-top: 0;">Medical Form Decision: ${statusText}</h2>
+       <p>The review for your medical certificate submission has been finalized.</p>
+       <div style="border-left: 4px solid ${color}; background: #f8fafc; padding: 25px; margin: 30px 0;">
+          <p style="margin: 0; font-size: 12px; color: #64748b; font-weight: 800; text-transform: uppercase;">Official Remarks</p>
+          <p style="margin: 10px 0 0 0; color: #1e293b; font-weight: 500; font-style: italic;">"${remarks || 'Decision finalized.'}"</p>
+       </div>
+    `;
+    return await this.sendEmail({ email: student.email, subject: `Medical Update: ${statusText}`, html });
+  }
+
   /**
    * Final approval notification to student
+
    */
   async sendRepeatFinalApprovalNotification(student, registration) {
     const html = `
@@ -1344,16 +1505,16 @@ class EmailService {
         const doc = new PDFDocument({ margin: 50, size: 'A4' });
         const chunks = [];
 
-        doc.on('data', (chunk) => {
+        doc.on('data', function(chunk) {
           chunks.push(chunk);
         });
 
-        doc.on('error', (error) => {
+        doc.on('error', function(error) {
           console.error('PDF generation error:', error);
           reject(error);
         });
 
-        doc.on('end', () => {
+        doc.on('end', function() {
           console.log('PDF generation completed, buffer size:', chunks.length);
           try {
             const buffer = Buffer.concat(chunks);
@@ -2105,6 +2266,7 @@ class EmailService {
       }
     });
   }
+
 }
 
 module.exports = new EmailService();
