@@ -431,35 +431,37 @@ const LecturerManagement = () => {
                     >
                       <FiTrendingUp size={18} />
                     </button>
-                    <button
-                      onClick={() => {
-                        setSelectedAssignment(assignment);
-                        setFormData({
-                          lecturerId: assignment.lecturer?._id || '',
-                          subjectId: assignment.subject?._id || '',
-                          departmentId: assignment.department?.name || assignment.department || '',
-                          academicYear: assignment.academicYear || '',
-                          semester: assignment.semester?.toString() || '',
-                          startDate: assignment.startDate ? new Date(assignment.startDate).toISOString().split('T')[0] : '',
-                          endDate: assignment.endDate ? new Date(assignment.endDate).toISOString().split('T')[0] : '',
-                          totalLectures: assignment.curriculum?.totalLectures || 30,
-                          totalPracticals: assignment.curriculum?.totalPracticals || 15,
-                          totalAssignments: assignment.curriculum?.totalAssignments || 10,
-                          minimumQualification: assignment.qualifications?.minimumQualification || 'B.Tech',
-                          notes: assignment.notes || ''
-                        });
-                        toggleModal('edit', true);
-                      }}
-                      className="text-amber-600 hover:text-amber-800"
-                    >
-                      <FiEdit2 size={18} />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(assignment._id)}
-                      className="text-red-600 hover:text-red-800"
-                    >
-                      <FiTrash2 size={18} />
-                    </button>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => {
+                          setSelectedAssignment(assignment);
+                          setFormData({
+                            lecturerId: assignment.lecturer?._id || '',
+                            subjectId: assignment.subject?._id || '',
+                            departmentId: assignment.department?.name || assignment.department || '',
+                            academicYear: assignment.academicYear || '',
+                            semester: assignment.semester?.toString() || '',
+                            startDate: assignment.startDate ? new Date(assignment.startDate).toISOString().split('T')[0] : '',
+                            endDate: assignment.endDate ? new Date(assignment.endDate).toISOString().split('T')[0] : '',
+                            totalLectures: assignment.curriculum?.totalLectures || 30,
+                            totalPracticals: assignment.curriculum?.totalPracticals || 15,
+                            totalAssignments: assignment.curriculum?.totalAssignments || 10,
+                            minimumQualification: assignment.qualifications?.minimumQualification || 'B.Tech',
+                            notes: assignment.notes || ''
+                          });
+                          toggleModal('edit', true);
+                        }}
+                        className="text-amber-600 hover:text-amber-800"
+                      >
+                        <FiEdit2 size={18} />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(assignment._id)}
+                        className="text-red-600 hover:text-red-800"
+                      >
+                        <FiTrash2 size={18} />
+                      </button>
+                    </div>
                   </div>
                 </td>
               </tr>
@@ -869,8 +871,8 @@ const EditModal = ({ isOpen, onClose, formData, setFormData, onSubmit, lecturers
       <div className="bg-white rounded-lg p-8 w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl">
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center gap-3">
-             <div className="p-2 bg-amber-50 text-amber-600 rounded-lg"><FiEdit2 size={24} /></div>
-             <h2 className="text-2xl font-black uppercase tracking-tight text-slate-800">Edit Assignment</h2>
+            <div className="p-2 bg-amber-50 text-amber-600 rounded-lg"><FiEdit2 size={24} /></div>
+            <h2 className="text-2xl font-black uppercase tracking-tight text-slate-800">Edit Assignment</h2>
           </div>
           <button onClick={onClose} className="text-slate-400 hover:text-slate-600 transition-colors">
             <FiX size={24} />
@@ -878,12 +880,12 @@ const EditModal = ({ isOpen, onClose, formData, setFormData, onSubmit, lecturers
         </div>
 
         <div className="bg-slate-50 p-4 rounded-xl mb-6 border border-slate-100">
-           <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-1">Subject</p>
-           <p className="font-bold text-slate-700">{assignment.subject?.code} - {assignment.subject?.name}</p>
-           <div className="flex gap-4 mt-2">
-              <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Year: <span className="text-slate-600">{assignment.academicYear}</span></p>
-              <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Semester: <span className="text-slate-600">{assignment.semester}</span></p>
-           </div>
+          <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-1">Subject</p>
+          <p className="font-bold text-slate-700">{assignment.subject?.code} - {assignment.subject?.name}</p>
+          <div className="flex gap-4 mt-2">
+            <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Year: <span className="text-slate-600">{assignment.academicYear}</span></p>
+            <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Semester: <span className="text-slate-600">{assignment.semester}</span></p>
+          </div>
         </div>
 
         <form onSubmit={onSubmit} className="space-y-4">

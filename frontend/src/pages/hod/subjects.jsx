@@ -547,22 +547,16 @@ const HodSubjects = () => {
             </div>
             <div className="flex flex-wrap gap-3">
               <button
-                onClick={() => setShowSeedModal(true)}
-                className="px-6 py-3 bg-indigo-50 text-indigo-600 rounded-2xl font-bold hover:bg-indigo-100 transition-all flex items-center gap-2"
-              >
-                <FiUpload /> Initialize Curriculum
-              </button>
-              <button
-                onClick={() => setShowBulkUploadModal(true)}
-                className="px-6 py-3 bg-slate-100 text-slate-600 rounded-2xl font-bold hover:bg-slate-200 transition-all flex items-center gap-2"
-              >
-                <FiDownload /> Bulk Upload
-              </button>
-              <button
-                onClick={() => { resetForm(); setShowAddModal(true); }}
-                className="px-6 py-3 bg-slate-900 text-white rounded-2xl font-bold hover:bg-slate-800 transition-all flex items-center gap-2 shadow-xl shadow-slate-200"
+                onClick={() => setShowAddModal(true)}
+                className="px-6 py-3 bg-indigo-600 text-white rounded-2xl font-bold hover:bg-indigo-700 transition-all flex items-center gap-2"
               >
                 <FiPlus /> Add Subject
+              </button>
+              <button
+                onClick={fetchData}
+                className="px-6 py-3 bg-indigo-50 text-indigo-600 rounded-2xl font-bold hover:bg-indigo-100 transition-all flex items-center gap-2"
+              >
+                <FiRefreshCw /> Refresh
               </button>
             </div>
           </div>
@@ -649,26 +643,24 @@ const HodSubjects = () => {
                       <p className="text-xs font-bold text-slate-600 leading-tight truncate w-32">{subject.lecturer?.name || 'Unassigned'}</p>
                     </div>
                   </div>
-                  <button 
-                    onClick={() => handleAssignClick(subject)}
-                    className="p-2 text-indigo-600 hover:bg-white rounded-xl transition-all shadow-sm"
-                    title="Change Lecturer"
-                  >
-                    <FiArrowRight />
-                  </button>
                 </div>
 
                 <div className="flex gap-3">
+                  <Link 
+                    to={`/hod/subject/${subject._id}/assessments`}
+                    className="flex-1 py-3 bg-slate-900 text-white rounded-xl font-black uppercase text-[10px] tracking-widest hover:bg-slate-800 transition-all flex items-center justify-center gap-2"
+                  >
+                    <FiAward /> Assessments
+                  </Link>
                   <button 
                     onClick={() => openEditModal(subject)}
-                    className="flex-1 py-4 bg-slate-900 text-white rounded-xl font-black uppercase text-[10px] tracking-[0.2em] transform transition-all active:scale-95"
+                    className="flex-1 py-3 border border-indigo-200 text-indigo-600 rounded-xl font-black uppercase text-[10px] tracking-widest hover:bg-indigo-50 transition-all flex items-center justify-center gap-2"
                   >
-                    Edit
+                    <FiEdit2 /> Edit
                   </button>
                   <button 
                     onClick={() => handleDeleteSubject(subject._id)}
-                    className="w-12 h-12 flex items-center justify-center bg-red-50 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all transform active:scale-95"
-                    title="Delete Subject"
+                    className="p-3 bg-rose-50 text-rose-500 rounded-xl hover:bg-rose-600 hover:text-white transition-all flex items-center justify-center"
                   >
                     <FiTrash2 />
                   </button>
@@ -930,10 +922,26 @@ const HodSubjects = () => {
                 {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
               </select>
             </div>
+            <div className="space-y-1">
+              <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Lecturer In Charge</label>
+              <select
+                name="lecturer"
+                value={formData.lecturer}
+                onChange={handleInputChange}
+                className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl font-bold focus:ring-2 focus:ring-indigo-500"
+              >
+                <option value="">Unassigned</option>
+                {lecturers.map(l => (
+                  <option key={l._id} value={l._id}>
+                    {l.name}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
-          <button type="submit" className="w-full py-5 bg-slate-900 text-white rounded-2xl font-black uppercase tracking-widest hover:bg-black transition-all transform active:scale-95">
-             Update Details
+          <button type="submit" className="w-full py-5 bg-indigo-600 text-white rounded-2xl font-black uppercase tracking-widest hover:bg-indigo-700 transition-all transform active:scale-95 shadow-xl shadow-indigo-100">
+             Save Changes
           </button>
         </form>
       </Modal>

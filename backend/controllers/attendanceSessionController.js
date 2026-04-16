@@ -2,6 +2,63 @@ const AttendanceSession = require('../models/AttendanceSession');
 const Course = require('../models/course');
 const User = require('../models/user');
 const Notification = require('../models/notification');
+const Enrollment = require('../models/Enrollment');
+
+// Helper to sync session data to Enrollment records
+const syncSessionToEnrollments = async (session) => {
+  if (!session.attendanceRecords || session.attendanceRecords.length === 0) {
+    console.log('[sync] No records to sync for session:', session._id);
+    return;
+  }
+
+  const dateStr = new Date(session.date).toISOString().split('T')[0];
+  console.log(`[sync] Starting sync for session ${session._id} on ${dateStr}`);
+  
+  for (const record of session.attendanceRecords) {
+    console.log(`[sync] Processing record for student ${record.student} in subject ${session.subject}`);
+    const enrollment = await Enrollment.findOne({
+      student: record.student,
+      course: session.subject
+    });
+
+    if (enrollment) {
+      console.log(`[sync] Found enrollment ${enrollment._id}. Syncing...`);
+      if (!enrollment.attendance) enrollment.attendance = [];
+      
+      const existingIndex = enrollment.attendance.findIndex(
+        a => a.date && a.date.toISOString().split('T')[0] === dateStr
+      );
+
+      const attendanceItem = {
+        date: session.date,
+        status: record.status,
+        startTime: session.startTime,
+        lecturerHour: session.lecturerHour,
+        markedBy: session.lecturer,
+        markedAt: new Date(),
+        remarks: record.remarks
+      };
+
+      if (existingIndex >= 0) {
+        enrollment.attendance[existingIndex] = attendanceItem;
+      } else {
+        enrollment.attendance.push(attendanceItem);
+      }
+      
+      // Recalculate attendance percentage
+      const total = enrollment.attendance.length;
+      const present = enrollment.attendance.filter(
+        a => a.status === 'present' || a.status === 'late'
+      ).length;
+      enrollment.attendancePercentage = total > 0 ? ((present / total) * 100).toFixed(2) : 0;
+      
+      await enrollment.save();
+      console.log(`[sync] Sync complete for ${record.student}. New %: ${enrollment.attendancePercentage}`);
+    } else {
+      console.warn(`[sync] FAILED: No enrollment found for student ${record.student} and course ${session.subject}`);
+    }
+  }
+};
 
 // @desc    Create an attendance session
 // @route   POST /api/attendance-sessions
@@ -44,8 +101,8 @@ exports.updateSession = async (req, res, next) => {
       return res.status(401).json({ success: false, message: 'Not authorized to update this session' });
     }
 
-    if (session.status !== 'draft') {
-      return res.status(403).json({ success: false, message: 'Cannot edit session once published to HOD' });
+    if (session.status === 'approved_by_hod') {
+      return res.status(403).json({ success: false, message: 'Cannot edit session once approved by HOD' });
     }
 
     session.date = date || session.date;
@@ -54,6 +111,9 @@ exports.updateSession = async (req, res, next) => {
     session.batch = batch || session.batch;
 
     await session.save();
+
+    // Sync to Enrollment models
+    await syncSessionToEnrollments(session);
 
     res.json({
       success: true,
@@ -102,9 +162,12 @@ exports.updateAttendanceRecords = async (req, res, next) => {
     session.attendanceRecords = attendanceRecords;
     await session.save();
 
+    // Sync to Enrollment models
+    await syncSessionToEnrollments(session);
+
     res.json({
       success: true,
-      message: 'Attendance records updated',
+      message: 'Attendance records updated and synced with enrollments',
       session
     });
   } catch (error) {

@@ -15,6 +15,9 @@ const LecturerAttendance = () => {
   const [saving, setSaving] = useState(false);
   const [attendanceDate, setAttendanceDate] = useState(new Date().toISOString().split('T')[0]);
   const [attendanceData, setAttendanceData] = useState({}); // {enrollmentId: status}
+  const [selectedBatch, setSelectedBatch] = useState('All');
+
+  const batches = ['2024/2025', '2023/2024', '2022/2023', '2021/2022', 'Repeat Batch (All)'];
 
   useEffect(() => {
     if (!subjectId) {
@@ -113,24 +116,55 @@ const LecturerAttendance = () => {
               />
            </div>
            <div className="hidden sm:block h-12 w-[1px] bg-slate-200"></div>
+           <div className="flex flex-col items-center sm:items-start ml-4">
+              <span className="text-[10px] text-slate-400 font-black uppercase tracking-widest mb-1.5 flex items-center"><FiUsers className="mr-1 inline" /> Batch Filter</span>
+              <select
+                value={selectedBatch}
+                onChange={(e) => setSelectedBatch(e.target.value)}
+                className="border border-slate-200 p-2 rounded-xl text-slate-700 font-bold text-sm focus:ring-emerald-500 focus:border-emerald-500 bg-slate-50 transition-colors outline-none"
+              >
+                <option value="All">All Batches</option>
+                {batches.map(b => <option key={b} value={b}>{b}</option>)}
+              </select>
+           </div>
+           <div className="hidden sm:block h-12 w-[1px] bg-slate-200"></div>
            <div className="flex flex-col items-center sm:items-start">
-              <span className="text-[10px] text-slate-400 font-black uppercase tracking-widest mb-1.5 flex items-center"><FiUsers className="mr-1 inline" /> Students Count</span>
-              <span className="text-2xl font-black text-slate-700 bg-emerald-50 text-emerald-700 px-4 py-1 rounded-xl">{students.length}</span>
+              <span className="text-[10px] text-slate-400 font-black uppercase tracking-widest mb-1.5 flex items-center"><FiUsers className="mr-1 inline" /> Displaying</span>
+              <span className="text-2xl font-black text-slate-700 bg-emerald-50 text-emerald-700 px-4 py-1 rounded-xl">
+                {selectedBatch === 'All' ? students.length : students.filter(s => s.student?.batch === selectedBatch).length}
+              </span>
            </div>
         </div>
       </div>
 
       <div className="bg-white rounded-[2rem] p-6 shadow-sm border border-slate-100 mb-8 flex flex-wrap items-center justify-between gap-4">
-         <p className="text-slate-500 font-bold text-sm uppercase tracking-wider">Bulk Actions Data Update</p>
+         <p className="text-slate-500 font-bold text-sm uppercase tracking-wider">Bulk Actions ({selectedBatch})</p>
          <div className="flex gap-3">
-            <button onClick={() => markAll('present')} className="px-5 py-2.5 bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white rounded-xl font-bold text-xs uppercase tracking-widest transition-all flex items-center gap-2">
-               <FiCheckCircle /> Mark All Present
+            <button 
+              onClick={() => {
+                const newData = { ...attendanceData };
+                students.filter(s => selectedBatch === 'All' || s.student?.batch === selectedBatch).forEach(s => {
+                  newData[s._id] = 'present';
+                });
+                setAttendanceData(newData);
+                toast.success(`Marked ${selectedBatch} as present`);
+              }} 
+              className="px-5 py-2.5 bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white rounded-xl font-bold text-xs uppercase tracking-widest transition-all flex items-center gap-2"
+            >
+               <FiCheckCircle /> Present
             </button>
-            <button onClick={() => markAll('absent')} className="px-5 py-2.5 bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white rounded-xl font-bold text-xs uppercase tracking-widest transition-all flex items-center gap-2">
-               <FiX /> Mark All Absent
-            </button>
-            <button onClick={() => markAll('late')} className="px-5 py-2.5 bg-amber-50 text-amber-600 hover:bg-amber-600 hover:text-white rounded-xl font-bold text-xs uppercase tracking-widest transition-all flex items-center gap-2">
-               <FiAlertCircle /> Mark All Late
+            <button 
+              onClick={() => {
+                const newData = { ...attendanceData };
+                students.filter(s => selectedBatch === 'All' || s.student?.batch === selectedBatch).forEach(s => {
+                  newData[s._id] = 'absent';
+                });
+                setAttendanceData(newData);
+                toast.success(`Marked ${selectedBatch} as absent`);
+              }} 
+              className="px-5 py-2.5 bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white rounded-xl font-bold text-xs uppercase tracking-widest transition-all flex items-center gap-2"
+            >
+               <FiX /> Absent
             </button>
          </div>
       </div>
@@ -146,7 +180,9 @@ const LecturerAttendance = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
-              {students.map((student) => (
+              {students
+                .filter(student => selectedBatch === 'All' || student.student?.batch === selectedBatch)
+                .map((student) => (
                 <tr key={student._id} className="hover:bg-slate-50/70 transition-colors">
                   <td className="px-8 py-5">
                     <div className="flex items-center gap-4">

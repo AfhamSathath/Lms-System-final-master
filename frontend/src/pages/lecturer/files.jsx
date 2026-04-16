@@ -122,6 +122,7 @@ const LecturerFiles = () => {
     year: 'all',
     semester: 'all',
     fileType: 'all',
+    batch: 'all',
     dateFrom: '',
     dateTo: ''
   });
@@ -251,6 +252,9 @@ const LecturerFiles = () => {
 
         // File type filter
         if (filters.fileType !== 'all' && file.fileType !== filters.fileType) return false;
+
+        // Batch filter
+        if (filters.batch !== 'all' && (file.academicYear || file.batch) !== filters.batch) return false;
 
         // Date filters
         if (filters.dateFrom && file.uploadedAt && new Date(file.uploadedAt) < new Date(filters.dateFrom)) return false;
@@ -780,7 +784,7 @@ const Filters = ({ filters, subjects, departments, uploaders, onFilterChange, on
         />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
         <Select
           icon={<FiCalendar />}
           value={filters.year}
@@ -798,6 +802,20 @@ const Filters = ({ filters, subjects, departments, uploaders, onFilterChange, on
           options={[
             { value: 'all', label: 'All Semesters' },
             ...SEMESTERS.map(s => ({ value: String(s), label: `Semester ${s}` }))
+          ]}
+        />
+
+        <Select
+          icon={<FiCalendar />}
+          value={filters.batch}
+          onChange={(v) => onFilterChange('batch', v)}
+          options={[
+            { value: 'all', label: 'All Batches' },
+            { value: '2024/2025', label: '2024/2025' },
+            { value: '2023/2024', label: '2023/2024' },
+            { value: '2022/2023', label: '2022/2023' },
+            { value: '2021/2022', label: '2021/2022' },
+            { value: 'Repeat Batch (All)', label: 'Repeat Batch (All)' }
           ]}
         />
 
@@ -1418,9 +1436,9 @@ const ViewModal = ({ isOpen, onClose, file, onDownload, onEdit, onDelete, getFil
         {/* Details Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 p-4 rounded-lg">
           <DetailItem label="Subject" value={file.subject ? `${file.subject.code || ''} - ${file.subject.name || 'Unknown'}` : 'N/A'} />
-          <DetailItem label="Department" value={file.department?.name || 'N/A'} />
-          <DetailItem label="Year of Study" value={file.yearOfStudy ? `${file.yearOfStudy}${getOrdinal(file.yearOfStudy)} Year` : 'N/A'} />
-          <DetailItem label="Semester" value={file.semester ? `Semester ${file.semester}` : 'N/A'} />
+          <DetailItem label="Department" value={file.subject?.department || file.department?.name || 'N/A'} />
+          <DetailItem label="Year of Study" value={file.subject?.year || file.academicYear || (file.yearOfStudy ? `${file.yearOfStudy}${getOrdinal(file.yearOfStudy)} Year` : 'N/A')} />
+          <DetailItem label="Semester" value={file.semester || file.subject?.semester ? `Semester ${file.semester || file.subject.semester}` : 'N/A'} />
           <DetailItem label="File Size" value={formatFileSize(file.size)} />
           <DetailItem label="Downloads" value={file.downloads || 0} />
           <DetailItem label="MIME Type" value={file.mimeType || 'N/A'} />

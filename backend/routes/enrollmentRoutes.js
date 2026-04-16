@@ -21,6 +21,7 @@ const {
   certifyResult,
   confirmStudentAttendance,
   reviewAttendanceByHOD,
+  publishAttendanceByHOD,
   getAttendanceDetails
 } = require('../controllers/enrollmentController');
 
@@ -144,6 +145,13 @@ router.put(
   '/:id/review-attendance',
   authorize('hod', 'admin'),
   reviewAttendanceByHOD
+);
+
+// HOD publishes attendance
+router.put(
+  '/:id/publish-attendance',
+  authorize('hod', 'admin'),
+  publishAttendanceByHOD
 );
 
 // Get detailed attendance information

@@ -36,14 +36,14 @@ const enrollmentSchema = new mongoose.Schema({
     default: 'enrolled',
     index: true
   },
-  
+
   // Waitlist information
   waitlistPosition: {
     type: Number,
     min: 1
   },
   waitlistDate: Date,
-  
+
   // Grades
   continuousAssessment: {
     type: Number,
@@ -77,7 +77,7 @@ const enrollmentSchema = new mongoose.Schema({
     default: 0,
     set: v => Math.round(v * 100) / 100
   },
-  
+
   // Grade mappings for calculation
   gradeMappings: {
     type: Map,
@@ -87,10 +87,10 @@ const enrollmentSchema = new mongoose.Schema({
       'B+': 3.3, 'B': 3.0, 'B-': 2.7,
       'C+': 2.3, 'C': 2.0, 'C-': 1.7,
       'D+': 1.3, 'D': 1.0, 'E': 0.5,
-      'F': 0.0, 'I': 0.0, 'W': 0.0, 'AU': 0.0
+      'F': 0.0
     }
   },
-  
+
   // Attendance
   attendance: [{
     date: {
@@ -102,6 +102,8 @@ const enrollmentSchema = new mongoose.Schema({
       enum: ['present', 'absent', 'late', 'excused'],
       required: true
     },
+    startTime: String,
+    lecturerHour: Number,
     markedBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User'
@@ -128,7 +130,11 @@ const enrollmentSchema = new mongoose.Schema({
     hodUpdatedAt: {
       type: Date
     },
-    hodRemarks: String
+    hodRemarks: String,
+    isPublished: {
+      type: Boolean,
+      default: false
+    }
   }],
   attendancePercentage: {
     type: Number,
@@ -136,7 +142,7 @@ const enrollmentSchema = new mongoose.Schema({
     max: 100,
     default: 0
   },
-  
+
   // Assessment components
   assessments: [{
     name: {
@@ -169,7 +175,7 @@ const enrollmentSchema = new mongoose.Schema({
       min: 0,
       max: 100,
       validate: {
-        validator: function(v) {
+        validator: function (v) {
           // Sum of weights for all assessments shouldn't exceed 100
           if (this.assessments) {
             const totalWeight = this.assessments.reduce((sum, a) => sum + (a.weight || 0), 0) + v;
@@ -219,7 +225,7 @@ const enrollmentSchema = new mongoose.Schema({
       default: 0
     }
   }],
-  
+
   // Payment information
   paymentStatus: {
     type: String,
@@ -233,7 +239,7 @@ const enrollmentSchema = new mongoose.Schema({
   },
   paymentDate: Date,
   paymentReference: String,
-  
+
   // Withdrawal information
   withdrawalDate: Date,
   withdrawalReason: {
@@ -245,7 +251,7 @@ const enrollmentSchema = new mongoose.Schema({
     ref: 'User'
   },
   withdrawalApprovedAt: Date,
-  
+
   // Remarks and notes
   remarks: {
     type: String,
@@ -257,7 +263,7 @@ const enrollmentSchema = new mongoose.Schema({
     trim: true,
     maxlength: [1000, 'Internal notes cannot exceed 1000 characters']
   },
-  
+
   // Grading metadata
   gradedBy: {
     type: mongoose.Schema.Types.ObjectId,
@@ -265,13 +271,13 @@ const enrollmentSchema = new mongoose.Schema({
   },
   gradedDate: Date,
   lastGradedAssessment: Date,
-  
+
   // Transcript visibility
   visibleOnTranscript: {
     type: Boolean,
     default: true
   },
-  
+
   // Audit fields
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
@@ -289,7 +295,7 @@ const enrollmentSchema = new mongoose.Schema({
 
 // Ensure one enrollment per student per course per semester
 enrollmentSchema.index(
-  { student: 1, course: 1, academicYear: 1, semester: 1 }, 
+  { student: 1, course: 1, academicYear: 1, semester: 1 },
   { unique: true }
 );
 
@@ -306,37 +312,37 @@ enrollmentSchema.index({ createdAt: -1 });
 enrollmentSchema.index({ 'attendance.date': 1, 'attendance.status': 1 });
 
 // Pre-save middleware for calculations
-enrollmentSchema.pre('save', function(next) {
+enrollmentSchema.pre('save', function (next) {
   try {
     // Calculate total marks from continuous assessment and final exam
     if (this.continuousAssessment !== undefined && this.finalExam !== undefined) {
       // Calculate weighted average (adjust weights as needed)
-      const caWeight = 0.4; // 40% for continuous assessment
-      const examWeight = 0.6; // 60% for final exam
-      
+      const caWeight = 0.35; // 35% for continuous assessment (CA)
+      const examWeight = 0.65; // 65% for final exam
+
       this.totalMarks = (this.continuousAssessment * caWeight) + (this.finalExam * examWeight);
-      
+
       // Round to 2 decimal places
       this.totalMarks = Math.round(this.totalMarks * 100) / 100;
-      
+
       // Calculate grade based on total marks
       this.calculateGradeFromMarks();
     }
-    
+
     // Calculate marks from assessments if they exist
     if (this.assessments && this.assessments.length > 0) {
       this.calculateFromAssessments();
     }
-    
+
     // Calculate attendance percentage
     this.calculateAttendancePercentage();
-    
+
     // Update last graded assessment date
     const gradedAssessments = this.assessments.filter(a => a.graded === true);
     if (gradedAssessments.length > 0) {
       this.lastGradedAssessment = new Date();
     }
-    
+
     next();
   } catch (error) {
     next(error);
@@ -344,7 +350,7 @@ enrollmentSchema.pre('save', function(next) {
 });
 
 // Pre-update middleware to handle updates
-enrollmentSchema.pre('findOneAndUpdate', function(next) {
+enrollmentSchema.pre('findOneAndUpdate', function (next) {
   this.set({ updatedAt: new Date() });
   next();
 });
@@ -354,7 +360,7 @@ enrollmentSchema.methods = {
   // Calculate grade from marks
   calculateGradeFromMarks() {
     const marks = this.totalMarks;
-    
+
     if (marks >= 85) this.grade = 'A+';
     else if (marks >= 80) this.grade = 'A';
     else if (marks >= 75) this.grade = 'A-';
@@ -368,60 +374,60 @@ enrollmentSchema.methods = {
     else if (marks >= 35) this.grade = 'D';
     else if (marks >= 30) this.grade = 'E';
     else this.grade = 'F';
-    
+
     // Calculate grade points
     this.gradePoints = this.gradeMappings.get(this.grade) || 0;
   },
-  
+
   // Calculate from assessments
   calculateFromAssessments() {
     let totalWeightedMarks = 0;
     let totalWeight = 0;
-    
+
     this.assessments.forEach(assessment => {
       if (assessment.graded && assessment.marksObtained !== undefined) {
         const marksPercentage = (assessment.marksObtained / assessment.maxMarks) * 100;
         const weightedMarks = (marksPercentage * assessment.weight) / 100;
         totalWeightedMarks += weightedMarks;
         totalWeight += assessment.weight;
-        
+
         // Update marks percentage for each assessment
         assessment.marksPercentage = Math.round(marksPercentage * 100) / 100;
       }
     });
-    
+
     if (totalWeight > 0) {
       this.totalMarks = (totalWeightedMarks / totalWeight) * 100;
       this.totalMarks = Math.round(this.totalMarks * 100) / 100;
       this.calculateGradeFromMarks();
     }
   },
-  
+
   // Calculate attendance percentage
   calculateAttendancePercentage() {
     if (this.attendance && this.attendance.length > 0) {
       const total = this.attendance.length;
-      const present = this.attendance.filter(a => 
+      const present = this.attendance.filter(a =>
         a.status === 'present' || a.status === 'late'
       ).length;
-      
+
       this.attendancePercentage = Math.round((present / total) * 100 * 100) / 100;
     } else {
       this.attendancePercentage = 0;
     }
   },
-  
+
   // Add attendance record
   addAttendance(date, status, markedBy, remarks = '') {
     if (!this.attendance) {
       this.attendance = [];
     }
-    
+
     // Check if attendance for this date already exists
-    const existingIndex = this.attendance.findIndex(a => 
+    const existingIndex = this.attendance.findIndex(a =>
       a.date.toDateString() === date.toDateString()
     );
-    
+
     const attendanceRecord = {
       date,
       status,
@@ -429,28 +435,28 @@ enrollmentSchema.methods = {
       markedAt: new Date(),
       remarks
     };
-    
+
     if (existingIndex >= 0) {
       this.attendance[existingIndex] = attendanceRecord;
     } else {
       this.attendance.push(attendanceRecord);
     }
-    
+
     this.calculateAttendancePercentage();
     return this;
   },
-  
+
   // Add assessment result
   addAssessment(assessmentData) {
     if (!this.assessments) {
       this.assessments = [];
     }
-    
+
     // Check if assessment with same name exists
-    const existingIndex = this.assessments.findIndex(a => 
+    const existingIndex = this.assessments.findIndex(a =>
       a.name === assessmentData.name && a.type === assessmentData.type
     );
-    
+
     if (existingIndex >= 0) {
       this.assessments[existingIndex] = {
         ...this.assessments[existingIndex],
@@ -464,11 +470,11 @@ enrollmentSchema.methods = {
         updatedAt: new Date()
       });
     }
-    
+
     this.calculateFromAssessments();
     return this;
   },
-  
+
   // Withdraw from course
   withdraw(reason, approvedBy) {
     this.enrollmentStatus = 'dropped';
@@ -478,13 +484,13 @@ enrollmentSchema.methods = {
     this.withdrawalApprovedAt = new Date();
     return this;
   },
-  
+
   // Check if student can drop course
   canDrop() {
     const enrollmentDate = new Date(this.enrollmentDate);
     const now = new Date();
     const daysEnrolled = Math.floor((now - enrollmentDate) / (1000 * 60 * 60 * 24));
-    
+
     // Can drop within first 14 days of semester
     return daysEnrolled <= 14 && this.enrollmentStatus === 'enrolled';
   }
@@ -495,7 +501,7 @@ enrollmentSchema.statics = {
   // Get enrollment statistics
   async getStats(filters = {}) {
     const match = { ...filters };
-    
+
     const stats = await this.aggregate([
       { $match: match },
       {
@@ -587,12 +593,12 @@ enrollmentSchema.statics = {
       recentEnrollments: []
     };
   },
-  
+
   // Get enrollment trends
   async getTrends(days = 30) {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
-    
+
     return this.aggregate([
       {
         $match: {
@@ -631,7 +637,7 @@ enrollmentSchema.statics = {
       }
     ]);
   },
-  
+
   // Bulk update enrollment status
   async bulkUpdateStatus(enrollmentIds, status, updatedBy) {
     return this.updateMany(
@@ -645,7 +651,7 @@ enrollmentSchema.statics = {
       }
     );
   },
-  
+
   // Get grade distribution for a course
   async getGradeDistribution(courseId, academicYear, semester) {
     return this.aggregate([
@@ -673,18 +679,18 @@ enrollmentSchema.statics = {
       { $sort: { grade: 1 } }
     ]);
   },
-  
+
   // Get student's GPA
   async getStudentGPA(studentId, academicYear = null) {
     const match = {
       student: mongoose.Types.ObjectId(studentId),
       enrollmentStatus: { $in: ['completed', 'enrolled'] }
     };
-    
+
     if (academicYear) {
       match.academicYear = academicYear;
     }
-    
+
     const result = await this.aggregate([
       { $match: match },
       {
@@ -723,7 +729,7 @@ enrollmentSchema.statics = {
         }
       }
     ]);
-    
+
     return result[0] || { gpa: 0, totalCredits: 0, totalGradePoints: 0, courseCount: 0 };
   }
 };

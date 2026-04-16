@@ -116,7 +116,7 @@ const Navbar = () => {
   const getNavbarMargin = () => {
     if (typeof window === 'undefined') return '0';
     if (window.innerWidth < 1024) return '0';
-    return sidebarOpen ? '16rem' : '4rem';
+    return sidebarOpen ? '16rem' : '5rem';
   };
 
   return (

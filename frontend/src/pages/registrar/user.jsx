@@ -54,6 +54,9 @@ const RegistrarUsers = () => {
   const [selectedSemester, setSelectedSemester] = useState('all');
   const [selectedDepartment, setSelectedDepartment] = useState('all');
   const [selectedStatus, setSelectedStatus] = useState('all');
+  const [selectedBatch, setSelectedBatch] = useState('all');
+
+  const batches = ['2024/2025', '2023/2024', '2022/2023', '2021/2022', 'Repeat Batch (All)'];
 
   // Modals
   const [showAddModal, setShowAddModal] = useState(false);
@@ -111,7 +114,7 @@ const RegistrarUsers = () => {
 
   useEffect(() => {
     filterUsers();
-  }, [searchTerm, selectedRole, selectedYear, selectedSemester, selectedDepartment, selectedStatus, users]);
+  }, [searchTerm, selectedRole, selectedYear, selectedSemester, selectedDepartment, selectedStatus, selectedBatch, users]);
 
   // Update departments when faculty changes
   useEffect(() => {
@@ -236,6 +239,11 @@ const RegistrarUsers = () => {
     // Status filter
     if (selectedStatus !== 'all') {
       filtered = filtered.filter(u => u && u.isActive === (selectedStatus === 'active'));
+    }
+
+    // Batch filter
+    if (selectedBatch !== 'all') {
+      filtered = filtered.filter(u => u && u.batch === selectedBatch);
     }
 
     // Search filter
@@ -684,7 +692,7 @@ const RegistrarUsers = () => {
 
       {/* Filters */}
       <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-7 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-8 gap-4">
           {/* Search */}
           <div className="relative lg:col-span-2">
             <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -777,11 +785,27 @@ const RegistrarUsers = () => {
             </select>
             <FiChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" />
           </div>
+
+          {/* Batch Filter */}
+          <div className="relative">
+            <FiUsers className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <select
+              value={selectedBatch}
+              onChange={(e) => setSelectedBatch(e.target.value)}
+              className="w-full pl-10 pr-8 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 appearance-none"
+            >
+              <option value="all">All Batches</option>
+              {batches.map(b => (
+                <option key={b} value={b}>{b}</option>
+              ))}
+            </select>
+            <FiChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" />
+          </div>
         </div>
 
         {/* Active Filters */}
         {(selectedRole !== 'all' || selectedYear !== 'all' || selectedSemester !== 'all' ||
-          selectedDepartment !== 'all' || selectedStatus !== 'all' || searchTerm) && (
+          selectedDepartment !== 'all' || selectedStatus !== 'all' || selectedBatch !== 'all' || searchTerm) && (
             <div className="mt-4 flex flex-wrap items-center gap-2">
               <span className="text-sm text-gray-500">Active filters:</span>
               {selectedRole !== 'all' && (

@@ -7,20 +7,42 @@ const emailService = require('../utils/emailService');
 // @access  Private (Admin, HOD, Dean, Registrar)
 exports.getActivities = async (req, res, next) => {
   try {
-    const { user, page = 1, limit = 10, sortBy = '-createdAt' } = req.query;
-    const query = {};
+    const { user, page = 1, limit = 20, sortBy = '-createdAt', action } = req.query;
+    let query = {};
 
-    // Filter by user if provided
-    if (user) query.user = user;
+    // Filter by specific action if provided
+    if (action) {
+      query.action = { $regex: action, $options: 'i' };
+    }
 
-    // Role-based access: restrict non-admin users to their own activities or their department/faculty
-    if (req.user.role !== 'admin') {
+    // Role-based access and scoping
+    if (req.user.role === 'admin' || req.user.role === 'registrar') {
+      // Admins and Registrars can see everything
+      if (user) query.user = user;
+    } else if (req.user.role === 'dean') {
+      // Deans see activities in their faculty
+      const facultyUsers = await User.find({ faculty: req.user.faculty }).select('_id');
+      const userIds = facultyUsers.map(u => u._id);
+      query.user = { $in: userIds };
+      if (user && userIds.some(id => id.toString() === user)) {
+        query.user = user;
+      }
+    } else if (req.user.role === 'hod') {
+      // HODs see activities in their department
+      const deptUsers = await User.find({ department: req.user.department }).select('_id');
+      const userIds = deptUsers.map(u => u._id);
+      query.user = { $in: userIds };
+      if (user && userIds.some(id => id.toString() === user)) {
+        query.user = user;
+      }
+    } else {
+      // Other users only see their own activities
       query.user = req.user._id;
     }
 
     const skip = (parseInt(page) - 1) * parseInt(limit);
     const activities = await Activity.find(query)
-      .populate('user', 'name email role department faculty')
+      .populate('user', 'name email role department faculty profilePicture')
       .sort(sortBy)
       .skip(skip)
       .limit(parseInt(limit));

@@ -164,7 +164,7 @@ exports.getFiles = async (req, res, next) => {
     }
 
     const files = await File.find(query)
-      .populate('subject', 'code name')
+      .populate('subject', 'code name department year semester')
       .populate('uploadedBy', 'name')
       .sort('-createdAt');
 

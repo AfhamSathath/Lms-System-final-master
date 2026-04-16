@@ -129,7 +129,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                   { name: 'Subject Registration', path: 'subjects', icon: FiBook },
                   { name: 'Exam Application', path: 'repeats', icon: FiClipboard },
                   { name: 'Exam Timetable', path: 'timetable', icon: FiCalendar },
-                  { name: 'My Assessment Marks', path: 'results', icon: FiStar },
+                  { name: 'My Assessment Marks', path: 'assessments', icon: FiStar },
                   { name: 'My Attendance', path: 'attendance', icon: FiCheckSquare },
                   { name: 'Mahapola/Bursary History', path: 'mahapola-details', icon: FiBriefcase },
                   { name: 'Feedback', path: 'feedback', icon: FiMessageSquare },
@@ -390,10 +390,12 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       >
         <button
           onClick={toggleSidebar}
-          className="absolute -right-3 top-8 bg-white rounded-full p-1.5 shadow-md border border-slate-200/80 hover:bg-slate-50 transition-all duration-200 z-40 lg:flex hidden items-center justify-center"
+          className={`absolute -right-4 top-10 bg-white rounded-full w-8 h-8 flex items-center justify-center shadow-[0_4px_12px_rgba(0,0,0,0.08)] border border-slate-200/50 hover:bg-slate-50 hover:scale-110 transition-all duration-300 z-50 lg:flex hidden group`}
+          aria-label={isOpen ? "Collapse Sidebar" : "Expand Sidebar"}
         >
-          {isOpen ? <FiChevronLeft className="h-4 w-4 text-slate-600" /> :
-            <FiChevronRight className="h-4 w-4 text-slate-600" />}
+          <div className="text-slate-500 transition-transform duration-500 group-hover:text-emerald-600">
+            {isOpen ? <FiChevronLeft className="h-5 w-5" /> : <FiChevronRight className="h-5 w-5" />}
+          </div>
         </button>
 
         <div className={`flex items-center justify-center py-6 border-b border-slate-100 ${isOpen ? 'px-4' : 'px-2'}`}>

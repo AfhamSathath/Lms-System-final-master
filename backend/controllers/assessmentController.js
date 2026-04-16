@@ -129,8 +129,14 @@ exports.updateMarks = async (req, res, next) => {
       return res.status(404).json({ success: false, message: 'Assessment not found' });
     }
 
-    if (assessment.status === 'published' || assessment.status === 'approved_by_hod') {
-      return res.status(403).json({ success: false, message: 'Cannot modify mathematically locked and approved assessments' });
+    // Only the lecturer who created the assessment or an admin can update marks
+    if (assessment.lecturer.toString() !== req.user.id && req.user.role !== 'admin') {
+      return res.status(403).json({ success: false, message: 'Not authorized to update marks for this assessment' });
+    }
+
+    // Only allow updates when in draft status
+    if (assessment.status !== 'draft') {
+      return res.status(403).json({ success: false, message: 'Cannot modify marks once submitted to HOD or published' });
     }
 
     assessment.marks = marks;

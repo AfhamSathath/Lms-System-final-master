@@ -3,6 +3,7 @@ const Course = require('../models/course');
 const User = require('../models/user');
 const Notification = require('../models/notification');
 const LecturerAssignment = require('../models/LecturerAssignment');
+const Assessment = require('../models/Assessment');
 const emailService = require('../utils/emailService');
 
 // Helper functions
@@ -196,7 +197,7 @@ exports.getEnrollments = async (req, res, next) => {
 
     const enrollments = await Enrollment.find(query)
       .populate('student', 'name studentId registrationNumber email department')
-      .populate('course', 'courseCode courseName credits level')
+      .populate('course', 'code name credits level')
       .populate('gradedBy', 'name')
       .populate('attendance.markedBy', 'name')
       .populate('attendance.updatedByHOD', 'name')
@@ -228,7 +229,7 @@ exports.getEnrollment = async (req, res, next) => {
   try {
     const enrollment = await Enrollment.findById(req.params.id)
       .populate('student', 'name studentId registrationNumber email phone department')
-      .populate('course', 'courseCode courseName credits level semester assessmentStructure')
+      .populate('course', 'code name credits level semester assessmentStructure')
       .populate('gradedBy', 'name email')
       .populate('attendance.markedBy', 'name')
       .populate('attendance.updatedByHOD', 'name');
@@ -343,21 +344,21 @@ exports.createEnrollment = async (req, res, next) => {
     // Populate data
     await enrollment.populate([
       { path: 'student', select: 'name studentId email' },
-      { path: 'course', select: 'courseCode courseName' }
+      { path: 'course', select: 'code name' }
     ]);
 
     // Create notification for student
     await Notification.create({
       user: student,
       title: 'Course Enrollment Successful',
-      message: `You have been successfully enrolled in ${enrollment.course?.courseCode || ''} - ${enrollment.course?.courseName || ''}`,
+      message: `You have been successfully enrolled in ${enrollment.course?.code || ''} - ${enrollment.course?.name || ''}`,
       type: 'ENROLLMENT',
       priority: 'MEDIUM',
       sender: req.user.id,
       metadata: {
         enrollmentId: enrollment._id,
         courseId: course,
-        courseCode: enrollment.course?.courseCode
+        courseCode: enrollment.course?.code
       }
     });
 
@@ -421,21 +422,21 @@ exports.updateEnrollment = async (req, res, next) => {
       updates,
       { new: true, runValidators: true }
     ).populate('student', 'name studentId email')
-      .populate('course', 'courseCode courseName');
+      .populate('course', 'code name');
 
     // If grade was updated, notify student
     if (updates.continuousAssessment !== undefined || updates.finalExam !== undefined) {
       await Notification.create({
         user: enrollment.student,
         title: 'Grade Updated',
-        message: `Your grade for ${updatedEnrollment.course?.courseCode || ''} has been updated.`,
+        message: `Your grade for ${updatedEnrollment.course?.code || ''} has been updated.`,
         type: 'grade',
         priority: 'high',
         sender: req.user.id,
         metadata: {
           enrollmentId: enrollment._id,
           courseId: enrollment.course,
-          courseCode: updatedEnrollment.course?.courseCode
+          courseCode: updatedEnrollment.course?.code
         }
       });
 
@@ -769,20 +770,20 @@ exports.updateGrades = async (req, res, next) => {
     await enrollment.save();
 
     await enrollment.populate('student', 'name studentId email');
-    await enrollment.populate('course', 'courseCode courseName');
+    await enrollment.populate('course', 'code name');
 
     // Notify student about grade update
     await Notification.create({
       user: enrollment.student?._id,
       title: 'Grade Posted',
-      message: `Your grade for ${enrollment.course?.courseCode || ''} has been posted. Grade: ${enrollment.grade || 'N/A'}`,
+      message: `Your grade for ${enrollment.course?.code || ''} has been posted. Grade: ${enrollment.grade || 'N/A'}`,
       type: 'grade',
       priority: 'high',
       sender: req.user.id,
       metadata: {
         enrollmentId: enrollment._id,
         courseId: enrollment.course?._id,
-        courseCode: enrollment.course?.courseCode,
+        courseCode: enrollment.course?.code,
         grade: enrollment.grade
       }
     });
@@ -943,21 +944,78 @@ exports.getStudentEnrollments = async (req, res, next) => {
     console.log('[getStudentEnrollments] Query:', query);
 
     const enrollments = await Enrollment.find(query)
-      .populate('course', 'courseCode courseName credits level')
+      .populate('course', 'code name credits year')
       .populate('gradedBy', 'name')
       .populate('attendance.markedBy', 'name')
       .populate('attendance.updatedByHOD', 'name')
       .sort('-academicYear -semester');
 
-    console.log('[getStudentEnrollments] Found enrollments:', {
-      count: enrollments.length,
-      enrollments: enrollments.map(e => ({
-        id: e._id,
-        course: e.course?.courseName,
-        academicYear: e.academicYear,
-        semester: e.semester,
-        attendanceCount: e.attendance?.length || 0
-      }))
+    console.log(`[getStudentEnrollments] Found ${enrollments.length} enrollments`);
+    if (enrollments.length > 0) {
+      console.log('[getStudentEnrollments] Sample enrollment course:', enrollments[0].course);
+    }
+
+    // DYNAMIC INJECTION: Fetch assessments from the Assessment collection for these courses
+    const courseIds = enrollments.map(e => e.course?._id).filter(Boolean);
+    const publishedAssessments = await Assessment.find({
+      subject: { $in: courseIds },
+      status: 'published'
+    }).populate('subject', 'code name');
+
+    const enrollmentsWithAssessments = enrollments.map(enrollment => {
+      const eObj = enrollment.toObject();
+      
+      // Get assessments for this specific course
+      const courseAssessments = publishedAssessments.filter(
+        a => a.subject?._id?.toString() === enrollment.course?._id?.toString()
+      );
+
+      // Map assessments to include this student's specific mark
+      const studentAssessments = courseAssessments.map(a => {
+        const studentMark = a.marks.find(
+          m => (m.student?._id?.toString() || m.student?.toString()) === studentId
+        );
+
+        return {
+          _id: a._id,
+          name: a.name,
+          type: a.type,
+          maxMarks: a.maxMarks,
+          marksObtained: studentMark ? studentMark.mark : 0,
+          graded: !!studentMark,
+          gradedDate: a.updatedAt,
+          submitted: true, // If it's published, consider it processed
+          remarks: studentMark ? studentMark.remarks : '',
+          weight: 0 // Default weight if not specified in Assessment model
+        };
+      });
+
+      // Merge with any existing assessments in the enrollment record
+      eObj.assessments = [...(eObj.assessments || []), ...studentAssessments];
+      
+      // Calculate total marks percentage if assessments exist
+      if (studentAssessments.length > 0) {
+        const totalObtained = studentAssessments.reduce((sum, a) => sum + (a.marksObtained || 0), 0);
+        const totalMax = studentAssessments.reduce((sum, a) => sum + (a.maxMarks || 0), 0);
+        if (totalMax > 0) {
+          eObj.totalMarks = (totalObtained / totalMax) * 35;
+        }
+      }
+
+      // Filter attendance records to only show published ones to student
+      if (eObj.attendance) {
+        eObj.attendance = eObj.attendance.filter(record => record.isPublished === true);
+        
+        // Recalculate attendance stats for student view based on published records only
+        if (eObj.attendance.length > 0) {
+          const present = eObj.attendance.filter(a => a.status === 'present' || a.status === 'late' || a.status === 'excused').length;
+          eObj.attendancePercentage = Math.round((present / eObj.attendance.length) * 100 * 100) / 100;
+        } else {
+          eObj.attendancePercentage = 0;
+        }
+      }
+
+      return eObj;
     });
 
     // Calculate GPA
@@ -989,7 +1047,7 @@ exports.getStudentEnrollments = async (req, res, next) => {
         gpa,
         totalCredits
       },
-      enrollments
+      enrollments: enrollmentsWithAssessments
     });
   } catch (error) {
     next(error);
@@ -1056,8 +1114,8 @@ exports.getCourseEnrollments = async (req, res, next) => {
       success: true,
       course: {
         id: course._id,
-        code: course.courseCode,
-        name: course.courseName
+        code: course.code,
+        name: course.name
       },
       stats,
       enrollments
@@ -1110,8 +1168,8 @@ exports.generateGradeSheet = async (req, res, next) => {
     // Generate grade sheet data
     const gradeSheet = {
       course: {
-        code: course.courseCode,
-        name: course.courseName,
+        code: course.code,
+        name: course.name,
         credits: course.credits,
         academicYear,
         semester: parseInt(semester)
@@ -1213,7 +1271,7 @@ exports.certifyResult = async (req, res, next) => {
   try {
     const enrollment = await Enrollment.findById(req.params.id)
       .populate('student', 'name email')
-      .populate('course', 'courseName courseCode');
+      .populate('course', 'name code');
 
     if (!enrollment) {
       return res.status(404).json({ success: false, message: 'Record not found.' });
@@ -1264,7 +1322,7 @@ exports.registerCourse = async (req, res, next) => {
     await Notification.create({
       user: student,
       title: 'Registration Successful',
-      message: `Enrolled in ${courseData.courseCode} - ${courseData.courseName}`,
+      message: `Enrolled in ${courseData.code} - ${courseData.name}`,
       type: 'enrollment',
       sender: student
     });
@@ -1338,7 +1396,7 @@ exports.confirmStudentAttendance = async (req, res, next) => {
           await Notification.create({
             user: enrollment.student,
             title: 'Attendance Discrepancy Reported',
-            message: `You confirmed attendance for ${recordDate.toDateString()} in ${enrollment.course.courseName}, but were marked absent. This has been flagged for HOD review.`,
+            message: `You confirmed attendance for ${recordDate.toDateString()} in ${enrollment.course.name}, but were marked absent. This has been flagged for HOD review.`,
             type: 'ATTENDANCE_DISCREPANCY',
             priority: 'MEDIUM',
             metadata: {
@@ -1355,7 +1413,7 @@ exports.confirmStudentAttendance = async (req, res, next) => {
             await Notification.create({
               user: hod._id,
               title: 'Attendance Discrepancy Requires Review',
-              message: `Student ${enrollment.student.name} reported attendance discrepancy for ${recordDate.toDateString()} in ${enrollment.course.courseName}`,
+              message: `Student ${enrollment.student.name} reported attendance discrepancy for ${recordDate.toDateString()} in ${enrollment.course.name}`,
               type: 'ATTENDANCE_REVIEW',
               priority: 'HIGH',
               metadata: {
@@ -1399,7 +1457,7 @@ exports.reviewAttendanceByHOD = async (req, res, next) => {
 
     const enrollment = await Enrollment.findById(req.params.id)
       .populate('student', 'name studentId department')
-      .populate('course', 'courseName courseCode');
+      .populate('course', 'name code');
 
     if (!enrollment) {
       return res.status(404).json({
@@ -1438,7 +1496,7 @@ exports.reviewAttendanceByHOD = async (req, res, next) => {
         await Notification.create({
           user: enrollment.student._id,
           title: 'Attendance Review Completed',
-          message: `Your attendance for ${recordDate.toDateString()} in ${enrollment.course.courseName} has been reviewed by HOD. Status: ${update.status}`,
+          message: `Your attendance for ${recordDate.toDateString()} in ${enrollment.course.name} has been reviewed by HOD. Status: ${update.status}`,
           type: 'ATTENDANCE_REVIEWED',
           priority: update.status === attendanceRecord.status ? 'LOW' : 'MEDIUM',
           metadata: {
@@ -1482,6 +1540,92 @@ exports.reviewAttendanceByHOD = async (req, res, next) => {
   }
 };
 
+// @desc    HOD publishes reviewed attendance to students
+// @route   PUT /api/enrollments/:id/publish-attendance
+// @access  Private (HOD, Admin)
+exports.publishAttendanceByHOD = async (req, res, next) => {
+  try {
+    const enrollment = await Enrollment.findById(req.params.id)
+      .populate('student', 'name studentId department')
+      .populate('course', 'name code');
+
+    if (!enrollment) {
+      return res.status(404).json({
+        success: false,
+        message: 'Enrollment not found'
+      });
+    }
+
+    // Check permissions
+    if (req.user.role === 'hod' && enrollment.student.department !== req.user.department) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied. You can only publish attendance for students in your department.'
+      });
+    }
+
+    // Mark all reviewed records as published
+    let publishedCount = 0;
+    console.log(`[publishAttendanceByHOD] Checking ${enrollment.attendance.length} attendance records for enrollment ${enrollment._id}`);
+    
+    enrollment.attendance.forEach((record, index) => {
+      const needsPublish = !record.isPublished;
+      // We check for any status that indicates it was marked (status exists)
+      const isMarked = !!record.status;
+      
+      console.log(`  Record ${index}: status=${record.status}, isPublished=${record.isPublished}, markedBy=${record.markedBy}, needsPublish=${needsPublish}, isMarked=${isMarked}`);
+
+      if (isMarked && needsPublish) {
+        record.isPublished = true;
+        publishedCount++;
+      }
+    });
+
+    console.log(`[publishAttendanceByHOD] Found ${publishedCount} records to publish`);
+
+    if (publishedCount === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'No new attendance records to publish',
+        debug: {
+          totalRecords: enrollment.attendance.length,
+          alreadyPublished: enrollment.attendance.filter(r => r.isPublished).length,
+          records: enrollment.attendance.map(r => ({
+            status: r.status,
+            isPublished: r.isPublished,
+            markedBy: r.markedBy,
+            date: r.date
+          }))
+        }
+      });
+    }
+
+    enrollment.markModified('attendance');
+    await enrollment.save();
+
+    // Notify student
+    await Notification.create({
+      user: enrollment.student._id,
+      title: 'Attendance Published',
+      message: `Your latest attendance records for ${enrollment.course.name} have been published and are now visible.`,
+      type: 'ATTENDANCE_PUBLISHED',
+      priority: 'LOW',
+      metadata: {
+        enrollmentId: enrollment._id,
+        courseName: enrollment.course.name
+      }
+    });
+
+    res.json({
+      success: true,
+      message: `Successfully published ${publishedCount} attendance records`,
+      publishedCount
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 // @desc    Get attendance details for admin/dean view
 // @route   GET /api/enrollments/:id/attendance-details
 // @access  Private (Admin, Dean, HOD, Lecturer)
@@ -1489,7 +1633,7 @@ exports.getAttendanceDetails = async (req, res, next) => {
   try {
     const enrollment = await Enrollment.findById(req.params.id)
       .populate('student', 'name studentId department email')
-      .populate('course', 'courseName courseCode')
+      .populate('course', 'name code')
       .populate('attendance.markedBy', 'name role')
       .populate('attendance.updatedByHOD', 'name role');
 
@@ -1521,15 +1665,19 @@ exports.getAttendanceDetails = async (req, res, next) => {
     }
 
     // Calculate attendance statistics
+    const attendanceArray = req.user.role === 'student' 
+      ? enrollment.attendance.filter(a => a.isPublished === true)
+      : enrollment.attendance;
+
     const attendanceStats = {
-      totalSessions: enrollment.attendance.length,
-      present: enrollment.attendance.filter(a => a.status === 'present').length,
-      absent: enrollment.attendance.filter(a => a.status === 'absent').length,
-      late: enrollment.attendance.filter(a => a.status === 'late').length,
-      excused: enrollment.attendance.filter(a => a.status === 'excused').length,
-      confirmedByStudent: enrollment.attendance.filter(a => a.studentConfirmed).length,
-      reviewedByHOD: enrollment.attendance.filter(a => a.updatedByHOD).length,
-      discrepancies: enrollment.attendance.filter(a => a.studentConfirmed && a.status === 'absent').length
+      totalSessions: attendanceArray.length,
+      present: attendanceArray.filter(a => a.status === 'present').length,
+      absent: attendanceArray.filter(a => a.status === 'absent').length,
+      late: attendanceArray.filter(a => a.status === 'late').length,
+      excused: attendanceArray.filter(a => a.status === 'excused').length,
+      confirmedByStudent: attendanceArray.filter(a => a.studentConfirmed).length,
+      reviewedByHOD: attendanceArray.filter(a => a.updatedByHOD).length,
+      discrepancies: attendanceArray.filter(a => a.studentConfirmed && a.status === 'absent').length
     };
 
     attendanceStats.attendancePercentage = attendanceStats.totalSessions > 0
@@ -1545,7 +1693,9 @@ exports.getAttendanceDetails = async (req, res, next) => {
         academicYear: enrollment.academicYear,
         semester: enrollment.semester
       },
-      attendance: enrollment.attendance,
+      attendance: req.user.role === 'student' 
+        ? enrollment.attendance.filter(a => a.isPublished === true)
+        : enrollment.attendance,
       statistics: attendanceStats
     });
   } catch (error) {

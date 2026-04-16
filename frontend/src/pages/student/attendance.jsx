@@ -21,7 +21,8 @@ const StudentAttendance = () => {
 
   useEffect(() => {
     // Filter enrollments by selected year and semester
-    const filtered = enrollments.filter(e => 
+    const filtered = enrollments.filter(e =>
+      e.yearOfStudy === selectedYear &&
       e.semester === parseInt(selectedSemester)
     );
     setFilteredEnrollments(filtered);
@@ -32,7 +33,7 @@ const StudentAttendance = () => {
     try {
       const response = await api.get(`/api/enrollments/student/${user.id}`);
       const allEnrollments = response.data.enrollments || [];
-      
+
       console.log('📚 Student Enrollments:', {
         total: allEnrollments.length,
         details: allEnrollments.map(e => ({
@@ -91,11 +92,10 @@ const StudentAttendance = () => {
               <button
                 key={y}
                 onClick={() => setSelectedYear(y)}
-                className={`px-6 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all duration-500 ${
-                  selectedYear === y 
-                    ? 'bg-slate-900 text-white shadow-2xl scale-105' 
-                    : 'bg-slate-50 text-slate-400 hover:bg-slate-100'
-                }`}
+                className={`px-6 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all duration-500 ${selectedYear === y
+                  ? 'bg-slate-900 text-white shadow-2xl scale-105'
+                  : 'bg-slate-50 text-slate-400 hover:bg-slate-100'
+                  }`}
               >
                 {y}
               </button>
@@ -112,11 +112,10 @@ const StudentAttendance = () => {
               <button
                 key={sem}
                 onClick={() => setSelectedSemester(sem)}
-                className={`px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all duration-500 ${
-                  selectedSemester === sem 
-                    ? 'bg-indigo-600 text-white shadow-2xl scale-105' 
-                    : 'bg-slate-50 text-slate-400 hover:bg-slate-100'
-                }`}
+                className={`px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all duration-500 ${selectedSemester === sem
+                  ? 'bg-indigo-600 text-white shadow-2xl scale-105'
+                  : 'bg-slate-50 text-slate-400 hover:bg-slate-100'
+                  }`}
               >
                 Semester {sem}
               </button>
@@ -125,149 +124,136 @@ const StudentAttendance = () => {
         </div>
       </div>
 
-      {/* Attendance Cards */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {filteredEnrollments.length > 0 ? (
-          filteredEnrollments.map((enrollment) => (
-            <AttendanceCard key={enrollment._id} enrollment={enrollment} />
-          ))
-        ) : (
-          <div className="lg:col-span-2 bg-white rounded-[3rem] p-24 text-center border-2 border-dashed border-slate-100 shadow-inner">
-            <FiBook className="h-16 w-16 text-slate-200 mx-auto mb-6" />
-            <h4 className="text-2xl font-black text-slate-800 uppercase tracking-tighter">
-              No Enrollments
-            </h4>
-            <p className="text-slate-400 font-medium italic mt-2">
-              You don't have any registered courses for this semester.
-            </p>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
-
-const AttendanceCard = ({ enrollment }) => {
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'present': return 'bg-emerald-100 text-emerald-700';
-      case 'absent': return 'bg-rose-100 text-rose-700';
-      case 'late': return 'bg-amber-100 text-amber-700';
-      case 'excused': return 'bg-blue-100 text-blue-700';
-      default: return 'bg-gray-100 text-gray-700';
-    }
-  };
-
-  const getStatusIcon = (status) => {
-    switch (status) {
-      case 'present': return <FiCheckCircle className="w-4 h-4" />;
-      case 'absent': return <FiXCircle className="w-4 h-4" />;
-      case 'late': return <FiClock className="w-4 h-4" />;
-      case 'excused': return <FiCheckCircle className="w-4 h-4" />;
-      default: return <FiClock className="w-4 h-4" />;
-    }
-  };
-
-  const attendancePercentage = enrollment.attendancePercentage || 0;
-
-  return (
-    <div className="bg-white rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300 border border-gray-100">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-700 px-6 py-5">
-        <div className="flex justify-between items-center">
-          <div>
-            <h3 className="text-xl font-bold text-white uppercase tracking-wider">
-              {enrollment.course?.courseCode}
-            </h3>
-            <p className="text-blue-100 font-medium">{enrollment.course?.courseName}</p>
-          </div>
-          <div className="bg-white/20 backdrop-blur-md rounded-full px-4 py-2 border border-white/30">
-            <span className="text-white font-bold text-lg">{attendancePercentage.toFixed(1)}%</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Content */}
-      <div className="p-6">
-        {/* Progress Bar */}
-        <div className="mb-6 h-3 w-full bg-gray-100 rounded-full overflow-hidden shadow-inner">
-          <div
-            className={`h-full transition-all duration-1000 ease-out rounded-full ${
-              attendancePercentage >= 75 ? 'bg-emerald-500' : 'bg-rose-500'
-            }`}
-            style={{ width: `${attendancePercentage}%` }}
-          ></div>
+      {/* Unified Academic Calendar Matrix Container */}
+      <div className="bg-white rounded-[2.5rem] shadow-2xl border border-slate-100 overflow-hidden animate-in fade-in slide-in-from-bottom-8 duration-1000 mb-20">
+        <div className="bg-slate-50 px-10 py-6 border-b border-slate-100 flex items-center justify-between">
+           <h2 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em] italic leading-none">Unified Academic Matrix</h2>
+           <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                 <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-lg shadow-emerald-200" />
+                 <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Present</span>
+              </div>
+              <div className="flex items-center gap-2">
+                 <div className="w-2 h-2 rounded-full bg-rose-500 shadow-lg shadow-rose-200" />
+                 <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Absent</span>
+              </div>
+           </div>
         </div>
 
-        {/* Status Indicators */}
-        <div className="flex flex-wrap gap-2 mb-6">
-          {enrollment.attendance?.length > 0 && (
-            <div className="flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">
-              <FiCalendar className="w-3 h-3" />
-              {enrollment.attendance.length} Sessions
-            </div>
-          )}
-          {attendancePercentage < 75 && (
-            <div className="flex items-center gap-1 px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-medium">
-              <FiAlertTriangle className="w-3 h-3" />
-              At Risk
-            </div>
-          )}
-        </div>
+        <div className="p-0 overflow-x-auto custom-scrollbar">
+          {filteredEnrollments.length > 0 ? (() => {
+            // 1. Extract all unique dates where sessions occurred across all subjects
+            const allDates = Array.from(new Set(
+              filteredEnrollments.flatMap(e => (e.attendance || []).map(r => new Date(r.date).toDateString()))
+            )).map(d => new Date(d)).sort((a, b) => a - b);
 
-        {/* Attendance Records */}
-        <div className="space-y-3">
-          <h4 className="font-bold text-gray-700 flex items-center">
-            <FiClock className="mr-2 text-indigo-500" />
-            Recent Records
-          </h4>
+            return (
+              <table className="w-full text-left border-collapse min-w-[800px]">
+                <thead>
+                  <tr className="bg-white">
+                    <th className="px-6 py-8 text-[10px] font-black text-slate-800 uppercase tracking-[0.2em] border-b border-slate-100 sticky left-0 bg-white z-20 shadow-[4px_0_8px_-4px_rgba(0,0,0,0.05)]">Subject</th>
+                    <th className="px-6 py-8 text-[10px] font-black text-slate-800 uppercase tracking-[0.2em] border-b border-slate-100 text-center">Type</th>
+                    <th className="px-6 py-8 text-[10px] font-black text-slate-800 uppercase tracking-[1px] border-b border-slate-100 text-center whitespace-nowrap">
+                       <p className="leading-none mb-1">Percentage</p>
+                       <p className="text-[7px] font-bold text-slate-400 normal-case">(Attended/Total)</p>
+                    </th>
+                    {/* Unique Calendar Dates as Headers */}
+                    {allDates.length > 0 ? allDates.map((date, i) => (
+                      <th key={i} className="px-3 py-8 text-[10px] font-black text-slate-500 uppercase tracking-widest text-center border-b border-slate-100 border-l border-slate-50 min-w-[65px]">
+                        <p className="leading-none text-slate-800">{date.toLocaleDateString(undefined, { day: '2-digit', month: '2-digit' })}</p>
+                        <p className="text-[7px] font-bold text-slate-400 mt-1">{date.toLocaleDateString(undefined, { weekday: 'short' })}</p>
+                      </th>
+                    )) : Array.from({ length: 10 }).map((_, i) => (
+                      <th key={i} className="px-3 py-8 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center border-b border-slate-100 border-l border-slate-50 min-w-[65px]">
+                        --/--
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-50">
+                  {filteredEnrollments.map((enrollment, eIdx) => {
+                    const attendedCount = (enrollment.attendance || []).filter(r => r.status === 'present' || r.status === 'late' || r.status === 'excused').length;
+                    const totalCount = enrollment.attendance?.length || 0;
+                    const percentage = totalCount > 0 ? (attendedCount / totalCount * 100).toFixed(0) : '0';
 
-          {enrollment.attendance && enrollment.attendance.length > 0 ? (
-            <div className="space-y-2 max-h-56 overflow-y-auto">
-              {enrollment.attendance.slice(-10).reverse().map((record, idx) => (
-                <div 
-                  key={idx} 
-                  className="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-100"
-                >
-                  <div className="flex items-center gap-3">
-                    <FiCalendar className="text-gray-400 w-4 h-4" />
-                    <span className="text-sm font-medium text-gray-700">
-                      {new Date(record.date).toLocaleDateString(undefined, {
-                        weekday: 'short',
-                        month: 'short',
-                        day: 'numeric'
-                      })}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {getStatusIcon(record.status)}
-                    <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${getStatusColor(record.status)}`}>
-                      {record.status}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-6 bg-gray-50 rounded-xl border border-dashed border-gray-300">
-              <FiBook className="mx-auto text-gray-300 mb-2 h-8 w-8" />
-              <p className="text-gray-400 text-sm">No attendance records yet</p>
+                    return (
+                      <tr key={eIdx} className="hover:bg-slate-50 transition-colors duration-300">
+                        <td className="px-6 py-6 sticky left-0 bg-white z-10 shadow-[4px_0_8px_-4px_rgba(0,0,0,0.05)] border-r border-slate-50 group-hover:bg-slate-50 transition-colors">
+                          <p className="text-xs font-black text-slate-900 leading-none mb-1 tracking-tight">{enrollment.course?.code}</p>
+                          <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest truncate max-w-[120px]">{enrollment.course?.name}</p>
+                        </td>
+                        <td className="px-6 py-6 text-center">
+                          <span className="px-3 py-1 bg-slate-100 text-slate-500 text-[8px] font-black rounded-full uppercase tracking-widest">
+                            {enrollment.course?.category || 'Theory'}
+                          </span>
+                        </td>
+                        <td className="px-6 py-6 text-center">
+                          <div className="flex flex-col items-center">
+                             <p className={`text-sm font-black leading-none mb-1 ${parseInt(percentage) < 75 ? 'text-rose-600' : 'text-slate-900'}`}>{percentage}%</p>
+                             <p className="text-[8px] font-bold text-slate-400">({attendedCount}/{totalCount})</p>
+                          </div>
+                        </td>
+                        {/* Session Mapping based on Date */}
+                        {allDates.length > 0 ? allDates.map((date, dIdx) => {
+                          const record = (enrollment.attendance || []).find(r => new Date(r.date).toDateString() === date.toDateString());
+                          const isPresent = record?.status === 'present' || record?.status === 'late' || record?.status === 'excused';
+                          const isAbsent = record?.status === 'absent';
+                          const isHODVerified = !!record?.updatedByHOD;
+
+                          return (
+                            <td key={dIdx} className="px-2 py-6 text-center border-l border-slate-50">
+                              {record ? (
+                                <div className="flex justify-center">
+                                  {isPresent ? (
+                                    <div 
+                                      className={`w-7 h-7 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-600 shadow-sm ring-1 ${isHODVerified ? 'ring-indigo-400 ring-offset-1' : 'ring-emerald-200'} transition-transform hover:scale-110`} 
+                                      title={`${record.status.toUpperCase()}${isHODVerified ? ' (Verified by HOD)' : ''}${record.hodRemarks ? ': ' + record.hodRemarks : ''}`}
+                                    >
+                                      <FiCheckCircle className="w-4 h-4 stroke-[3px]" />
+                                    </div>
+                                  ) : isAbsent ? (
+                                    <div 
+                                      className={`w-7 h-7 rounded-xl bg-rose-100 flex items-center justify-center text-rose-600 shadow-sm ring-1 ${isHODVerified ? 'ring-indigo-400 ring-offset-1' : 'ring-rose-200'} transition-transform hover:scale-110`}
+                                      title={`ABSENT${isHODVerified ? ' (Verified by HOD)' : ''}${record.hodRemarks ? ': ' + record.hodRemarks : ''}`}
+                                    >
+                                      <FiXCircle className="w-4 h-4 stroke-[3px]" />
+                                    </div>
+                                  ) : (
+                                    <div className={`w-7 h-7 rounded-xl bg-slate-100 border ${isHODVerified ? 'border-indigo-400' : 'border-slate-200'}`} />
+                                  )}
+                                </div>
+                              ) : (
+                                <div className="h-0.5 w-2 bg-slate-100 mx-auto rounded-full" />
+                              )}
+                            </td>
+                          );
+                        }) : Array.from({ length: 10 }).map((_, i) => (
+                          <td key={i} className="px-2 py-6 text-center border-l border-slate-50">
+                             <div className="h-0.5 w-2 bg-slate-100 mx-auto rounded-full" />
+                          </td>
+                        ))}
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            );
+          })() : (
+            <div className="py-32 flex flex-col items-center justify-center bg-slate-50/50">
+              <FiBook className="h-16 w-16 text-slate-200 mb-6" />
+              <h3 className="text-xl font-black text-slate-800 uppercase tracking-widest">No Active Enrollments</h3>
+              <p className="text-slate-400 font-medium italic mt-2">Registers for {selectedYear} Semester {selectedSemester} will appear here.</p>
             </div>
           )}
         </div>
-
-        {/* Risk Warning */}
-        {attendancePercentage < 75 && (
-          <div className="mt-6 p-4 bg-rose-50 rounded-xl border border-rose-100 flex items-start gap-3">
-            <FiAlertTriangle className="text-rose-500 mt-1 flex-shrink-0" />
-            <div>
-              <h5 className="text-rose-700 font-bold text-sm uppercase">Attendance Warning</h5>
-              <p className="text-rose-600 text-xs mt-1">
-                Your attendance is below 75%. Contact your lecturer immediately.
-              </p>
-            </div>
-          </div>
-        )}
+        
+        {/* Footer Progress Indicator */}
+        <div className="px-10 py-6 bg-slate-50 flex items-center justify-between border-t border-slate-100">
+           <div className="h-2 w-64 bg-slate-200 rounded-full overflow-hidden">
+              <div className="h-full w-1/3 bg-slate-900 rounded-full shadow-lg" />
+           </div>
+           <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Attendance Unified Calendar v2.0 • Matrix Engine</p>
+        </div>
       </div>
     </div>
   );

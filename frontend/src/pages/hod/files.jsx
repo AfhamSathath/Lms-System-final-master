@@ -131,7 +131,10 @@ const HodFiles = () => {
               files.map((file) => (
                 <tr key={file._id} className="border-t border-gray-200 hover:bg-gray-50">
                   <td className="px-4 py-3">{file.title}</td>
-                  <td className="px-4 py-3">{file.subject?.name || file.subject || '-'}</td>
+                  <td className="px-4 py-3">
+                    {file.subject?.name || file.subject || '-'} 
+                    {file.subject?.department ? ` (${file.subject.department})` : ''}
+                  </td>
                   <td className="px-4 py-3">{file.uploadedBy?.name || file.uploadedBy || '-'}</td>
                   <td className="px-4 py-3">{new Date(file.createdAt).toLocaleDateString()}</td>
                   <td className="px-4 py-3">

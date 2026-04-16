@@ -17,6 +17,8 @@ const LecturerEnrollment = () => {
   const [enrolledStudents, setEnrolledStudents] = useState([]);
   const [departmentStudents, setDepartmentStudents] = useState([]);
   const [search, setSearch] = useState('');
+  const [filterBatch, setFilterBatch] = useState('All');
+  const batches = ['2024/2025', '2023/2024', '2022/2023', '2021/2022', 'Repeat Batch (All)'];
   const [showAddModal, setShowAddModal] = useState(false);
   const [filters, setFilters] = useState({
     search: '',
@@ -137,10 +139,12 @@ const LecturerEnrollment = () => {
     setShowAddModal(true);
   };
 
-  const filteredEnrolled = enrolledStudents.filter(e => 
-    e.student?.name?.toLowerCase().includes(search.toLowerCase()) ||
-    e.student?.studentId?.toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredEnrolled = enrolledStudents.filter(e => {
+    const matchesSearch = e.student?.name?.toLowerCase().includes(search.toLowerCase()) ||
+      e.student?.studentId?.toLowerCase().includes(search.toLowerCase());
+    const matchesBatch = filterBatch === 'All' ? true : e.student?.batch === filterBatch;
+    return matchesSearch && matchesBatch;
+  });
 
   const studentsToEnroll = departmentStudents.filter(s => {
     const matchesFilters = 
@@ -242,16 +246,28 @@ const LecturerEnrollment = () => {
                   {/* List */}
                   <div className="bg-white rounded-[2rem] shadow-sm border border-slate-200 overflow-hidden">
                     <div className="px-8 py-6 border-b border-slate-50 flex justify-between items-center">
-                       <h4 className="text-xs font-black uppercase tracking-widest text-slate-400">Enrolled Students ({enrolledStudents.length})</h4>
-                       <div className="relative">
-                         <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                         <input 
-                           type="text" 
-                           placeholder="Search enrolled..." 
-                           className="pl-10 pr-4 py-2 bg-slate-50 border-none rounded-xl text-sm font-bold"
-                           value={search}
-                           onChange={(e) => setSearch(e.target.value)}
-                         />
+                       <h4 className="text-xs font-black uppercase tracking-widest text-slate-400">Enrolled Students ({filteredEnrolled.length})</h4>
+                       <div className="flex gap-3">
+                         <select
+                           value={filterBatch}
+                           onChange={(e) => setFilterBatch(e.target.value)}
+                           className="px-3 py-2 bg-slate-50 border-none rounded-xl text-xs font-bold outline-none"
+                         >
+                           <option value="All">All Batches</option>
+                           {batches.map(b => (
+                             <option key={b} value={b}>{b}</option>
+                           ))}
+                         </select>
+                         <div className="relative">
+                           <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                           <input 
+                             type="text" 
+                             placeholder="Search enrolled..." 
+                             className="pl-10 pr-4 py-2 bg-slate-50 border-none rounded-xl text-sm font-bold"
+                             value={search}
+                             onChange={(e) => setSearch(e.target.value)}
+                           />
+                         </div>
                        </div>
                     </div>
                     <div className="overflow-x-auto">

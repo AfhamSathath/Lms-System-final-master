@@ -10,7 +10,7 @@ const LayoutWrapper = ({ children }) => {
   if (!user) return children;
 
   return (
-    <div className={`transition-all duration-300 flex-1 ${sidebarOpen ? 'lg:ml-52' : 'lg:ml-16'}`}>
+    <div className={`transition-all duration-300 flex-1 ${sidebarOpen ? 'lg:ml-64' : 'lg:ml-20'}`}>
       {children}
     </div>
   );
@@ -35,6 +35,7 @@ import StudentNotifications from './pages/student/notifications';
 import StudentProfile from './pages/student/profile';
 import StudentAttendance from './pages/student/attendance';
 import StudentAssignments from './pages/student/assignments';
+import StudentAssessments from './pages/student/assessments';
 import StudentFees from './pages/student/fees';
 import StudentFeedback from './pages/student/feedback';
 import StudentCourseRegistration from './pages/student/courseRegistration';
@@ -186,6 +187,7 @@ function MainRoutes() {
         <Route path="profile" element={<StudentProfile />} />
         <Route path="attendance" element={<StudentAttendance />} />
         <Route path="assignments" element={<StudentAssignments />} />
+        <Route path="assessments" element={<StudentAssessments />} />
         <Route path="fees" element={<StudentFees />} />
         <Route path="feedback" element={<StudentFeedback />} />
         <Route path="registration" element={<StudentCourseRegistration />} />

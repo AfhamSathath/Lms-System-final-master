@@ -15,6 +15,9 @@ const LecturerResults = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedSubjectId, setSelectedSubjectId] = useState(subjectId);
+  const [selectedBatch, setSelectedBatch] = useState('All');
+
+  const batches = ['2024/2025', '2023/2024', '2022/2023', '2021/2022', 'Repeat Batch (All)'];
 
   useEffect(() => {
     fetchResults();
@@ -35,13 +38,14 @@ const LecturerResults = () => {
 
   const filteredResults = results.filter((result) => {
     const matchesSubject = selectedSubjectId ? result.subject?._id === selectedSubjectId : true;
+    const matchesBatch = selectedBatch === 'All' ? true : (result.student?.batch === selectedBatch || result.academicYear === selectedBatch);
     const matchesSearch = searchTerm
       ? result.student?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         result.student?.studentId?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         result.subject?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         result.subject?.code?.toLowerCase().includes(searchTerm.toLowerCase())
       : true;
-    return matchesSubject && matchesSearch;
+    return matchesSubject && matchesBatch && matchesSearch;
   });
 
   if (loading) return <Loader fullScreen />;
@@ -79,14 +83,26 @@ const LecturerResults = () => {
               <h2 className="text-xl font-bold text-slate-900">Results Ledger</h2>
               <p className="text-sm text-slate-500">Review student scorecards and published outcomes</p>
             </div>
-            <div className="relative">
-              <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-              <input
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search student, subject, or code"
-                className="w-full md:w-[300px] pl-12 pr-4 py-3 rounded-3xl border border-slate-200 focus:ring-2 focus:ring-indigo-100 focus:border-indigo-300"
-              />
+            <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
+              <div className="relative flex-1">
+                <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Search student, subject, or code"
+                  className="w-full md:w-[260px] pl-12 pr-4 py-3 rounded-3xl border border-slate-200 focus:ring-2 focus:ring-indigo-100 focus:border-indigo-300"
+                />
+              </div>
+              <select
+                value={selectedBatch}
+                onChange={(e) => setSelectedBatch(e.target.value)}
+                className="w-full sm:w-[180px] rounded-3xl border border-slate-200 px-6 py-3 bg-white text-slate-700 font-bold focus:ring-2 focus:ring-indigo-100 focus:border-indigo-300 outline-none transition-all appearance-none"
+              >
+                <option value="All">All Batches</option>
+                {batches.map(batch => (
+                  <option key={batch} value={batch}>{batch}</option>
+                ))}
+              </select>
             </div>
           </div>
 

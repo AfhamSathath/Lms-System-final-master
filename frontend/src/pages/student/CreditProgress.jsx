@@ -121,8 +121,8 @@ const CreditProgress = () => {
                         {data.enrollments.map((e, idx) => (
                           <tr key={idx} className="hover:bg-slate-50/30 transition-colors">
                             <td className="px-10 py-6">
-                               <p className="font-black text-slate-700 uppercase tracking-tight text-sm">{e.course?.courseName}</p>
-                               <p className="text-[10px] font-bold text-slate-400 lowercase">{e.course?.courseCode}</p>
+                               <p className="font-black text-slate-700 uppercase tracking-tight text-sm">{e.course?.name}</p>
+                               <p className="text-[10px] font-bold text-slate-400 lowercase">{e.course?.code}</p>
                             </td>
                             <td className="px-10 py-6 font-mono font-bold text-slate-500">{e.course?.credits}</td>
                             <td className="px-10 py-6">

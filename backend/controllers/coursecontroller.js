@@ -27,6 +27,38 @@ const getAssignedSubjectIds = async (lecturerId) => {
   return assignments.map(a => a.subject);
 };
 
+// Helper function to attach enrollment counts to subjects
+const attachEnrollmentCounts = async (subjects) => {
+  if (!subjects || subjects.length === 0) return [];
+
+  const subjectIds = subjects.map(s => s._id);
+  const enrollmentCounts = await Enrollment.aggregate([
+    {
+      $match: {
+        course: { $in: subjectIds },
+        enrollmentStatus: 'enrolled'
+      }
+    },
+    {
+      $group: {
+        _id: '$course',
+        count: { $sum: 1 }
+      }
+    }
+  ]);
+
+  const countsMap = enrollmentCounts.reduce((acc, curr) => {
+    acc[curr._id.toString()] = curr.count;
+    return acc;
+  }, {});
+
+  return subjects.map(sub => ({
+    ...(sub.toObject ? sub.toObject() : sub),
+    semesterNumber: sub.semesterNumber,
+    enrolledStudents: countsMap[sub._id.toString()] || 0
+  }));
+};
+
 // Helper to build subject query based on user role
 const getRoleBasedQuery = async (req, baseQuery = {}) => {
   const query = { ...baseQuery, isActive: true };
@@ -80,16 +112,12 @@ exports.getSubjects = async (req, res, next) => {
       .populate('lecturer', 'name email lecturerId')
       .sort({ year: 1, semester: 1, code: 1 });
 
-    // Add virtual semester number
-    const subjectsWithSemNumber = subjects.map(sub => ({
-      ...sub.toObject(),
-      semesterNumber: sub.semesterNumber
-    }));
+    const subjectsWithDetails = await attachEnrollmentCounts(subjects);
 
     res.json({
       success: true,
       count: subjects.length,
-      subjects: subjectsWithSemNumber,
+      subjects: subjectsWithDetails,
     });
   } catch (error) {
     next(error);
@@ -116,12 +144,11 @@ exports.getSubject = async (req, res, next) => {
       return res.status(404).json({ message: 'Subject not found' });
     }
 
+    const subjectWithDetails = (await attachEnrollmentCounts([subject]))[0];
+
     res.json({
       success: true,
-      subject: {
-        ...subject.toObject(),
-        semesterNumber: subject.semesterNumber
-      },
+      subject: subjectWithDetails,
     });
   } catch (error) {
     next(error);
@@ -251,13 +278,12 @@ exports.getSubjectsByYearAndSemester = async (req, res, next) => {
       .populate('lecturer', 'name email lecturerId')
       .sort({ code: 1 });
 
+    const subjectsWithDetails = await attachEnrollmentCounts(subjects);
+
     res.json({
       success: true,
       count: subjects.length,
-      subjects: subjects.map(sub => ({
-        ...sub.toObject(),
-        semesterNumber: sub.semesterNumber
-      })),
+      subjects: subjectsWithDetails,
     });
   } catch (error) {
     next(error);
@@ -276,13 +302,12 @@ exports.getSubjectsByYear = async (req, res, next) => {
       .populate('lecturer', 'name email lecturerId')
       .sort({ semester: 1, code: 1 });
 
+    const subjectsWithDetails = await attachEnrollmentCounts(subjects);
+
     res.json({
       success: true,
       count: subjects.length,
-      subjects: subjects.map(sub => ({
-        ...sub.toObject(),
-        semesterNumber: sub.semesterNumber
-      })),
+      subjects: subjectsWithDetails,
     });
   } catch (error) {
     next(error);
@@ -307,6 +332,8 @@ exports.getSubjectsByDepartment = async (req, res, next) => {
       .populate('lecturer', 'name email lecturerId')
       .sort({ year: 1, semester: 1, code: 1 });
 
+    const subjectsWithDetails = await attachEnrollmentCounts(subjects);
+
     // Group by year and semester for easier frontend consumption
     const groupedSubjects = {};
 
@@ -317,13 +344,10 @@ exports.getSubjectsByDepartment = async (req, res, next) => {
       };
     });
 
-    subjects.forEach(sub => {
+    subjectsWithDetails.forEach(sub => {
       if (groupedSubjects[sub.year]) {
         const semKey = sub.semester === 1 ? 'semester1' : 'semester2';
-        groupedSubjects[sub.year][semKey].push({
-          ...sub.toObject(),
-          semesterNumber: sub.semesterNumber
-        });
+        groupedSubjects[sub.year][semKey].push(sub);
       }
     });
 
@@ -331,10 +355,7 @@ exports.getSubjectsByDepartment = async (req, res, next) => {
       success: true,
       count: subjects.length,
       subjects: groupedSubjects,
-      flatList: subjects.map(sub => ({
-        ...sub.toObject(),
-        semesterNumber: sub.semesterNumber
-      }))
+      flatList: subjectsWithDetails
     });
   } catch (error) {
     next(error);
@@ -354,13 +375,12 @@ exports.getSubjectsByCategory = async (req, res, next) => {
       .populate('lecturer', 'name email')
       .sort({ year: 1, semester: 1, code: 1 });
 
+    const subjectsWithDetails = await attachEnrollmentCounts(subjects);
+
     res.json({
       success: true,
       count: subjects.length,
-      subjects: subjects.map(sub => ({
-        ...sub.toObject(),
-        semesterNumber: sub.semesterNumber
-      }))
+      subjects: subjectsWithDetails
     });
   } catch (error) {
     next(error);
@@ -607,13 +627,12 @@ exports.getSubjectsByLecturer = async (req, res, next) => {
       isActive: true
     }).sort({ year: 1, semester: 1, code: 1 });
 
+    const subjectsWithDetails = await attachEnrollmentCounts(subjects);
+
     res.json({
       success: true,
       count: subjects.length,
-      subjects: subjects.map(sub => ({
-        ...sub.toObject(),
-        semesterNumber: sub.semesterNumber
-      }))
+      subjects: subjectsWithDetails
     });
   } catch (error) {
     next(error);

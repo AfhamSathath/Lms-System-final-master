@@ -13,6 +13,8 @@ const HodStudents = () => {
   const [students, setStudents] = useState([]);
   const [unassignedStudents, setUnassignedStudents] = useState([]);
   const [search, setSearch] = useState('');
+  const [selectedBatch, setSelectedBatch] = useState('All');
+  const batches = ['2024/2025', '2023/2024', '2022/2023', '2021/2022', 'Repeat Batch (All)'];
   const [showAssignModal, setShowAssignModal] = useState(false);
   const [assignSearch, setAssignSearch] = useState('');
   const [assigning, setAssigning] = useState(false);
@@ -38,15 +40,15 @@ const HodStudents = () => {
     try {
       const res = await api.get('/api/auth/users?role=student');
       const allStudents = res.data.users || [];
-      
+
       // My department students
-      const myStudents = allStudents.filter(s => 
+      const myStudents = allStudents.filter(s =>
         (s.department || '').toLowerCase() === (user.department || '').toLowerCase()
       );
-      
+
       // Unassigned students (no department set)
       const pool = allStudents.filter(s => !s.department || s.department.trim() === '');
-      
+
       setStudents(myStudents);
       setUnassignedStudents(pool);
     } catch (error) {
@@ -110,11 +112,13 @@ const HodStudents = () => {
     }
   };
 
-  const filteredStudents = students.filter((student) =>
-    student.name?.toLowerCase().includes(search.toLowerCase()) ||
-    student.studentId?.toLowerCase().includes(search.toLowerCase()) ||
-    student.email?.toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredStudents = students.filter((student) => {
+    const matchesSearch = student.name?.toLowerCase().includes(search.toLowerCase()) ||
+      student.studentId?.toLowerCase().includes(search.toLowerCase()) ||
+      student.email?.toLowerCase().includes(search.toLowerCase());
+    const matchesBatch = selectedBatch === 'All' ? true : student.batch === selectedBatch;
+    return matchesSearch && matchesBatch;
+  });
 
   const filteredUnassigned = unassignedStudents.filter((student) =>
     student.name?.toLowerCase().includes(assignSearch.toLowerCase()) ||
@@ -133,6 +137,14 @@ const HodStudents = () => {
             <p className="text-gray-500 font-medium">Managing assignments for <span className="text-indigo-600 font-bold">{user.department}</span></p>
           </div>
           <div className="flex items-center gap-3">
+            <select
+              value={selectedBatch}
+              onChange={(e) => setSelectedBatch(e.target.value)}
+              className="px-4 py-3 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-indigo-500 font-medium transition-all outline-none"
+            >
+              <option value="All">All Batches</option>
+              {batches.map(b => <option key={b} value={b}>{b}</option>)}
+            </select>
             <div className="relative">
               <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
               <input
@@ -215,14 +227,14 @@ const HodStudents = () => {
                   </td>
                   <td className="px-8 py-6 text-right">
                     <div className="flex items-center justify-end gap-2">
-                      <button 
+                      <button
                         onClick={() => handleEditClick(student)}
                         className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all"
                         title="Edit Details"
                       >
                         <FiEdit2 size={18} />
                       </button>
-                      <button 
+                      <button
                         onClick={() => handleRemoveStudent(student._id)}
                         className="p-2 text-red-600 hover:bg-red-50 rounded-xl transition-all"
                         title="Remove from Department"
@@ -239,15 +251,15 @@ const HodStudents = () => {
       </div>
 
       {/* Assign Modal */}
-      <Modal 
-        isOpen={showAssignModal} 
+      <Modal
+        isOpen={showAssignModal}
         onClose={() => setShowAssignModal(false)}
         title="Assign Students to Department"
       >
         <div className="space-y-6">
           <div className="relative">
             <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-            <input 
+            <input
               type="text"
               placeholder="Filter unassigned students..."
               className="w-full pl-10 pr-4 py-3 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-indigo-500 font-medium"
@@ -255,7 +267,7 @@ const HodStudents = () => {
               onChange={(e) => setAssignSearch(e.target.value)}
             />
           </div>
-          
+
           <div className="max-h-[400px] overflow-y-auto space-y-2 pr-2 custom-scrollbar">
             {filteredUnassigned.length === 0 ? (
               <p className="text-center py-10 text-gray-400 font-bold uppercase text-xs">No unassigned students found</p>

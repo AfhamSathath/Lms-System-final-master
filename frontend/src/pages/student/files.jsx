@@ -26,58 +26,49 @@ const StudentFiles = () => {
 
   useEffect(() => {
     fetchData();
-  }, [selectedYear, selectedSemester]);
-
-  useEffect(() => {
-    const params = queryString.parse(location.search);
-    if (params.subject) {
-      setSelectedSubject(params.subject);
-    }
-  }, [location.search]);
-
+  }, []);
 
   useEffect(() => {
     filterFiles();
-  }, [searchTerm, selectedSubject, files]);
+  }, [searchTerm, selectedSubject, selectedYear, selectedSemester, files, subjects]);
 
   const fetchData = async () => {
+    setLoading(true);
     try {
-      // fetch all files the student can access; backend handles public/enrollment
       const [filesRes, subjectsRes] = await Promise.all([
         api.get('/api/files'),
         api.get('/api/subjects')
       ]);
-      const filelist = (filesRes?.data?.files && Array.isArray(filesRes.data.files)) ? filesRes.data.files : [];
-      let sublist = (subjectsRes?.data?.subjects && Array.isArray(subjectsRes.data.subjects)) ? subjectsRes.data.subjects : [];
-      
-      // Filter subjects by selected year/semester
-      sublist = sublist.filter(s => s.year === selectedYear && s.semester === selectedSemester);
-      
-      setFiles(filelist);
-      setFilteredFiles(filelist.filter(f => sublist.some(s => s._id === f.subject?._id)));
-      setSubjects(sublist);
+      setFiles(filesRes?.data?.files || []);
+      setSubjects(subjectsRes?.data?.subjects || []);
     } catch (error) {
       console.error('Error fetching data:', error);
-      setFiles([]);
-      setFilteredFiles([]);
-      setSubjects([]);
+      toast.error('Failed to load resources');
     } finally {
       setLoading(false);
     }
   };
 
   const filterFiles = () => {
-    let filtered = files;
+    // 1. First, find all subjects that match the selected year and semester
+    const periodSubjects = subjects.filter(s => 
+      s.year === selectedYear && s.semester === parseInt(selectedSemester)
+    );
+    const periodSubjectIds = periodSubjects.map(s => s._id);
+
+    // 2. Filter files that belong to these subjects or match other criteria
+    let filtered = files.filter(file => periodSubjectIds.includes(file.subject?._id));
 
     if (selectedSubject !== 'all') {
       filtered = filtered.filter(file => file.subject?._id === selectedSubject);
     }
 
     if (searchTerm) {
+      const lowSearch = searchTerm.toLowerCase();
       filtered = filtered.filter(file =>
-        file.originalName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        file.subject?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        file.description?.toLowerCase().includes(searchTerm.toLowerCase())
+        file.originalName.toLowerCase().includes(lowSearch) ||
+        file.subject?.name.toLowerCase().includes(lowSearch) ||
+        file.description?.toLowerCase().includes(lowSearch)
       );
     }
 
@@ -116,44 +107,67 @@ const StudentFiles = () => {
   }
 
   return (
-    <div className="p-6">
-      <div className="container mx-auto">
+      <div className="container mx-auto px-4 py-8 bg-slate-50 min-h-screen">
         {/* Header */}
-        <div className="mb-12 flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
-            <h1 className="text-4xl font-extrabold text-slate-800 tracking-tight font-outfit uppercase">Learning Materials</h1>
-            <p className="text-slate-500 mt-2 font-medium italic">{selectedYear} - Semester {selectedSemester} Resource Hub</p>
+            <h1 className="text-4xl font-black text-slate-800 tracking-tight uppercase font-outfit">Resource Repository</h1>
+            <p className="text-slate-500 mt-2 font-medium italic">Course materials, lecture notes, and supplementary files for your modules.</p>
           </div>
           
-          <div className="flex flex-wrap gap-4 items-center">
-              <div className="flex bg-white p-1.5 rounded-2xl shadow-xl border border-slate-50">
+          <div className="flex gap-4">
+             <div className="bg-white px-6 py-4 rounded-3xl shadow-xl border border-slate-100 hidden sm:block">
+                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Available Files</p>
+                <p className="text-xl font-black text-slate-800">{filteredFiles.length}</p>
+             </div>
+          </div>
+        </div>
+
+        {/* Premium Academic Filters */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12 animate-in fade-in slide-in-from-top-4 duration-1000">
+           <div className="bg-white rounded-[2rem] shadow-xl p-8 border border-slate-100 relative overflow-hidden group">
+              <div className="absolute top-0 right-0 p-8 opacity-[0.02] group-hover:scale-125 transition-transform duration-1000">
+                 <FiBook className="h-32 w-32" />
+              </div>
+              <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-6 italic">Academic Year</label>
+              <div className="flex flex-wrap gap-4 relative z-10">
                  {years.map(y => (
-                    <button 
+                    <button
                       key={y}
                       onClick={() => setSelectedYear(y)}
-                      className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-tighter transition-all ${
-                        selectedYear === y ? 'bg-slate-900 text-white' : 'text-slate-400 hover:text-slate-600'
+                      className={`px-6 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all duration-500 ${
+                         selectedYear === y 
+                         ? 'bg-slate-900 text-white shadow-2xl scale-105' 
+                         : 'bg-slate-50 text-slate-400 hover:bg-slate-100'
                       }`}
                     >
-                      {y.split(' ')[0]}
+                      {y}
                     </button>
                  ))}
               </div>
+           </div>
 
-              <div className="flex bg-white p-1.5 rounded-2xl shadow-xl border border-slate-50">
+           <div className="bg-white rounded-[2rem] shadow-xl p-8 border border-indigo-50 relative overflow-hidden group">
+              <div className="absolute top-0 right-0 p-8 opacity-[0.02] group-hover:scale-125 transition-transform duration-1000">
+                 <FiSearch className="h-32 w-32" />
+              </div>
+              <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-6 italic">Semester</label>
+              <div className="flex flex-wrap gap-4 relative z-10">
                  {semesters.map(s => (
-                    <button 
+                    <button
                       key={s}
                       onClick={() => setSelectedSemester(s)}
-                      className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-tighter transition-all ${
-                        selectedSemester === s ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-400 hover:text-slate-600'
+                      className={`px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all duration-500 ${
+                         selectedSemester === s 
+                         ? 'bg-indigo-600 text-white shadow-2xl scale-105' 
+                         : 'bg-slate-50 text-slate-400 hover:bg-slate-100'
                       }`}
                     >
-                      Sem {s}
+                      Semester {s}
                     </button>
                  ))}
               </div>
-          </div>
+           </div>
         </div>
 
         {/* Filters */}
@@ -183,7 +197,9 @@ const StudentFiles = () => {
                 className="w-full pl-10 pr-8 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white"
               >
                 <option value="all">All Subjects</option>
-                {subjects.map(subject => (
+                {subjects
+                  .filter(s => s.year === selectedYear && s.semester === parseInt(selectedSemester))
+                  .map(subject => (
                   <option key={subject._id} value={subject._id}>
                     {subject.name} ({subject.code})
                   </option>
@@ -260,7 +276,6 @@ const StudentFiles = () => {
           </div>
         )}
       </div>
-    </div>
   );
 };
 
