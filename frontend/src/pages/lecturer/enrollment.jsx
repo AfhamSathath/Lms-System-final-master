@@ -159,10 +159,10 @@ const LecturerEnrollment = () => {
   if (loading) return <Loader fullScreen />;
 
   return (
-    <div className="p-6 bg-slate-50 min-h-screen">
+    <div className="p-6 bg-white min-h-screen">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 mb-8">
+        <div className="bg-white rounded-2xl shadow-sm border border-black p-8 mb-8">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <h1 className="text-3xl font-black text-slate-800 tracking-tight uppercase">Subject Enrollment</h1>
@@ -180,7 +180,7 @@ const LecturerEnrollment = () => {
             <h2 className="text-xs font-black uppercase tracking-widest text-slate-400 px-4">Your Subjects</h2>
             <div className="space-y-2">
               {assignedSubjects.length === 0 ? (
-                <div className="p-4 bg-white rounded-xl border border-dashed border-slate-300 text-center text-slate-400 text-xs font-bold uppercase">
+                <div className="p-4 bg-white rounded-xl border border-dashed border-black text-center text-slate-400 text-xs font-bold uppercase">
                   No subjects assigned
                 </div>
               ) : (
@@ -217,7 +217,7 @@ const LecturerEnrollment = () => {
              {selectedSubject ? (
                <div className="space-y-6">
                   {/* Subject Header */}
-                  <div className="bg-white rounded-[2rem] shadow-sm border border-slate-200 p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                  <div className="bg-white rounded-[2rem] shadow-sm border border-black p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                     <div>
                       <h3 className="text-2xl font-black text-slate-800 tracking-tighter uppercase">{selectedSubject.subject.name}</h3>
                       <div className="flex flex-wrap gap-2 mt-2">
@@ -229,7 +229,7 @@ const LecturerEnrollment = () => {
                     <div className="flex gap-3">
                       <button
                         onClick={handleAutoEnrollBatch}
-                        className="bg-indigo-50 text-indigo-600 px-6 py-4 rounded-2xl font-black flex items-center gap-2 hover:bg-indigo-100 transition shadow-sm active:scale-95"
+                        className="bg-indigo-50 text-indigo-600 px-6 py-4 rounded-2xl font-black flex items-center gap-2 hover:bg-white border border-black transition shadow-sm active:scale-95"
                         title="Auto-enroll students by batch"
                       >
                         <FiUsers /> Auto-Enroll Batch
@@ -244,14 +244,14 @@ const LecturerEnrollment = () => {
                   </div>
 
                   {/* List */}
-                  <div className="bg-white rounded-[2rem] shadow-sm border border-slate-200 overflow-hidden">
+                  <div className="bg-white rounded-[2rem] shadow-sm border border-black overflow-hidden">
                     <div className="px-8 py-6 border-b border-slate-50 flex justify-between items-center">
                        <h4 className="text-xs font-black uppercase tracking-widest text-slate-400">Enrolled Students ({filteredEnrolled.length})</h4>
                        <div className="flex gap-3">
                          <select
                            value={filterBatch}
                            onChange={(e) => setFilterBatch(e.target.value)}
-                           className="px-3 py-2 bg-slate-50 border-none rounded-xl text-xs font-bold outline-none"
+                           className="px-3 py-2 bg-white border-none rounded-xl text-xs font-bold outline-none"
                          >
                            <option value="All">All Batches</option>
                            {batches.map(b => (
@@ -263,7 +263,7 @@ const LecturerEnrollment = () => {
                            <input 
                              type="text" 
                              placeholder="Search enrolled..." 
-                             className="pl-10 pr-4 py-2 bg-slate-50 border-none rounded-xl text-sm font-bold"
+                             className="pl-10 pr-4 py-2 bg-white border-none rounded-xl text-sm font-bold"
                              value={search}
                              onChange={(e) => setSearch(e.target.value)}
                            />
@@ -273,7 +273,7 @@ const LecturerEnrollment = () => {
                     <div className="overflow-x-auto">
                       <table className="w-full text-left">
                         <thead>
-                          <tr className="bg-slate-50/30">
+                          <tr className="bg-white/30">
                             <th className="px-8 py-4 text-[10px] font-black uppercase text-slate-400">Student Info</th>
                             <th className="px-8 py-4 text-[10px] font-black uppercase text-slate-400">Student ID</th>
                             <th className="px-8 py-4 text-[10px] font-black uppercase text-slate-400">Enrollment Date</th>
@@ -287,7 +287,7 @@ const LecturerEnrollment = () => {
                             </tr>
                           ) : (
                             filteredEnrolled.map(e => (
-                              <tr key={e._id} className="hover:bg-slate-50/30 transition-colors">
+                              <tr key={e._id} className="hover:bg-white/30 transition-colors">
                                 <td className="px-8 py-5">
                                   <div className="flex items-center gap-3">
                                     <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 font-black">
@@ -318,7 +318,7 @@ const LecturerEnrollment = () => {
                   </div>
                </div>
              ) : (
-               <div className="bg-white rounded-[3rem] shadow-sm border border-slate-200 border-dashed p-20 flex flex-col items-center text-center">
+               <div className="bg-white rounded-[3rem] shadow-sm border border-black border-dashed p-20 flex flex-col items-center text-center">
                   <div className="w-20 h-20 bg-indigo-50 rounded-3xl flex items-center justify-center text-4xl text-indigo-600 mb-6 drop-shadow-sm">
                     <FiBook className="opacity-40" />
                   </div>
@@ -341,7 +341,7 @@ const LecturerEnrollment = () => {
                <div>
                   <label className="text-[10px] font-black uppercase text-slate-400 ml-1">Batch</label>
                   <select 
-                    className="w-full mt-1 bg-slate-50 border-none rounded-xl py-2.5 px-3 text-sm font-bold focus:ring-2 focus:ring-indigo-100 transition-all opacity-80"
+                    className="w-full mt-1 bg-white border-none rounded-xl py-2.5 px-3 text-sm font-bold focus:ring-2 focus:ring-indigo-100 transition-all opacity-80"
                     value={filters.batch}
                     onChange={e => setFilters({...filters, batch: e.target.value})}
                   >
@@ -355,7 +355,7 @@ const LecturerEnrollment = () => {
                <div>
                   <label className="text-[10px] font-black uppercase text-slate-400 ml-1">Year</label>
                   <select 
-                    className="w-full mt-1 bg-slate-50 border-none rounded-xl py-2.5 px-3 text-sm font-bold focus:ring-2 focus:ring-indigo-100 transition-all opacity-80"
+                    className="w-full mt-1 bg-white border-none rounded-xl py-2.5 px-3 text-sm font-bold focus:ring-2 focus:ring-indigo-100 transition-all opacity-80"
                     value={filters.yearOfStudy}
                     onChange={e => setFilters({...filters, yearOfStudy: e.target.value})}
                   >
@@ -369,7 +369,7 @@ const LecturerEnrollment = () => {
                <div>
                   <label className="text-[10px] font-black uppercase text-slate-400 ml-1">Semester</label>
                   <select 
-                    className="w-full mt-1 bg-slate-50 border-none rounded-xl py-2.5 px-3 text-sm font-bold focus:ring-2 focus:ring-indigo-100 transition-all opacity-80"
+                    className="w-full mt-1 bg-white border-none rounded-xl py-2.5 px-3 text-sm font-bold focus:ring-2 focus:ring-indigo-100 transition-all opacity-80"
                     value={filters.semester}
                     onChange={e => setFilters({...filters, semester: e.target.value})}
                   >
@@ -385,7 +385,7 @@ const LecturerEnrollment = () => {
                    <input 
                      type="text"
                      placeholder="Name or ID..."
-                     className="w-full bg-slate-50 border-none rounded-xl py-2.5 pl-10 pr-4 text-sm font-bold focus:ring-2 focus:ring-indigo-100 transition-all"
+                     className="w-full bg-white border-none rounded-xl py-2.5 pl-10 pr-4 text-sm font-bold focus:ring-2 focus:ring-indigo-100 transition-all"
                      value={filters.search}
                      onChange={e => setFilters({...filters, search: e.target.value})}
                    />
@@ -398,7 +398,7 @@ const LecturerEnrollment = () => {
                 <p className="text-center py-10 text-slate-400 font-black uppercase text-xs">No more students available with these filters</p>
               ) : (
                 studentsToEnroll.map(student => (
-                  <div key={student._id} className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl hover:bg-indigo-50 transition-colors">
+                  <div key={student._id} className="flex items-center justify-between p-4 bg-white rounded-2xl hover:bg-indigo-50 transition-colors">
                     <div>
                        <p className="font-bold text-slate-700">{student.name}</p>
                        <p className="text-[10px] text-slate-400 font-bold uppercase">{student.studentId || "No ID"}</p>

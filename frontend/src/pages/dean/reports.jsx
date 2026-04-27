@@ -57,7 +57,7 @@ const DeanReports = () => {
   ];
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
+    <div className="p-6 bg-white min-h-screen">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
         <div className="flex items-center gap-4">
            <div className="p-4 bg-emerald-600 rounded-3xl text-white shadow-xl shadow-emerald-200">
@@ -103,14 +103,14 @@ const DeanReports = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
          <div className="lg:col-span-2 space-y-8">
-            <div className="bg-white p-10 rounded-[40px] shadow-sm border border-gray-100 relative group overflow-hidden">
+            <div className="bg-white p-10 rounded-[40px] shadow-sm border border-black relative group overflow-hidden">
                <div className="flex justify-between items-center mb-10">
                   <h3 className="text-xl font-bold text-gray-800 flex items-center gap-3">
                      <FiGlobe className="text-emerald-500" /> Departmental Throughput
                   </h3>
                   <button 
                     onClick={() => fetchStats()}
-                    className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400 hover:bg-emerald-50 hover:text-emerald-500 transition-all shadow-sm border border-gray-100"
+                    className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-gray-400 hover:bg-emerald-50 hover:text-emerald-500 transition-all shadow-sm border border-black"
                   >
                     <FiActivity size={16} />
                   </button>
@@ -134,14 +134,14 @@ const DeanReports = () => {
                </div>
             </div>
 
-            <div className="bg-white p-10 rounded-[40px] shadow-sm border border-gray-100">
+            <div className="bg-white p-10 rounded-[40px] shadow-sm border border-black">
                <h3 className="text-xl font-bold text-gray-800 mb-8 flex items-center gap-3">
                   <FiCloudLightning className="text-indigo-500" /> Real-time Anomaly Detection
                </h3>
                <div className="space-y-4">
                   {anomalies.length > 0 ? (
                     anomalies.map((a, i) => (
-                      <div key={i} className="flex items-center gap-4 p-4 hover:bg-gray-50 rounded-3xl transition-all border border-transparent hover:border-gray-100">
+                      <div key={i} className="flex items-center gap-4 p-4 hover:bg-white rounded-3xl transition-all border border-transparent hover:border-black">
                          <div className="w-12 h-12 bg-rose-50 rounded-2xl flex items-center justify-center text-rose-500 border border-rose-100">
                             <FiAlertCircle size={24} />
                          </div>
@@ -151,20 +151,20 @@ const DeanReports = () => {
                          </div>
                          <button 
                            onClick={() => handleInvestigate(a)}
-                           className="text-xs font-black uppercase text-indigo-600 tracking-widest px-4 py-2 bg-indigo-50 rounded-xl hover:bg-indigo-100 transition-all active:scale-95"
+                           className="text-xs font-black uppercase text-indigo-600 tracking-widest px-4 py-2 bg-indigo-50 rounded-xl hover:bg-white border border-black transition-all active:scale-95"
                          >
                            Investigate
                          </button>
                       </div>
                     ))
                   ) : (
-                    <div className="p-8 text-center bg-gray-50 rounded-3xl text-gray-400 font-bold uppercase text-xs tracking-widest">No anomalies detected in faculty stream</div>
+                    <div className="p-8 text-center bg-white rounded-3xl text-gray-400 font-bold uppercase text-xs tracking-widest">No anomalies detected in faculty stream</div>
                   )}
                </div>
             </div>
          </div>
 
-         <div className="bg-white p-10 rounded-[40px] shadow-sm border border-gray-100 h-fit">
+         <div className="bg-white p-10 rounded-[40px] shadow-sm border border-black h-fit">
             <h3 className="text-xl font-bold text-gray-800 mb-8">Faculty Pulse</h3>
             <div className="space-y-8">
                {[
@@ -178,7 +178,7 @@ const DeanReports = () => {
                        <span className="text-[10px] font-black text-gray-400 tracking-widest group-hover:text-gray-800 transition-colors uppercase">{p.label}</span>
                        <span className="text-sm font-black text-gray-800">{p.val}</span>
                     </div>
-                    <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                    <div className="h-1.5 bg-white border border-black rounded-full overflow-hidden">
                        <motion.div
                          initial={{ width: 0 }}
                          animate={{ width: '80%' }}
@@ -217,17 +217,17 @@ const DeanReports = () => {
                    <p className="text-gray-700 font-medium">Automatic tracker detected that {selectedAnomaly.name} is currently at {selectedAnomaly.progress}% completion, which is 60% below the expected faculty pace.</p>
                 </div>
                 <div className="space-y-4 mb-10">
-                   <div className="flex justify-between p-4 bg-gray-50 rounded-2xl">
+                   <div className="flex justify-between p-4 bg-white rounded-2xl">
                       <span className="text-xs font-black text-gray-400 uppercase tracking-widest">Department</span>
                       <span className="text-sm font-bold">{selectedAnomaly.department}</span>
                    </div>
-                   <div className="flex justify-between p-4 bg-gray-50 rounded-2xl">
+                   <div className="flex justify-between p-4 bg-white rounded-2xl">
                       <span className="text-xs font-black text-gray-400 uppercase tracking-widest">Year/Sem</span>
                       <span className="text-sm font-bold">{selectedAnomaly.year} • Sem {selectedAnomaly.semester}</span>
                    </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
-                   <button onClick={() => { toast.success('Lecturer notified'); setSelectedAnomaly(null); }} className="py-4 border-2 border-gray-100 rounded-2xl font-black text-[10px] tracking-widest uppercase hover:bg-gray-50 transition-all">Request Correction</button>
+                   <button onClick={() => { toast.success('Lecturer notified'); setSelectedAnomaly(null); }} className="py-4 border-2 border-black rounded-2xl font-black text-[10px] tracking-widest uppercase hover:bg-white transition-all">Request Correction</button>
                    <button onClick={() => { toast.success('Dean review scheduled'); setSelectedAnomaly(null); }} className="py-4 bg-rose-600 text-white rounded-2xl font-black text-[10px] tracking-widest uppercase shadow-lg shadow-rose-200 transition-all">Escalate to HOD</button>
                 </div>
              </motion.div>

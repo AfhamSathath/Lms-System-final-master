@@ -36,7 +36,7 @@ const HodTimetable = () => {
       ) : (
         <div className="bg-white rounded-xl shadow-lg overflow-x-auto">
           <table className="min-w-full text-left">
-            <thead className="bg-gray-100">
+            <thead className="bg-white border border-black">
               <tr>
                 <th className="px-4 py-3 text-sm font-medium text-gray-600">Date</th>
                 <th className="px-4 py-3 text-sm font-medium text-gray-600">Subject</th>
@@ -48,7 +48,7 @@ const HodTimetable = () => {
             </thead>
             <tbody>
               {timetables.map((item) => (
-                <tr key={item._id} className="border-t border-gray-200 hover:bg-gray-50">
+                <tr key={item._id} className="border-t border-black hover:bg-white">
                   <td className="px-4 py-3 text-sm text-gray-700">{new Date(item.date).toLocaleDateString()}</td>
                   <td className="px-4 py-3 text-sm text-gray-700">{item.subject?.name || 'N/A'}</td>
                   <td className="px-4 py-3 text-sm text-gray-700">{item.examType || 'Exam'}</td>

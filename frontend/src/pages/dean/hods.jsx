@@ -78,7 +78,7 @@ const DeanHods = () => {
   if (loading) return <div className="p-8 text-center animate-pulse text-rose-500 font-black uppercase tracking-tighter">Initializing Authority protocols...</div>;
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
+    <div className="p-6 bg-white min-h-screen">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
         <div>
           <h1 className="text-3xl font-black text-gray-800 uppercase tracking-tight">HOD Management</h1>
@@ -113,7 +113,7 @@ const DeanHods = () => {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
               transition={{ delay: index * 0.05 }}
-              className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 relative group overflow-hidden"
+              className="bg-white p-6 rounded-3xl shadow-sm border border-black relative group overflow-hidden"
             >
               <div className="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
                 <button
@@ -124,7 +124,7 @@ const DeanHods = () => {
                 </button>
                 <button
                   onClick={() => handleDelete(hod._id)}
-                  className="bg-gray-50 text-gray-600 p-2 rounded-xl border border-gray-100 hover:bg-rose-50 hover:text-rose-600 transition-colors"
+                  className="bg-white text-gray-600 p-2 rounded-xl border border-black hover:bg-rose-50 hover:text-rose-600 transition-colors"
                 >
                   <FiTrash2 size={16} />
                 </button>
@@ -152,11 +152,11 @@ const DeanHods = () => {
               </div>
 
               <div className="pt-6 border-t border-gray-50 grid grid-cols-2 gap-4">
-                <div className="text-center p-3 bg-gray-50 rounded-2xl">
+                <div className="text-center p-3 bg-white rounded-2xl">
                   <p className="text-[10px] uppercase font-black text-gray-400 tracking-tighter">Lecturers</p>
                   <p className="text-lg font-black text-gray-800 tracking-tight">{hod.lecturerCount || 0}</p>
                 </div>
-                <div className="text-center p-3 bg-gray-50 rounded-2xl">
+                <div className="text-center p-3 bg-white rounded-2xl">
                   <p className="text-[10px] uppercase font-black text-gray-400 tracking-tighter">Subjects</p>
                   <p className="text-lg font-black text-gray-800 tracking-tight">{hod.courseCount || 0}</p>
                 </div>
@@ -167,7 +167,7 @@ const DeanHods = () => {
       </div>
 
       {filteredHods.length === 0 && (
-        <div className="text-center py-20 bg-white rounded-[40px] shadow-sm border border-dashed border-gray-200">
+        <div className="text-center py-20 bg-white rounded-[40px] shadow-sm border border-dashed border-black">
           <FiBox size={48} className="mx-auto text-gray-200 mb-4" />
           <h2 className="text-xl font-bold text-gray-400 uppercase tracking-widest">No HODs Found</h2>
         </div>
@@ -270,7 +270,7 @@ const AppointHODModal = ({ isOpen, onClose, onSuccess, editingHod, user }) => {
           <h2 className="text-2xl font-black text-gray-800 uppercase tracking-tighter">
             {editingHod ? 'Update HOD Status' : 'New Appointment'}
           </h2>
-          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-2xl transition-colors"><FiX /></button>
+          <button onClick={onClose} className="p-2 hover:bg-white border border-black rounded-2xl transition-colors"><FiX /></button>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -282,18 +282,18 @@ const AppointHODModal = ({ isOpen, onClose, onSuccess, editingHod, user }) => {
                 <input
                   type="text"
                   placeholder="Search lecturer pool..."
-                  className="w-full pl-10 pr-4 py-3 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-rose-500 text-sm font-bold"
+                  className="w-full pl-10 pr-4 py-3 bg-white border-none rounded-2xl focus:ring-2 focus:ring-rose-500 text-sm font-bold"
                   value={searchLecturer}
                   onChange={(e) => setSearchLecturer(e.target.value)}
                 />
               </div>
-              <div className="max-h-40 overflow-y-auto space-y-1 p-1 bg-gray-50 rounded-2xl">
+              <div className="max-h-40 overflow-y-auto space-y-1 p-1 bg-white rounded-2xl">
                 {filteredLecturers.map(l => (
                   <button
                     key={l._id}
                     type="button"
                     onClick={() => setSelectedLecturer(l)}
-                    className={`w-full text-left p-3 rounded-xl transition-all flex items-center justify-between ${selectedLecturer?._id === l._id ? 'bg-rose-500 text-white' : 'hover:bg-gray-100'}`}
+                    className={`w-full text-left p-3 rounded-xl transition-all flex items-center justify-between ${selectedLecturer?._id === l._id ? 'bg-rose-500 text-white' : 'hover:bg-white border border-black'}`}
                   >
                     <span className="text-xs font-bold truncate">{l.name}</span>
                     {selectedLecturer?._id === l._id && <FiCheckCircle />}
@@ -306,7 +306,7 @@ const AppointHODModal = ({ isOpen, onClose, onSuccess, editingHod, user }) => {
           <div>
             <label className="text-[10px] uppercase font-black text-gray-400 tracking-widest block mb-2">Department Assignment</label>
             <select
-              className="w-full py-3 px-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-rose-500 text-sm font-bold appearance-none"
+              className="w-full py-3 px-4 bg-white border-none rounded-2xl focus:ring-2 focus:ring-rose-500 text-sm font-bold appearance-none"
               value={department}
               onChange={(e) => setDepartment(e.target.value)}
               required

@@ -37,7 +37,7 @@ const BursarDashboard = () => {
   ];
 
   return (
-    <div className="p-8 bg-gray-50 min-h-screen font-outfit">
+    <div className="p-8 bg-white min-h-screen font-outfit">
       <div className="flex flex-col md:flex-row justify-between md:items-center gap-6 mb-12">
         <div>
           <h1 className="text-4xl font-black text-gray-900 uppercase italic tracking-tighter scale-x-110 origin-left">Bursary Operations Control</h1>
@@ -72,13 +72,13 @@ const BursarDashboard = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-         <div className="lg:col-span-2 bg-white p-10 rounded-[40px] shadow-sm border border-gray-100 overflow-hidden relative">
+         <div className="lg:col-span-2 bg-white p-10 rounded-[40px] shadow-sm border border-black overflow-hidden relative">
             <h2 className="text-2xl font-black text-gray-800 mb-8 uppercase tracking-tighter italic flex items-center justify-between">
                Revenue Ledger (Today) <FiShield className="text-gray-100 text-6xl absolute -top-4 -right-4" />
             </h2>
             <div className="space-y-4 relative z-10">
                {RecentTransactions.map((tx, idx) => (
-                  <div key={idx} className="p-6 bg-gray-50/50 rounded-3xl border border-gray-50 flex justify-between items-center hover:bg-emerald-50/20 transition-all cursor-pointer group">
+                  <div key={idx} className="p-6 bg-white/50 rounded-3xl border border-gray-50 flex justify-between items-center hover:bg-emerald-50/20 transition-all cursor-pointer group">
                      <div className="flex items-center gap-6">
                         <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-emerald-600 font-black shadow-sm group-hover:rotate-[360deg] transition-transform duration-700 text-xs">{tx.id.slice(3)}</div>
                         <div>

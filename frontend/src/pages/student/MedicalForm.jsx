@@ -79,10 +79,10 @@ const StudentMedicalForm = () => {
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-        <div className="bg-gradient-to-r from-blue-600 to-indigo-700 p-6 text-white">
+      <div className="bg-white rounded-xl shadow-sm border border-black overflow-hidden">
+        <div className="bg-white border border-black p-6 text-slate-900">
           <h2 className="text-2xl font-bold">Medical Application Form</h2>
-          <p className="mt-2 text-blue-100">Submit your Medical Certificate details for absence coverage</p>
+          <p className="mt-2 text-slate-500">Submit your Medical Certificate details for absence coverage</p>
         </div>
         
         <form onSubmit={handleSubmit} className="p-8">
@@ -100,7 +100,7 @@ const StudentMedicalForm = () => {
                 value={formData.registrationNumber}
                 onChange={handleChange}
                 placeholder="e.g. IT20123456"
-                className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full p-3 border border-black rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 required
               />
             </div>
@@ -112,7 +112,7 @@ const StudentMedicalForm = () => {
                 name="fullName"
                 value={formData.fullName}
                 onChange={handleChange}
-                className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full p-3 border border-black rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 required
               />
             </div>
@@ -125,7 +125,7 @@ const StudentMedicalForm = () => {
                 value={formData.faculty}
                 onChange={handleChange}
                 placeholder="e.g. Computing"
-                className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full p-3 border border-black rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 required
               />
             </div>
@@ -138,7 +138,7 @@ const StudentMedicalForm = () => {
                 value={formData.semester}
                 onChange={handleChange}
                 placeholder="e.g. Y2S1"
-                className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full p-3 border border-black rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 required
               />
             </div>
@@ -156,7 +156,7 @@ const StudentMedicalForm = () => {
                 value={formData.illness}
                 onChange={handleChange}
                 placeholder="Brief description of the illness"
-                className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full p-3 border border-black rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 required
               />
             </div>
@@ -169,7 +169,7 @@ const StudentMedicalForm = () => {
                 value={formData.mcNumber}
                 onChange={handleChange}
                 placeholder="Medical Certificate No."
-                className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full p-3 border border-black rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 required
               />
             </div>
@@ -182,7 +182,7 @@ const StudentMedicalForm = () => {
                 value={formData.doctorName}
                 onChange={handleChange}
                 placeholder="Dr. Name"
-                className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full p-3 border border-black rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 required
               />
             </div>
@@ -195,7 +195,7 @@ const StudentMedicalForm = () => {
                 value={formData.hospital}
                 onChange={handleChange}
                 placeholder="Government Hospital / Private Clinic"
-                className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full p-3 border border-black rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 required
               />
             </div>
@@ -207,7 +207,7 @@ const StudentMedicalForm = () => {
                 name="startDate"
                 value={formData.startDate}
                 onChange={handleChange}
-                className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full p-3 border border-black rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 required
               />
             </div>
@@ -219,7 +219,7 @@ const StudentMedicalForm = () => {
                 name="endDate"
                 value={formData.endDate}
                 onChange={handleChange}
-                className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full p-3 border border-black rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 required
               />
             </div>
@@ -227,7 +227,7 @@ const StudentMedicalForm = () => {
             {/* Document Upload */}
             <div className="col-span-1 md:col-span-2 mt-4">
               <label className="block text-sm font-medium text-slate-700 mb-2">Upload Medical Certificate Copy (PDF/JPG)</label>
-              <label htmlFor="mc-upload" className="block border-2 border-dashed border-slate-300 rounded-lg p-8 text-center hover:bg-slate-50 transition-colors cursor-pointer">
+              <label htmlFor="mc-upload" className="block border-2 border-dashed border-black rounded-lg p-8 text-center hover:bg-white transition-colors cursor-pointer">
                 <FiUpload className="mx-auto h-12 w-12 text-slate-400 mb-4" />
                 <p className="text-slate-600">Drag and drop file here, or click to browse</p>
                 <input type="file" className="hidden" id="mc-upload" onChange={handleFileChange} accept=".pdf,.jpg,.jpeg" />

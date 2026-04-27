@@ -85,14 +85,14 @@ const StudentFeedback = () => {
   if (loading) return <Loader fullScreen />;
 
   return (
-    <div className="container mx-auto px-4 py-8 bg-slate-50 min-h-screen">
+    <div className="container mx-auto px-4 py-8 bg-white min-h-screen">
       <div className="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
           <h1 className="text-4xl font-extrabold text-slate-800 tracking-tight font-outfit">Student Feedback</h1>
           <p className="text-slate-500 mt-2 font-medium italic">Shape the future of education with your valuable insights.</p>
         </div>
         {!selectedCourse && (
-          <div className="bg-white p-6 rounded-3xl shadow-xl border border-slate-100 flex items-center gap-4">
+          <div className="bg-white p-6 rounded-3xl shadow-xl border border-black flex items-center gap-4">
              <div className="p-3 bg-fuchsia-50 rounded-2xl text-fuchsia-600">
                 <FiMessageSquare className="h-6 w-6" />
              </div>
@@ -121,7 +121,7 @@ const StudentFeedback = () => {
                     ? 'bg-slate-900 shadow-2xl scale-105 border-0' 
                     : hasSubmitted(enrollment.course?._id)
                     ? 'bg-emerald-50 border border-emerald-100 opacity-60 cursor-default shadow-inner'
-                    : 'bg-white border border-slate-100 hover:shadow-xl hover:border-indigo-200'
+                    : 'bg-white border border-black hover:shadow-xl hover:border-indigo-200'
                  }`}
                >
                  <div className="relative z-10 flex flex-col h-full">
@@ -151,7 +151,7 @@ const StudentFeedback = () => {
 
         <div className="lg:col-span-8">
            {selectedCourse ? (
-             <div className="bg-white rounded-[4rem] shadow-2xl p-12 border border-slate-100 relative overflow-hidden h-full">
+             <div className="bg-white rounded-[4rem] shadow-2xl p-12 border border-black relative overflow-hidden h-full">
                <div className="absolute top-0 right-0 -mr-20 -mt-20 opacity-5">
                   <FiMessageSquare className="w-96 h-96" />
                </div>
@@ -218,7 +218,7 @@ const StudentFeedback = () => {
                        <textarea 
                          value={form.comments}
                          onChange={(e) => setForm({ ...form, comments: e.target.value })}
-                         className="w-full bg-slate-50 border-0 rounded-[2.5rem] p-8 text-slate-700 font-medium focus:ring-4 focus:ring-indigo-100 focus:bg-white transition-all min-h-[150px] placeholder-slate-300"
+                         className="w-full bg-white border-0 rounded-[2.5rem] p-8 text-slate-700 font-medium focus:ring-4 focus:ring-indigo-100 focus:bg-white transition-all min-h-[150px] placeholder-slate-300"
                          placeholder="Be specific, constructive feedback helps your lecturers improve..."
                          maxLength={500}
                        />
@@ -229,7 +229,7 @@ const StudentFeedback = () => {
                                id="anonymous"
                                checked={form.isAnonymous}
                                onChange={(e) => setForm({ ...form, isAnonymous: e.target.checked })}
-                               className="w-5 h-5 rounded-lg border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                               className="w-5 h-5 rounded-lg border-black text-indigo-600 focus:ring-indigo-500"
                              />
                              <label htmlFor="anonymous" className="text-xs font-extrabold text-slate-500 uppercase tracking-widest cursor-pointer hover:text-indigo-600 transition-colors">Submit Anonymously</label>
                           </div>
@@ -249,8 +249,8 @@ const StudentFeedback = () => {
                </div>
              </div>
            ) : (
-             <div className="bg-white rounded-[4rem] shadow-xl p-20 border border-slate-100 h-full flex flex-col items-center justify-center text-center">
-                <div className="w-32 h-32 bg-slate-50 rounded-[2.5rem] flex items-center justify-center mb-10 border border-slate-100">
+             <div className="bg-white rounded-[4rem] shadow-xl p-20 border border-black h-full flex flex-col items-center justify-center text-center">
+                <div className="w-32 h-32 bg-white rounded-[2.5rem] flex items-center justify-center mb-10 border border-black">
                    <FiMessageSquare className="w-12 h-12 text-slate-300" />
                 </div>
                 <h3 className="text-3xl font-black text-slate-800 mb-4 leading-none">Your Voice Matters.</h3>
@@ -261,7 +261,7 @@ const StudentFeedback = () => {
                    <div className="p-3 bg-white rounded-full text-indigo-600 shadow-sm">
                       <FiAlertCircle />
                    </div>
-                   <p className="text-[10px] font-black text-indigo-700 uppercase tracking-widest leading-none">Select a course from the left to begin evaluation</p>
+                   <p className="text-[10px] font-black text-slate-700 uppercase tracking-widest leading-none">Select a course from the left to begin evaluation</p>
                 </div>
              </div>
            )}

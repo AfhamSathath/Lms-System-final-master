@@ -70,14 +70,14 @@ const DeanAudit = () => {
   if (loading) return <div className="p-8 text-center animate-pulse text-indigo-500 font-black uppercase tracking-tighter">Calibrating Audit Engines...</div>;
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
+    <div className="p-6 bg-white min-h-screen">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
         <div>
           <h1 className="text-3xl font-black text-gray-800 uppercase tracking-tight">Faculty Quality Audit</h1>
           <p className="text-gray-500 font-medium tracking-tight">Systematic Review of Academic Delivery & Curriculum Progress</p>
         </div>
         <div className="flex gap-2 w-full md:w-auto">
-          <button onClick={fetchCourses} className="p-3 bg-white rounded-2xl shadow-sm border border-gray-100 text-gray-500 hover:text-indigo-600 transition-all">
+          <button onClick={fetchCourses} className="p-3 bg-white rounded-2xl shadow-sm border border-black text-gray-500 hover:text-indigo-600 transition-all">
             <FiRefreshCw size={24} />
           </button>
           <button 
@@ -91,7 +91,7 @@ const DeanAudit = () => {
 
       {/* Stats bar */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-         <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 overflow-hidden relative">
+         <div className="bg-white p-6 rounded-3xl shadow-sm border border-black overflow-hidden relative">
             <div className="relative z-10">
                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Total Active Courses</p>
                <h2 className="text-3xl font-black text-gray-800 tracking-tight">{courses.length}</h2>
@@ -128,7 +128,7 @@ const DeanAudit = () => {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: idx * 0.02 }}
-                className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow relative overflow-hidden"
+                className="bg-white p-6 rounded-3xl shadow-sm border border-black hover:shadow-md transition-shadow relative overflow-hidden"
               >
                 <div className="flex flex-col lg:flex-row gap-6 items-start lg:items-center justify-between">
                   <div className="flex-1 min-w-0">
@@ -150,7 +150,7 @@ const DeanAudit = () => {
                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Delivery Progress</span>
                        <span className="text-xs font-black text-indigo-600">{course.progress}%</span>
                     </div>
-                    <div className="h-3 bg-gray-100 rounded-full overflow-hidden border border-gray-50 p-0.5">
+                    <div className="h-3 bg-white border border-black rounded-full overflow-hidden border border-gray-50 p-0.5">
                        <motion.div 
                          initial={{ width: 0 }}
                          animate={{ width: `${course.progress}%` }}
@@ -168,7 +168,7 @@ const DeanAudit = () => {
                     </div>
                     <button 
                       onClick={() => setSelectedCourse(course)}
-                      className="p-3 bg-gray-50 text-gray-400 rounded-2xl hover:bg-indigo-50 hover:text-indigo-600 transition-all active:scale-90 shadow-sm border border-gray-100"
+                      className="p-3 bg-white text-gray-400 rounded-2xl hover:bg-indigo-50 hover:text-indigo-600 transition-all active:scale-90 shadow-sm border border-black"
                     >
                        <FiExternalLink size={20} />
                     </button>
@@ -195,17 +195,17 @@ const DeanAudit = () => {
                          <h2 className="text-3xl font-black text-gray-800 tracking-tighter uppercase">{selectedCourse.name}</h2>
                          <p className="text-gray-400 font-bold">{selectedCourse.code} • {selectedCourse.department}</p>
                       </div>
-                      <button onClick={() => setSelectedCourse(null)} className="p-3 bg-gray-50 rounded-2xl hover:bg-gray-100 transition-colors">
+                      <button onClick={() => setSelectedCourse(null)} className="p-3 bg-white rounded-2xl hover:bg-white border border-black transition-colors">
                          <FiExternalLink className="rotate-45" /> 
                       </button>
                    </div>
 
                    <div className="grid grid-cols-2 gap-6 mb-10">
-                      <div className="p-6 bg-gray-50 rounded-3xl">
+                      <div className="p-6 bg-white rounded-3xl">
                          <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Lecturer In-Charge</p>
                          <p className="font-black text-gray-800">Dr. {selectedCourse.lecturer?.name || 'Assigned Staff'}</p>
                       </div>
-                      <div className="p-6 bg-gray-50 rounded-3xl">
+                      <div className="p-6 bg-white rounded-3xl">
                          <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Credits Value</p>
                          <p className="font-black text-gray-800">{selectedCourse.credits}.0 Credits</p>
                       </div>
@@ -218,7 +218,7 @@ const DeanAudit = () => {
                         { label: 'Module 02: Advanced Architecture', status: 'In Progress', date: 'Current' },
                         { label: 'Mid-term Assessment', status: 'Scheduled', date: 'April 15' },
                       ].map((item, i) => (
-                        <div key={i} className="flex justify-between items-center p-5 bg-white border border-gray-100 rounded-3xl shadow-sm">
+                        <div key={i} className="flex justify-between items-center p-5 bg-white border border-black rounded-3xl shadow-sm">
                            <div className="flex items-center gap-4">
                               <div className={`w-2 h-2 rounded-full ${item.status === 'Completed' ? 'bg-emerald-500' : 'bg-amber-500'}`} />
                               <span className="font-bold text-gray-700">{item.label}</span>
@@ -241,7 +241,7 @@ const DeanAudit = () => {
       </AnimatePresence>
 
       {filteredCourses.length === 0 && (
-         <div className="text-center py-20 bg-white rounded-3xl shadow-sm border border-gray-100 mt-8">
+         <div className="text-center py-20 bg-white rounded-3xl shadow-sm border border-black mt-8">
             <FiAlertCircle size={48} className="mx-auto text-gray-200 mb-4" />
             <p className="text-xl font-bold text-gray-300 uppercase tracking-widest">No matching audit data</p>
          </div>

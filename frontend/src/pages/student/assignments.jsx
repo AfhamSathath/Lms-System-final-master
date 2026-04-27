@@ -47,7 +47,7 @@ const StudentAssignments = () => {
   if (loading) return <Loader fullScreen />;
 
   return (
-    <div className="container mx-auto px-4 py-8 bg-gray-50 min-h-screen">
+    <div className="container mx-auto px-4 py-8 bg-white min-h-screen">
       <div className="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
           <h1 className="text-4xl font-extrabold text-slate-800 tracking-tight font-outfit uppercase">Course Assignments</h1>
@@ -55,7 +55,7 @@ const StudentAssignments = () => {
         </div>
         
         <div className="flex flex-wrap gap-4 items-center">
-            <div className="flex bg-white p-1.5 rounded-2xl shadow-xl border border-slate-100">
+            <div className="flex bg-white p-1.5 rounded-2xl shadow-xl border border-black">
                {years.map(y => (
                   <button 
                     key={y}
@@ -69,7 +69,7 @@ const StudentAssignments = () => {
                ))}
             </div>
 
-            <div className="flex bg-white p-1.5 rounded-2xl shadow-xl border border-slate-100">
+            <div className="flex bg-white p-1.5 rounded-2xl shadow-xl border border-black">
                {semesters.map(s => (
                   <button 
                     key={s}
@@ -83,7 +83,7 @@ const StudentAssignments = () => {
                ))}
             </div>
 
-            <div className="bg-white px-6 py-3 rounded-2xl shadow-xl border border-slate-100 flex items-center gap-4">
+            <div className="bg-white px-6 py-3 rounded-2xl shadow-xl border border-black flex items-center gap-4">
               <div className="p-2 bg-blue-50 rounded-lg">
                 <FiBookOpen className="text-blue-600 h-4 w-4" />
               </div>
@@ -97,12 +97,12 @@ const StudentAssignments = () => {
 
       <div className="space-y-8">
         {enrollments.map((enrollment) => (
-          <div key={enrollment._id} className="bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-100 ring-1 ring-slate-100 transition-all duration-300 hover:ring-blue-200">
-            <div className="bg-gradient-to-r from-slate-800 to-slate-900 border-b border-white/10 px-8 py-6">
+          <div key={enrollment._id} className="bg-white rounded-3xl shadow-xl overflow-hidden border border-black ring-1 ring-slate-100 transition-all duration-300 hover:ring-blue-200">
+            <div className="bg-white border-b border-black border-b border-white/10 px-8 py-6">
               <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
                 <div>
                   <span className="px-3 py-1 bg-blue-600 text-white text-[10px] font-black rounded-full uppercase mb-2 inline-block">Credit {enrollment.course?.credits}</span>
-                  <h3 className="text-2xl font-black text-white leading-tight">{enrollment.course?.name}</h3>
+                  <h3 className="text-2xl font-black text-slate-900 leading-tight">{enrollment.course?.name}</h3>
                   <p className="text-slate-400 text-sm font-medium mt-1">{enrollment.course?.code}</p>
                 </div>
                 <div className="flex gap-3">
@@ -128,10 +128,10 @@ const StudentAssignments = () => {
                 {enrollment.assessments && enrollment.assessments.length > 0 ? (
                   enrollment.assessments.map((assessment, idx) => (
                     <div key={idx} className={`p-6 rounded-3xl border transition-all duration-300 ${
-                      assessment.graded ? 'bg-slate-50 border-slate-200' : 'bg-white border-blue-100 hover:border-blue-400 hover:shadow-lg group'
+                      assessment.graded ? 'bg-slate-50 border-black' : 'bg-white border-blue-100 hover:border-blue-400 hover:shadow-lg group'
                     }`}>
                       <div className="flex justify-between items-start mb-4">
-                        <div className={`p-3 rounded-2xl ${assessment.graded ? 'bg-green-100 text-green-600' : 'bg-blue-100 text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors'}`}>
+                        <div className={`p-3 rounded-2xl ${assessment.graded ? 'bg-white border border-black text-green-600' : 'bg-white border border-black text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors'}`}>
                           <FiFileText className="h-5 w-5" />
                         </div>
                         {assessment.graded ? (
@@ -149,7 +149,7 @@ const StudentAssignments = () => {
                         <FiCalendar className="mr-1" /> Type: {assessment.type}
                       </p>
 
-                      <div className="flex items-center justify-between pt-4 border-t border-slate-100">
+                      <div className="flex items-center justify-between pt-4 border-t border-black">
                         <div className="flex items-center text-xs font-bold text-slate-500">
                           <FiClock className="mr-1 h-3 w-3" />
                           Weight: {assessment.weight}%
@@ -170,7 +170,7 @@ const StudentAssignments = () => {
                     </div>
                   ))
                 ) : (
-                  <div className="col-span-full py-12 flex flex-col items-center justify-center bg-slate-50 rounded-3xl border border-dashed border-slate-300">
+                  <div className="col-span-full py-12 flex flex-col items-center justify-center bg-white rounded-3xl border border-dashed border-black">
                     <FiBookOpen className="h-12 w-12 text-slate-300 mb-4" />
                     <p className="text-slate-500 font-bold">No structured assessments defined yet.</p>
                     <p className="text-slate-400 text-sm">Wait for your lecturer to upload the course plan.</p>
@@ -179,7 +179,7 @@ const StudentAssignments = () => {
               </div>
 
               <div className="mt-8 flex flex-col md:flex-row gap-4">
-                <div className="flex-1 bg-slate-50 p-6 rounded-3xl border border-slate-100">
+                <div className="flex-1 bg-white p-6 rounded-3xl border border-black">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="h-1 w-12 bg-blue-600 rounded-full"></div>
                     <span className="text-xs font-black text-slate-400 uppercase tracking-widest">Lecturer Remarks</span>

@@ -204,7 +204,7 @@ const SubjectAssessments = () => {
   const batchFilteredStudents = students.filter(s => s && s.batch === activeAssessment?.batch);
 
   return (
-    <div className="container mx-auto px-4 py-8 bg-slate-50 min-h-screen pb-32">
+    <div className="container mx-auto px-4 py-8 bg-white min-h-screen pb-32">
       <div className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-3xl font-black text-slate-800 tracking-tight uppercase">Assessments Hub</h1>
@@ -216,7 +216,7 @@ const SubjectAssessments = () => {
             <select
               value={filterBatch}
               onChange={(e) => setFilterBatch(e.target.value)}
-              className="bg-white border-slate-200 rounded-lg text-xs font-bold text-slate-600 px-3 py-2 shadow-sm focus:ring-indigo-500 outline-none"
+              className="bg-white border-black rounded-lg text-xs font-bold text-slate-600 px-3 py-2 shadow-sm focus:ring-indigo-500 outline-none"
             >
               <option value="All">All Batches</option>
               <option value="2024/2025">2024/2025</option>
@@ -250,11 +250,11 @@ const SubjectAssessments = () => {
       </div>
 
         {showCreate && (
-        <div className="bg-white p-6 rounded-2xl shadow-xl border border-slate-100 mb-8 grid grid-cols-1 md:grid-cols-5 gap-4">
+        <div className="bg-white p-6 rounded-2xl shadow-xl border border-black mb-8 grid grid-cols-1 md:grid-cols-5 gap-4">
           <div className="md:col-span-2">
             <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Assessment Name</label>
             <select
-              className="w-full border-slate-200 rounded-lg p-2 bg-slate-50 font-semibold text-slate-700 focus:ring-indigo-500 focus:border-indigo-500"
+              className="w-full border-black rounded-lg p-2 bg-white font-semibold text-slate-700 focus:ring-indigo-500 focus:border-indigo-500"
               value={newAssessment.name}
               onChange={e => setNewAssessment({ ...newAssessment, name: e.target.value })}
             >
@@ -286,7 +286,7 @@ const SubjectAssessments = () => {
           </div>
           <div>
             <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Type</label>
-            <select className="w-full border-slate-200 rounded-lg p-2 bg-slate-50 font-semibold focus:ring-indigo-500" value={newAssessment.type} onChange={e => setNewAssessment({ ...newAssessment, type: e.target.value })}>
+            <select className="w-full border-black rounded-lg p-2 bg-white font-semibold focus:ring-indigo-500" value={newAssessment.type} onChange={e => setNewAssessment({ ...newAssessment, type: e.target.value })}>
               <option value="theory">Theory</option>
               <option value="practical">Practical</option>
             </select>
@@ -294,7 +294,7 @@ const SubjectAssessments = () => {
           <div>
             <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Batch Target</label>
             <select
-              className="w-full border-slate-200 rounded-lg p-2 bg-slate-50 font-semibold focus:ring-indigo-500"
+              className="w-full border-black rounded-lg p-2 bg-white font-semibold focus:ring-indigo-500"
               value={newAssessment.batch}
               onChange={e => setNewAssessment({ ...newAssessment, batch: e.target.value })}
             >
@@ -307,7 +307,7 @@ const SubjectAssessments = () => {
           </div>
           <div>
             <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Max Marks</label>
-            <input type="number" className="w-full border-slate-200 rounded-lg p-2 bg-slate-50 font-semibold" value={newAssessment.maxMarks} onChange={e => setNewAssessment({ ...newAssessment, maxMarks: e.target.value })} />
+            <input type="number" className="w-full border-black rounded-lg p-2 bg-white font-semibold" value={newAssessment.maxMarks} onChange={e => setNewAssessment({ ...newAssessment, maxMarks: e.target.value })} />
           </div>
           <div className="md:col-span-5 flex justify-end mt-2">
             <button onClick={handleCreateOrUpdate} className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-2 rounded-lg font-bold text-sm tracking-wide">
@@ -319,10 +319,10 @@ const SubjectAssessments = () => {
 
         {
           activeAssessment ? (
-            <div className="bg-white p-6 rounded-3xl shadow-xl border border-slate-100 mb-8">
+            <div className="bg-white p-6 rounded-3xl shadow-xl border border-black mb-8">
               <div className="flex justify-between items-center mb-6 border-b pb-4">
                 <h2 className="text-xl font-black text-slate-700">{activeAssessment.name} - Mark Entry (Batch: {activeAssessment.batch})</h2>
-                <span className="px-4 py-1.5 bg-indigo-50 text-indigo-700 rounded-xl font-bold text-xs uppercase">Max Marks: {activeAssessment.maxMarks}</span>
+                <span className="px-4 py-1.5 bg-indigo-50 text-slate-700 rounded-xl font-bold text-xs uppercase">Max Marks: {activeAssessment.maxMarks}</span>
               </div>
 
               <div className="overflow-x-auto">
@@ -338,7 +338,7 @@ const SubjectAssessments = () => {
                     {batchFilteredStudents.map(s => {
                       if (!s) return null;
                       return (
-                        <tr key={s._id} className="hover:bg-slate-50">
+                        <tr key={s._id} className="hover:bg-white">
                           <td className="p-3 font-mono text-xs bg-slate-100 rounded my-2 inline-block ml-3 font-bold text-slate-600">{s.studentId}</td>
                           <td className="p-3 font-bold text-slate-700 text-sm">{s.name}</td>
                           <td className="p-3 text-right">
@@ -348,7 +348,7 @@ const SubjectAssessments = () => {
                               max={activeAssessment.maxMarks}
                               className={`border rounded-lg py-1 px-3 w-24 text-center font-black focus:ring-indigo-500 outline-none ${Number(marksData[s._id]) > activeAssessment.maxMarks
                                 ? 'border-rose-500 bg-rose-50 text-rose-700 animate-pulse'
-                                : 'border-slate-200 bg-slate-50 text-slate-700'
+                                : 'border-black bg-slate-50 text-slate-700'
                                 } ${(activeAssessment.status !== 'draft' || user.role === 'hod') ? 'opacity-50 cursor-not-allowed bg-slate-100' : ''}`}
                               value={marksData[s._id] !== undefined ? marksData[s._id] : ''}
                               onChange={e => setMarksData({ ...marksData, [s._id]: e.target.value })}
@@ -379,13 +379,13 @@ const SubjectAssessments = () => {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {filteredAssessments.map(assess => (
-                <div key={assess._id} className="bg-white p-6 rounded-3xl shadow-md border border-slate-100 flex flex-col justify-between">
+                <div key={assess._id} className="bg-white p-6 rounded-3xl shadow-md border border-black flex flex-col justify-between">
                   <div>
                     <div className="flex justify-between items-start mb-2">
                       <h3 className="text-lg font-black text-slate-800">{assess.name}</h3>
                       <span className={`px-3 py-1 text-[10px] uppercase tracking-widest font-bold rounded-lg ${assess.status === 'draft' ? 'bg-slate-100 text-slate-500' :
                         assess.status === 'pending_hod' ? 'bg-amber-100 text-amber-700' :
-                          assess.status === 'approved_by_hod' ? 'bg-blue-100 text-blue-700' :
+                          assess.status === 'approved_by_hod' ? 'bg-white border border-black text-slate-700' :
                             'bg-emerald-100 text-emerald-700'
                         }`}>
                         {assess.status.replace(/_/g, ' ')}
@@ -393,14 +393,14 @@ const SubjectAssessments = () => {
                     </div>
                     <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Batch: {assess.batch} • {assess.type}</p>
 
-                    <div className="flex items-center gap-2 mb-4 bg-slate-50 p-3 rounded-xl border border-slate-100">
+                    <div className="flex items-center gap-2 mb-4 bg-white p-3 rounded-xl border border-black">
                       <FiUsers className="text-indigo-400" />
                       <span className="text-sm font-bold text-slate-700">Marks assigned: {assess.marks?.length || 0} / {students.length}</span>
                     </div>
                   </div>
 
                   <div className="flex gap-2 mt-4 pt-4 border-t border-slate-50">
-                    <button onClick={() => openMarkingPanel(assess)} className="flex-1 py-2 font-bold text-xs uppercase tracking-widest bg-slate-50 hover:bg-slate-100 text-slate-700 rounded-xl flex items-center justify-center gap-2 transition-colors">
+                    <button onClick={() => openMarkingPanel(assess)} className="flex-1 py-2 font-bold text-xs uppercase tracking-widest bg-white hover:bg-slate-100 text-slate-700 rounded-xl flex items-center justify-center gap-2 transition-colors">
                       <FiClipboard /> Manage Marks
                     </button>
                     {assess.status === 'draft' && user.role === 'lecturer' && (
@@ -426,7 +426,7 @@ const SubjectAssessments = () => {
               ))}
 
               {filteredAssessments.length === 0 && (
-                <div className="col-span-1 md:col-span-2 text-center py-20 bg-slate-50/50 rounded-3xl border border-dashed border-slate-300">
+                <div className="col-span-1 md:col-span-2 text-center py-20 bg-white/50 rounded-3xl border border-dashed border-black">
                   {students.length === 0 ? (
                     <div className="flex flex-col items-center">
                       <FiUsers className="mx-auto h-16 w-16 text-slate-300 mb-4" />

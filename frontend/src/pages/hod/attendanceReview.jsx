@@ -200,8 +200,8 @@ const HODAttendanceReview = () => {
       case 'present': return 'bg-emerald-100 text-emerald-700';
       case 'absent': return 'bg-rose-100 text-rose-700';
       case 'late': return 'bg-amber-100 text-amber-700';
-      case 'excused': return 'bg-blue-100 text-blue-700';
-      default: return 'bg-gray-100 text-gray-700';
+      case 'excused': return 'bg-white border border-black text-slate-700';
+      default: return 'bg-white border border-black text-gray-700';
     }
   };
 
@@ -217,7 +217,7 @@ const HODAttendanceReview = () => {
       </div>
 
       {/* Search and Filters */}
-      <div className="bg-white rounded-2xl shadow-xl p-6 mb-8 border border-gray-100">
+      <div className="bg-white rounded-2xl shadow-xl p-6 mb-8 border border-black">
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1 relative">
             <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -226,14 +226,14 @@ const HODAttendanceReview = () => {
               placeholder="Search by student name, ID, or course..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              className="w-full pl-10 pr-4 py-3 border border-black rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
             />
           </div>
           <div className="flex gap-4">
             <select 
               value={filterBatch} 
               onChange={(e) => setFilterBatch(e.target.value)}
-              className="px-4 py-3 bg-gray-100 border-0 rounded-xl font-medium text-gray-700 focus:ring-2 focus:ring-indigo-500 outline-none"
+              className="px-4 py-3 bg-white border border-black border-0 rounded-xl font-medium text-gray-700 focus:ring-2 focus:ring-indigo-500 outline-none"
             >
               <option value="all">All Batches</option>
               <option value="2024/2025">2024/2025</option>
@@ -254,7 +254,7 @@ const HODAttendanceReview = () => {
                   className={`px-4 py-3 rounded-xl font-medium transition-all ${
                     filterType === filter.value
                       ? 'bg-indigo-600 text-white shadow-lg'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      : 'bg-white border border-black text-gray-700 hover:bg-gray-200'
                   }`}
                 >
                   {filter.label}
@@ -267,7 +267,7 @@ const HODAttendanceReview = () => {
 
       {/* Statistics */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
+        <div className="bg-white rounded-2xl shadow-xl p-6 border border-black">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Total Enrollments</p>
@@ -276,7 +276,7 @@ const HODAttendanceReview = () => {
             <FiBook className="w-8 h-8 text-blue-500" />
           </div>
         </div>
-        <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
+        <div className="bg-white rounded-2xl shadow-xl p-6 border border-black">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">With Attendance Records</p>
@@ -287,7 +287,7 @@ const HODAttendanceReview = () => {
             <FiCheckCircle className="w-8 h-8 text-green-500" />
           </div>
         </div>
-        <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
+        <div className="bg-white rounded-2xl shadow-xl p-6 border border-black">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Avg. Attendance Rate</p>
@@ -300,7 +300,7 @@ const HODAttendanceReview = () => {
             <FiPieChart className="w-8 h-8 text-indigo-500" />
           </div>
         </div>
-        <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
+        <div className="bg-white rounded-2xl shadow-xl p-6 border border-black">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Requiring Review</p>
@@ -329,7 +329,7 @@ const HODAttendanceReview = () => {
             onToggle={() => toggleStudent(group.student._id)}
           />
         )) : (
-          <div className="bg-white rounded-2xl p-12 text-center border border-gray-100 shadow-xl">
+          <div className="bg-white rounded-2xl p-12 text-center border border-black shadow-xl">
             <FiBook className="h-16 w-16 text-gray-300 mx-auto mb-4" />
             <h3 className="text-xl font-bold text-gray-800 mb-2">No Records Found</h3>
             <p className="text-gray-600">
@@ -350,9 +350,9 @@ const StudentAttendanceDashboard = ({
   const { student, semesters, needsReviewTotal, totalEnrollments } = group;
 
   return (
-    <div className="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden transition-all duration-300 hover:shadow-2xl">
+    <div className="bg-white rounded-3xl shadow-xl border border-black overflow-hidden transition-all duration-300 hover:shadow-2xl">
       {/* Student Profile Header */}
-      <div className="bg-gradient-to-r from-indigo-700 via-indigo-600 to-purple-700 p-6">
+      <div className="bg-white border border-black p-6">
         <div className="flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-6">
             <div className="relative">
@@ -366,7 +366,7 @@ const StudentAttendanceDashboard = ({
               )}
             </div>
             <div>
-              <h3 className="text-2xl font-black text-white tracking-tight">{student?.name}</h3>
+              <h3 className="text-2xl font-black text-slate-900 tracking-tight">{student?.name}</h3>
               <div className="flex items-center gap-3 mt-1">
                 <span className="text-indigo-100 text-sm font-medium tracking-wide bg-white/10 px-3 py-0.5 rounded-full">{student?.studentId}</span>
                 <span className="h-1 w-1 bg-white/30 rounded-full"></span>
@@ -394,13 +394,13 @@ const StudentAttendanceDashboard = ({
       <div className="p-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
            {/* Summary Stats */}
-           <div className="md:col-span-4 bg-slate-50 rounded-2xl p-1 mb-2 border border-slate-100 flex gap-1">
+           <div className="md:col-span-4 bg-white rounded-2xl p-1 mb-2 border border-black flex gap-1">
               {[
                 { label: 'Overall Status', value: needsReviewTotal > 0 ? 'Review Required' : 'Up to Date', icon: FiActivity, color: needsReviewTotal > 0 ? 'text-amber-600' : 'text-emerald-600' },
                 { label: 'Academic Year', value: group.academicYear, icon: FiCalendar, color: 'text-indigo-600' },
                 { label: 'Action Items', value: `${needsReviewTotal} discrepancies`, icon: FiAlertTriangle, color: needsReviewTotal > 0 ? 'text-rose-600' : 'text-slate-400' }
               ].map((stat, i) => (
-                <div key={i} className="flex-1 bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex items-center gap-4">
+                <div key={i} className="flex-1 bg-white p-4 rounded-xl shadow-sm border border-black flex items-center gap-4">
                   <div className={`p-3 rounded-xl bg-slate-50 ${stat.color}`}>
                     <stat.icon size={20} />
                   </div>
@@ -417,13 +417,13 @@ const StudentAttendanceDashboard = ({
         {isExpanded && (
           <div className="mt-6 space-y-8 animate-in fade-in slide-in-from-top-4 duration-500">
             {Object.entries(semesters).sort().map(([sem, enrollments]) => (
-              <div key={sem} className="bg-slate-50/50 rounded-3xl p-6 border border-slate-100">
+              <div key={sem} className="bg-white/50 rounded-3xl p-6 border border-black">
                 <div className="flex items-center justify-between mb-6">
                   <h4 className="text-lg font-black text-slate-800 flex items-center gap-2">
                     <FiActivity className="text-indigo-500" />
                     Semester {sem} Summary
                   </h4>
-                  <span className="px-4 py-1 bg-white border border-slate-200 text-slate-500 rounded-full text-xs font-bold uppercase tracking-widest">
+                  <span className="px-4 py-1 bg-white border border-black text-slate-500 rounded-full text-xs font-bold uppercase tracking-widest">
                     {enrollments.length} Subjects
                   </span>
                 </div>
@@ -446,7 +446,7 @@ const StudentAttendanceDashboard = ({
             ))}
 
             {/* Global Last Attendance Log */}
-            <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm">
+            <div className="bg-white border border-black rounded-3xl overflow-hidden shadow-sm">
               <div className="bg-slate-800 px-6 py-4 flex justify-between items-center">
                 <h5 className="text-white font-black uppercase tracking-widest text-xs flex items-center gap-2">
                   <FiClock className="text-indigo-400" />
@@ -456,7 +456,7 @@ const StudentAttendanceDashboard = ({
               </div>
               <div className="p-0">
                 <table className="w-full text-left border-collapse">
-                  <thead className="bg-slate-50 border-b border-slate-200 font-black uppercase text-[10px] text-slate-500 tracking-widest">
+                  <thead className="bg-white border-b border-black font-black uppercase text-[10px] text-slate-500 tracking-widest">
                     <tr>
                       <th className="px-6 py-4">Date</th>
                       <th className="px-6 py-4">Time / Hr</th>
@@ -469,7 +469,7 @@ const StudentAttendanceDashboard = ({
                     {(group.enrollments || []).flatMap(e => 
                       (e.attendance || []).map(r => ({ ...r, course: e.course }))
                     ).sort((a,b) => new Date(b.date) - new Date(a.date)).slice(0, 10).map((record, i) => (
-                      <tr key={i} className="hover:bg-slate-50 transition-colors">
+                      <tr key={i} className="hover:bg-white transition-colors">
                         <td className="px-6 py-4">
                           <p className="font-bold text-slate-700 text-sm">
                             {new Date(record.date).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}
@@ -548,7 +548,7 @@ const SubjectStatItem = ({ enrollment, onReview, onPublish, reviewing, isSelecte
   );
 
   return (
-    <div className={`bg-white rounded-2xl border transition-all ${isSelected ? 'ring-2 ring-indigo-500 border-transparent shadow-lg' : 'border-slate-200'}`}>
+    <div className={`bg-white rounded-2xl border transition-all ${isSelected ? 'ring-2 ring-indigo-500 border-transparent shadow-lg' : 'border-black'}`}>
       <div className="p-4">
         <div className="flex justify-between items-start mb-4">
           <div className="flex-1">
@@ -607,10 +607,10 @@ const SubjectStatItem = ({ enrollment, onReview, onPublish, reviewing, isSelecte
 
         {/* Review Form - Same logic as before but adapted to this component */}
         {isSelected && recordsNeedingReview.length > 0 && (
-          <div className="mt-4 bg-slate-50 rounded-xl p-3 border border-slate-100">
+          <div className="mt-4 bg-white rounded-xl p-3 border border-black">
              <div className="space-y-3">
                 {recordsNeedingReview.map((record, idx) => (
-                  <div key={idx} className="bg-white p-3 rounded-lg border border-slate-100 shadow-sm">
+                  <div key={idx} className="bg-white p-3 rounded-lg border border-black shadow-sm">
                     <div className="flex justify-between items-center mb-2">
                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
                          {new Date(record.date).toLocaleDateString()}
@@ -621,7 +621,7 @@ const SubjectStatItem = ({ enrollment, onReview, onPublish, reviewing, isSelecte
                     </div>
                     
                     {record.studentRemarks && (
-                      <div className="mb-2 p-2 bg-indigo-50 rounded-md text-[10px] text-indigo-700 italic border-l-2 border-indigo-300">
+                      <div className="mb-2 p-2 bg-indigo-50 rounded-md text-[10px] text-slate-700 italic border-l-2 border-indigo-300">
                          "{record.studentRemarks}"
                       </div>
                     )}
@@ -647,7 +647,7 @@ const SubjectStatItem = ({ enrollment, onReview, onPublish, reviewing, isSelecte
 
                     <textarea
                       placeholder="HOD Remarks..."
-                      className="w-full text-[10px] p-2 bg-slate-50 border border-slate-100 rounded-lg outline-none focus:ring-1 focus:ring-indigo-400"
+                      className="w-full text-[10px] p-2 bg-white border border-black rounded-lg outline-none focus:ring-1 focus:ring-indigo-400"
                       rows="1"
                       onChange={(e) => setReviews(prev => ({
                         ...prev,

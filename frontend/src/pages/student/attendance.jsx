@@ -57,8 +57,8 @@ const StudentAttendance = () => {
       case 'present': return 'bg-emerald-100 text-emerald-700';
       case 'absent': return 'bg-rose-100 text-rose-700';
       case 'late': return 'bg-amber-100 text-amber-700';
-      case 'excused': return 'bg-blue-100 text-blue-700';
-      default: return 'bg-gray-100 text-gray-700';
+      case 'excused': return 'bg-white border border-black text-slate-700';
+      default: return 'bg-white border border-black text-gray-700';
     }
   };
 
@@ -125,8 +125,8 @@ const StudentAttendance = () => {
       </div>
 
       {/* Unified Academic Calendar Matrix Container */}
-      <div className="bg-white rounded-[2.5rem] shadow-2xl border border-slate-100 overflow-hidden animate-in fade-in slide-in-from-bottom-8 duration-1000 mb-20">
-        <div className="bg-slate-50 px-10 py-6 border-b border-slate-100 flex items-center justify-between">
+      <div className="bg-white rounded-[2.5rem] shadow-2xl border border-black overflow-hidden animate-in fade-in slide-in-from-bottom-8 duration-1000 mb-20">
+        <div className="bg-white px-10 py-6 border-b border-black flex items-center justify-between">
            <h2 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em] italic leading-none">Unified Academic Matrix</h2>
            <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
@@ -151,20 +151,20 @@ const StudentAttendance = () => {
               <table className="w-full text-left border-collapse min-w-[800px]">
                 <thead>
                   <tr className="bg-white">
-                    <th className="px-6 py-8 text-[10px] font-black text-slate-800 uppercase tracking-[0.2em] border-b border-slate-100 sticky left-0 bg-white z-20 shadow-[4px_0_8px_-4px_rgba(0,0,0,0.05)]">Subject</th>
-                    <th className="px-6 py-8 text-[10px] font-black text-slate-800 uppercase tracking-[0.2em] border-b border-slate-100 text-center">Type</th>
-                    <th className="px-6 py-8 text-[10px] font-black text-slate-800 uppercase tracking-[1px] border-b border-slate-100 text-center whitespace-nowrap">
+                    <th className="px-6 py-8 text-[10px] font-black text-slate-800 uppercase tracking-[0.2em] border-b border-black sticky left-0 bg-white z-20 shadow-[4px_0_8px_-4px_rgba(0,0,0,0.05)]">Subject</th>
+                    <th className="px-6 py-8 text-[10px] font-black text-slate-800 uppercase tracking-[0.2em] border-b border-black text-center">Type</th>
+                    <th className="px-6 py-8 text-[10px] font-black text-slate-800 uppercase tracking-[1px] border-b border-black text-center whitespace-nowrap">
                        <p className="leading-none mb-1">Percentage</p>
                        <p className="text-[7px] font-bold text-slate-400 normal-case">(Attended/Total)</p>
                     </th>
                     {/* Unique Calendar Dates as Headers */}
                     {allDates.length > 0 ? allDates.map((date, i) => (
-                      <th key={i} className="px-3 py-8 text-[10px] font-black text-slate-500 uppercase tracking-widest text-center border-b border-slate-100 border-l border-slate-50 min-w-[65px]">
+                      <th key={i} className="px-3 py-8 text-[10px] font-black text-slate-500 uppercase tracking-widest text-center border-b border-black border-l border-slate-50 min-w-[65px]">
                         <p className="leading-none text-slate-800">{date.toLocaleDateString(undefined, { day: '2-digit', month: '2-digit' })}</p>
                         <p className="text-[7px] font-bold text-slate-400 mt-1">{date.toLocaleDateString(undefined, { weekday: 'short' })}</p>
                       </th>
                     )) : Array.from({ length: 10 }).map((_, i) => (
-                      <th key={i} className="px-3 py-8 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center border-b border-slate-100 border-l border-slate-50 min-w-[65px]">
+                      <th key={i} className="px-3 py-8 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center border-b border-black border-l border-slate-50 min-w-[65px]">
                         --/--
                       </th>
                     ))}
@@ -177,8 +177,8 @@ const StudentAttendance = () => {
                     const percentage = totalCount > 0 ? (attendedCount / totalCount * 100).toFixed(0) : '0';
 
                     return (
-                      <tr key={eIdx} className="hover:bg-slate-50 transition-colors duration-300">
-                        <td className="px-6 py-6 sticky left-0 bg-white z-10 shadow-[4px_0_8px_-4px_rgba(0,0,0,0.05)] border-r border-slate-50 group-hover:bg-slate-50 transition-colors">
+                      <tr key={eIdx} className="hover:bg-white transition-colors duration-300">
+                        <td className="px-6 py-6 sticky left-0 bg-white z-10 shadow-[4px_0_8px_-4px_rgba(0,0,0,0.05)] border-r border-slate-50 group-hover:bg-white transition-colors">
                           <p className="text-xs font-black text-slate-900 leading-none mb-1 tracking-tight">{enrollment.course?.code}</p>
                           <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest truncate max-w-[120px]">{enrollment.course?.name}</p>
                         </td>
@@ -219,7 +219,7 @@ const StudentAttendance = () => {
                                       <FiXCircle className="w-4 h-4 stroke-[3px]" />
                                     </div>
                                   ) : (
-                                    <div className={`w-7 h-7 rounded-xl bg-slate-100 border ${isHODVerified ? 'border-indigo-400' : 'border-slate-200'}`} />
+                                    <div className={`w-7 h-7 rounded-xl bg-slate-100 border ${isHODVerified ? 'border-indigo-400' : 'border-black'}`} />
                                   )}
                                 </div>
                               ) : (
@@ -239,7 +239,7 @@ const StudentAttendance = () => {
               </table>
             );
           })() : (
-            <div className="py-32 flex flex-col items-center justify-center bg-slate-50/50">
+            <div className="py-32 flex flex-col items-center justify-center bg-white/50">
               <FiBook className="h-16 w-16 text-slate-200 mb-6" />
               <h3 className="text-xl font-black text-slate-800 uppercase tracking-widest">No Active Enrollments</h3>
               <p className="text-slate-400 font-medium italic mt-2">Registers for {selectedYear} Semester {selectedSemester} will appear here.</p>
@@ -248,7 +248,7 @@ const StudentAttendance = () => {
         </div>
         
         {/* Footer Progress Indicator */}
-        <div className="px-10 py-6 bg-slate-50 flex items-center justify-between border-t border-slate-100">
+        <div className="px-10 py-6 bg-white flex items-center justify-between border-t border-black">
            <div className="h-2 w-64 bg-slate-200 rounded-full overflow-hidden">
               <div className="h-full w-1/3 bg-slate-900 rounded-full shadow-lg" />
            </div>

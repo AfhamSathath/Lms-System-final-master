@@ -24,6 +24,15 @@ const timetableSchema = new mongoose.Schema({
   startTime: { type: String, required: true },
   endTime: { type: String, required: true },
   venue: { type: String, required: true },
+  status: {
+    type: String,
+    enum: ['draft', 'pending_dean', 'pending_hod', 'published'],
+    default: 'draft'
+  },
+  supervisors: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }]
 }, { timestamps: true });
 
 // Autofill year & semester from subject

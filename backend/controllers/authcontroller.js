@@ -368,17 +368,28 @@ exports.updateUser = async (req, res, next) => {
     const updateData = { ...req.body };
     delete updateData.password;
 
+    const oldUser = await User.findById(req.params.id);
+    if (!oldUser) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
     const user = await User.findByIdAndUpdate(
       req.params.id,
       updateData,
       { new: true, runValidators: true }
     ).select('-password');
 
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: 'User not found'
-      });
+    if (updateData.role && oldUser.role !== updateData.role) {
+      emailService.sendRoleChangeEmail(user, oldUser.role, updateData.role).catch(err => console.error('Role change email failed:', err));
+    }
+    
+    const sensitiveFields = ['email', 'studentId', 'lecturerId', 'name'];
+    const updatedSensitive = sensitiveFields.filter(f => updateData[f] && oldUser[f] && updateData[f] !== oldUser[f]);
+    if (updatedSensitive.length > 0) {
+      emailService.sendProfileUpdateEmail(user, updatedSensitive).catch(err => console.error('Profile update email failed:', err));
     }
 
     res.json({
@@ -446,6 +457,9 @@ exports.deleteUser = async (req, res, next) => {
         message: 'You cannot delete your own account'
       });
     }
+
+    // Send account deletion email before deleting
+    emailService.sendAccountDeletionEmail(user).catch(err => console.error('Account deletion email failed:', err));
 
     await user.deleteOne();
 
@@ -529,6 +543,8 @@ exports.resetPassword = async (req, res, next) => {
     user.resetPasswordExpire = undefined;
 
     await user.save();
+
+    emailService.sendPasswordChangeConfirmEmail(user).catch(err => console.error('Password change confirmation email failed:', err));
 
     // Generate new token
     const token = generateToken(user._id);

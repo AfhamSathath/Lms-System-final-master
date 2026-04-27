@@ -78,7 +78,7 @@ const StudentCourseRegistration = () => {
   if (loading) return <Loader fullScreen />;
 
   return (
-    <div className="container mx-auto px-4 py-8 bg-slate-50 min-h-screen">
+    <div className="container mx-auto px-4 py-8 bg-white min-h-screen">
       <div className="mb-12 flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
           <h1 className="text-4xl font-extrabold text-slate-800 tracking-tight font-outfit uppercase tracking-widest">Course Registration</h1>
@@ -86,7 +86,7 @@ const StudentCourseRegistration = () => {
         </div>
         
         <div className="flex flex-wrap gap-4 items-center">
-            <div className="flex bg-white p-1.5 rounded-2xl shadow-xl border border-slate-100">
+            <div className="flex bg-white p-1.5 rounded-2xl shadow-xl border border-black">
                {years.map(y => (
                   <button 
                     key={y}
@@ -100,7 +100,7 @@ const StudentCourseRegistration = () => {
                ))}
             </div>
 
-            <div className="flex bg-white p-1.5 rounded-2xl shadow-xl border border-slate-100">
+            <div className="flex bg-white p-1.5 rounded-2xl shadow-xl border border-black">
                {semesters.map(s => (
                   <button 
                     key={s}
@@ -114,14 +114,14 @@ const StudentCourseRegistration = () => {
                ))}
             </div>
 
-            <div className="flex bg-white p-2 rounded-2xl shadow-xl border border-slate-100 relative min-w-[240px]">
+            <div className="flex bg-white p-2 rounded-2xl shadow-xl border border-black relative min-w-[240px]">
                <FiSearch className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 h-4 w-4" />
                <input 
                  type="text"
                  value={searchTerm}
                  onChange={(e) => setSearchTerm(e.target.value)}
                  placeholder="Search code..."
-                 className="w-full bg-slate-50 border-0 rounded-xl py-2 pl-10 pr-4 text-xs font-bold text-slate-700 placeholder-slate-400 focus:ring-0"
+                 className="w-full bg-white border-0 rounded-xl py-2 pl-10 pr-4 text-xs font-bold text-slate-700 placeholder-slate-400 focus:ring-0"
                />
             </div>
         </div>
@@ -129,7 +129,7 @@ const StudentCourseRegistration = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {filtered.map((subject) => (
-          <div key={subject._id} className={`bg-white rounded-[3rem] shadow-2xl overflow-hidden border border-slate-100 transition-all duration-500 group relative ${
+          <div key={subject._id} className={`bg-white rounded-[3rem] shadow-2xl overflow-hidden border border-black transition-all duration-500 group relative ${
             enrolledSubjectIds.has(subject._id) ? 'grayscale-[0.5] opacity-80 scale-95 shadow-lg' : 'hover:scale-[1.03] hover:shadow-indigo-100'
           }`}>
              
@@ -147,12 +147,12 @@ const StudentCourseRegistration = () => {
                <p className="text-[10px] text-indigo-500 font-black uppercase tracking-[0.2em] mb-2">{subject.code}</p>
                <h3 className="text-2xl font-black text-slate-800 leading-tight mb-4 group-hover:text-indigo-600 transition-colors">{subject.name}</h3>
                
-               <div className="flex items-center gap-2 mb-8 bg-slate-50 py-2 px-4 rounded-full self-start">
+               <div className="flex items-center gap-2 mb-8 bg-white py-2 px-4 rounded-full self-start">
                   <FiInfo className="text-slate-400 h-3 w-3" />
                   <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest leading-none">Core Curriculum</p>
                </div>
 
-               <div className="mt-auto pt-8 border-t border-slate-100">
+               <div className="mt-auto pt-8 border-t border-black">
                   {enrolledSubjectIds.has(subject._id) ? (
                     <div className="w-full flex items-center justify-center gap-2 py-4 bg-emerald-50 text-emerald-600 rounded-[2rem] font-black text-xs uppercase tracking-widest">
                        <FiCheckCircle className="h-5 w-5" /> Enrolled Successfully
@@ -177,7 +177,7 @@ const StudentCourseRegistration = () => {
         ))}
         
         {filtered.length === 0 && (
-          <div className="col-span-full py-24 text-center bg-white rounded-[4rem] border border-slate-100 shadow-xl border-dashed">
+          <div className="col-span-full py-24 text-center bg-white rounded-[4rem] border border-black shadow-xl border-dashed">
              <FiAlertCircle className="w-16 h-16 text-slate-300 mx-auto mb-6" />
              <h3 className="text-3xl font-black text-slate-700 mb-2">No new courses available.</h3>
              <p className="text-slate-400 font-bold italic">Check back after your department releases next semester's updates.</p>
@@ -185,7 +185,7 @@ const StudentCourseRegistration = () => {
         )}
       </div>
 
-      <div className="mt-16 p-10 bg-gradient-to-r from-indigo-100 to-fuchsia-100 rounded-[4rem] flex flex-col md:flex-row items-center justify-between gap-10">
+      <div className="mt-16 p-10 bg-white border border-black rounded-[4rem] flex flex-col md:flex-row items-center justify-between gap-10">
         <div className="flex gap-6 items-center">
            <div className="h-20 w-20 bg-white rounded-[2.5rem] shadow-xl flex items-center justify-center text-indigo-600">
               <FiCheckCircle className="h-8 w-8" />

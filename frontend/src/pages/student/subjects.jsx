@@ -81,7 +81,7 @@ const StudentSubjects = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50/50 p-6">
+    <div className="min-h-screen bg-white/50 p-6">
       <div className="container mx-auto max-w-7xl">
         {/* Header Section */}
         <motion.div 
@@ -91,7 +91,7 @@ const StudentSubjects = () => {
         >
           <h1 className="text-4xl font-extrabold text-slate-800 tracking-tight flex items-center">
             My Subjects
-            <span className="ml-3 px-3 py-1 bg-indigo-100 text-indigo-600 text-sm font-bold rounded-full">
+            <span className="ml-3 px-3 py-1 bg-white border border-black text-indigo-600 text-sm font-bold rounded-full">
               {filteredSubjects.length}
             </span>
           </h1>
@@ -103,7 +103,7 @@ const StudentSubjects = () => {
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white rounded-3xl shadow-[0_10px_30px_-10px_rgba(0,0,0,0.1)] p-8 border border-slate-100"
+            className="bg-white rounded-3xl shadow-[0_10px_30px_-10px_rgba(0,0,0,0.1)] p-8 border border-black"
           >
              <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-6 italic">
                Select Academic Year
@@ -129,7 +129,7 @@ const StudentSubjects = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="bg-white rounded-3xl shadow-[0_10px_30px_-10px_rgba(0,0,0,0.1)] p-8 border border-slate-100"
+            className="bg-white rounded-3xl shadow-[0_10px_30px_-10px_rgba(0,0,0,0.1)] p-8 border border-black"
           >
              <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-6 italic">
                Select Semester
@@ -166,7 +166,7 @@ const StudentSubjects = () => {
               placeholder="Search subjects by name or code..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-16 pr-8 py-5 bg-white border border-slate-100 rounded-3xl shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)] focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500/50 outline-none transition-all text-slate-700 placeholder-slate-300 font-medium"
+              className="w-full pl-16 pr-8 py-5 bg-white border border-black rounded-3xl shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)] focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500/50 outline-none transition-all text-slate-700 placeholder-slate-300 font-medium"
             />
           </div>
         </motion.div>
@@ -191,12 +191,12 @@ const StudentSubjects = () => {
                     variants={itemVariants}
                     whileHover={{ y: -10 }}
                     layout
-                    className="bg-white rounded-3xl shadow-[0_10px_40px_-15px_rgba(0,0,0,0.08)] overflow-hidden border border-slate-50 flex flex-col group"
+                    className="bg-white rounded-3xl shadow-[0_10px_40px_-15px_rgba(0,0,0,0.08)] overflow-hidden border border-black flex flex-col group"
                   >
                     {/* Header with Gradient */}
                     <div className="bg-gradient-to-br from-indigo-600 to-purple-600 px-8 py-7 relative overflow-hidden">
                       <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl" />
-                      <h3 className="text-xl font-bold text-white relative z-10 leading-tight group-hover:scale-[1.02] transition-transform">
+                      <h3 className="text-xl font-bold text-slate-900 relative z-10 leading-tight group-hover:scale-[1.02] transition-transform">
                         {subject.name}
                       </h3>
                       <p className="text-indigo-100 text-xs font-black tracking-widest mt-2 uppercase opacity-80">
@@ -206,8 +206,8 @@ const StudentSubjects = () => {
 
                     <div className="p-8 flex-1 flex flex-col">
                       <div className="space-y-5 mb-8">
-                        <div className="flex items-center text-slate-500 bg-slate-50 p-3 rounded-2xl border border-slate-100/50">
-                          <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center mr-4">
+                        <div className="flex items-center text-slate-500 bg-white p-3 rounded-2xl border border-black/50">
+                          <div className="w-10 h-10 rounded-xl bg-white border border-black flex items-center justify-center mr-4">
                             <FiBook className="text-blue-600 text-lg" />
                           </div>
                           <div>
@@ -216,7 +216,7 @@ const StudentSubjects = () => {
                           </div>
                         </div>
 
-                        <div className="flex items-center text-slate-500 bg-slate-50 p-3 rounded-2xl border border-slate-100/50">
+                        <div className="flex items-center text-slate-500 bg-white p-3 rounded-2xl border border-black/50">
                           <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center mr-4">
                             <FiUser className="text-emerald-600 text-lg" />
                           </div>
@@ -246,7 +246,7 @@ const StudentSubjects = () => {
                         
                         <button 
                           onClick={() => handleSyllabusClick(subject.syllabus)}
-                          className="w-full bg-white border-2 border-slate-100 text-slate-600 py-4 px-6 rounded-2xl font-bold text-sm flex items-center justify-center hover:border-indigo-100 hover:bg-indigo-50/30 hover:text-indigo-600 transition-all"
+                          className="w-full bg-white border-2 border-black text-slate-600 py-4 px-6 rounded-2xl font-bold text-sm flex items-center justify-center hover:border-indigo-100 hover:bg-indigo-50/30 hover:text-indigo-600 transition-all"
                         >
                           <FiBook className="mr-2" />
                           View Syllabus
@@ -261,9 +261,9 @@ const StudentSubjects = () => {
               <motion.div 
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="text-center py-32 bg-white rounded-[3rem] shadow-[0_15px_60px_-15px_rgba(0,0,0,0.05)] border border-slate-100"
+                className="text-center py-32 bg-white rounded-[3rem] shadow-[0_15px_60px_-15px_rgba(0,0,0,0.05)] border border-black"
               >
-                <div className="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto mb-6">
                   <FiBook className="h-10 w-10 text-slate-300" />
                 </div>
                 <h3 className="text-2xl font-bold text-slate-700">No subjects found</h3>

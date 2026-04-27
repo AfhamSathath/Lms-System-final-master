@@ -86,20 +86,20 @@ const HodFiles = () => {
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="File title"
-          className="border border-gray-300 rounded-lg px-3 py-2"
+          className="border border-black rounded-lg px-3 py-2"
           required
         />
         <input
           value={subject}
           onChange={(e) => setSubject(e.target.value)}
           placeholder="Subject name"
-          className="border border-gray-300 rounded-lg px-3 py-2"
+          className="border border-black rounded-lg px-3 py-2"
           required
         />
         <input
           type="file"
           onChange={(e) => setFileInput(e.target.files[0])}
-          className="border border-gray-300 rounded-lg px-3 py-2"
+          className="border border-black rounded-lg px-3 py-2"
           required
         />
         <button
@@ -113,7 +113,7 @@ const HodFiles = () => {
 
       <div className="bg-white rounded-xl shadow-lg overflow-x-auto">
         <table className="min-w-full text-left">
-          <thead className="bg-gray-100">
+          <thead className="bg-white border border-black">
             <tr>
               <th className="px-4 py-3 text-sm font-medium text-gray-600">Title</th>
               <th className="px-4 py-3 text-sm font-medium text-gray-600">Subject</th>
@@ -129,7 +129,7 @@ const HodFiles = () => {
               </tr>
             ) : (
               files.map((file) => (
-                <tr key={file._id} className="border-t border-gray-200 hover:bg-gray-50">
+                <tr key={file._id} className="border-t border-black hover:bg-white">
                   <td className="px-4 py-3">{file.title}</td>
                   <td className="px-4 py-3">
                     {file.subject?.name || file.subject || '-'} 
@@ -140,7 +140,7 @@ const HodFiles = () => {
                   <td className="px-4 py-3">
                     <a
                       href={`/api/subject-files/download/${file._id}`}
-                      className="text-purple-600 hover:text-purple-800"
+                      className="text-purple-600 hover:text-slate-800"
                       target="_blank"
                       rel="noreferrer"
                     >

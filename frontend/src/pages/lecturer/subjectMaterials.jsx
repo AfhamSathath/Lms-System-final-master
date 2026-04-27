@@ -219,16 +219,16 @@ const SubjectMaterials = ({ sidebarOpen }) => {
 
   const getFileTypeColor = (fileType) => {
     const colors = {
-      lecture_notes: 'bg-blue-100 text-blue-800',
-      slides: 'bg-purple-100 text-purple-800',
-      lab_manual: 'bg-orange-100 text-orange-800',
-      assignment: 'bg-yellow-100 text-yellow-800',
-      past_paper: 'bg-red-100 text-red-800',
-      solution: 'bg-green-100 text-green-800',
-      reference: 'bg-indigo-100 text-indigo-800',
-      syllabus: 'bg-pink-100 text-pink-800'
+      lecture_notes: 'bg-white border border-black text-slate-800',
+      slides: 'bg-white border border-black text-slate-800',
+      lab_manual: 'bg-white border border-black text-slate-800',
+      assignment: 'bg-white border border-black text-slate-800',
+      past_paper: 'bg-white border border-black text-slate-800',
+      solution: 'bg-white border border-black text-slate-800',
+      reference: 'bg-white border border-black text-slate-800',
+      syllabus: 'bg-white border border-black text-slate-800'
     };
-    return colors[fileType] || 'bg-gray-100 text-gray-800';
+    return colors[fileType] || 'bg-white border border-black text-gray-800';
   };
 
   if (loading) return <Loader fullScreen />;
@@ -236,17 +236,17 @@ const SubjectMaterials = ({ sidebarOpen }) => {
   return (
     <div className={`flex-1 p-6 transition-all duration-300`}>
       {/* Header */}
-      <div className="bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl shadow-lg p-6 mb-8 text-white">
+      <div className="bg-white border border-black rounded-2xl shadow-lg p-6 mb-8 text-slate-900">
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-bold flex items-center gap-2">
               <FiBook /> Subject Materials & Curriculum
             </h1>
-            <p className="text-purple-100 mt-1">Upload and manage curriculum resources</p>
+            <p className="text-slate-500 mt-1">Upload and manage curriculum resources</p>
           </div>
           <button
             onClick={() => toggleModal('upload', true)}
-            className="bg-white text-purple-600 px-6 py-3 rounded-lg font-semibold flex items-center gap-2 hover:bg-purple-50 transition"
+            className="bg-white text-purple-600 px-6 py-3 rounded-lg font-semibold flex items-center gap-2 hover:bg-white border border-black transition"
           >
             <FiUpload /> Upload Material
           </button>
@@ -309,7 +309,7 @@ const SubjectMaterials = ({ sidebarOpen }) => {
               semester: 'all',
               academicYear: 'all'
             })}
-            className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
+            className="px-4 py-2 bg-white border border-black text-gray-700 rounded-lg hover:bg-gray-200"
           >
             Clear
           </button>
@@ -348,7 +348,7 @@ const SubjectMaterials = ({ sidebarOpen }) => {
             {file.tags.length > 0 && (
               <div className="flex gap-2 mb-4 flex-wrap">
                 {file.tags.map(tag => (
-                  <span key={tag} className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs">
+                  <span key={tag} className="bg-white border border-black text-gray-700 px-2 py-1 rounded text-xs">
                     #{tag}
                   </span>
                 ))}
@@ -553,7 +553,7 @@ const UploadModal = ({ isOpen, onClose, formData, setFormData, onSubjectChange, 
             <button
               type="button"
               onClick={onClose}
-              className="px-6 py-2 border rounded-lg text-gray-700 hover:bg-gray-50"
+              className="px-6 py-2 border rounded-lg text-gray-700 hover:bg-white"
             >
               Cancel
             </button>
@@ -585,7 +585,7 @@ const CurriculumModal = ({ isOpen, onClose, subject, curriculum }) => {
         </div>
 
         {subject && (
-          <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+          <div className="mb-6 p-4 bg-white rounded-lg">
             <p className="text-lg font-semibold">{subject.code} - {subject.name}</p>
             <p className="text-sm text-gray-600">Credits: {subject.credits}</p>
           </div>
@@ -636,7 +636,7 @@ const CurriculumModal = ({ isOpen, onClose, subject, curriculum }) => {
             {curriculum.compliance.missing.length > 0 && (
               <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
                 <p className="font-semibold text-yellow-900 mb-2">Missing Materials:</p>
-                <ul className="list-disc list-inside text-sm text-yellow-800">
+                <ul className="list-disc list-inside text-sm text-slate-800">
                   {curriculum.compliance.missing.map(item => (
                     <li key={item}>{item.replace(/_/g, ' ')}</li>
                   ))}

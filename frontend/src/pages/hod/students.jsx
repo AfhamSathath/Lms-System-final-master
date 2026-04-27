@@ -128,9 +128,9 @@ const HodStudents = () => {
   if (loading) return <Loader fullScreen />;
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
+    <div className="p-6 bg-white min-h-screen">
       {/* Header */}
-      <div className="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8 mb-8">
+      <div className="bg-white rounded-[2rem] shadow-sm border border-black p-8 mb-8">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
             <h1 className="text-3xl font-black text-gray-800 tracking-tight uppercase">Departmental Students</h1>
@@ -140,7 +140,7 @@ const HodStudents = () => {
             <select
               value={selectedBatch}
               onChange={(e) => setSelectedBatch(e.target.value)}
-              className="px-4 py-3 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-indigo-500 font-medium transition-all outline-none"
+              className="px-4 py-3 bg-white border-none rounded-2xl focus:ring-2 focus:ring-indigo-500 font-medium transition-all outline-none"
             >
               <option value="All">All Batches</option>
               {batches.map(b => <option key={b} value={b}>{b}</option>)}
@@ -152,7 +152,7 @@ const HodStudents = () => {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search students..."
-                className="pl-10 pr-4 py-3 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-indigo-500 w-full md:w-64 font-medium transition-all"
+                className="pl-10 pr-4 py-3 bg-white border-none rounded-2xl focus:ring-2 focus:ring-indigo-500 w-full md:w-64 font-medium transition-all"
               />
             </div>
             <button
@@ -173,10 +173,10 @@ const HodStudents = () => {
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden">
+      <div className="bg-white rounded-[2rem] shadow-sm border border-black overflow-hidden">
         <table className="w-full text-left">
           <thead>
-            <tr className="bg-gray-50/50">
+            <tr className="bg-white/50">
               <th className="px-8 py-6 text-xs font-black uppercase tracking-widest text-gray-400">Student Info</th>
               <th className="px-8 py-6 text-xs font-black uppercase tracking-widest text-gray-400">Academic ID</th>
               <th className="px-8 py-6 text-xs font-black uppercase tracking-widest text-gray-400">Batch / Year</th>
@@ -196,7 +196,7 @@ const HodStudents = () => {
               </tr>
             ) : (
               filteredStudents.map((student) => (
-                <tr key={student._id} className="hover:bg-gray-50/50 transition-colors group">
+                <tr key={student._id} className="hover:bg-white/50 transition-colors group">
                   <td className="px-8 py-6">
                     <div className="flex items-center gap-4">
                       <div className="w-12 h-12 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600 font-black text-lg shadow-sm">
@@ -262,7 +262,7 @@ const HodStudents = () => {
             <input
               type="text"
               placeholder="Filter unassigned students..."
-              className="w-full pl-10 pr-4 py-3 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-indigo-500 font-medium"
+              className="w-full pl-10 pr-4 py-3 bg-white border-none rounded-2xl focus:ring-2 focus:ring-indigo-500 font-medium"
               value={assignSearch}
               onChange={(e) => setAssignSearch(e.target.value)}
             />
@@ -273,7 +273,7 @@ const HodStudents = () => {
               <p className="text-center py-10 text-gray-400 font-bold uppercase text-xs">No unassigned students found</p>
             ) : (
               filteredUnassigned.map(s => (
-                <div key={s._id} className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl hover:bg-indigo-50 transition-colors group">
+                <div key={s._id} className="flex items-center justify-between p-4 bg-white rounded-2xl hover:bg-indigo-50 transition-colors group">
                   <div>
                     <p className="font-bold text-gray-800">{s.name}</p>
                     <p className="text-xs text-gray-400">{s.email}</p>
@@ -307,7 +307,7 @@ const HodStudents = () => {
                 value={editFormData.batch}
                 onChange={(e) => setEditFormData({ ...editFormData, batch: e.target.value })}
                 placeholder="e.g. 2021/2022"
-                className="w-full px-4 py-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-indigo-500 font-medium"
+                className="w-full px-4 py-3 bg-white border-none rounded-xl focus:ring-2 focus:ring-indigo-500 font-medium"
               />
             </div>
             <div>
@@ -315,7 +315,7 @@ const HodStudents = () => {
               <select
                 value={editFormData.isActive}
                 onChange={(e) => setEditFormData({ ...editFormData, isActive: e.target.value === 'true' })}
-                className="w-full px-4 py-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-indigo-500 font-medium"
+                className="w-full px-4 py-3 bg-white border-none rounded-xl focus:ring-2 focus:ring-indigo-500 font-medium"
               >
                 <option value="true">Active</option>
                 <option value="false">Inactive</option>
@@ -329,7 +329,7 @@ const HodStudents = () => {
               <select
                 value={editFormData.yearOfStudy}
                 onChange={(e) => setEditFormData({ ...editFormData, yearOfStudy: e.target.value })}
-                className="w-full px-4 py-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-indigo-500 font-medium"
+                className="w-full px-4 py-3 bg-white border-none rounded-xl focus:ring-2 focus:ring-indigo-500 font-medium"
               >
                 <option value="">Select Year</option>
                 <option value="1">1st Year</option>
@@ -344,7 +344,7 @@ const HodStudents = () => {
               <select
                 value={editFormData.semester}
                 onChange={(e) => setEditFormData({ ...editFormData, semester: e.target.value })}
-                className="w-full px-4 py-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-indigo-500 font-medium"
+                className="w-full px-4 py-3 bg-white border-none rounded-xl focus:ring-2 focus:ring-indigo-500 font-medium"
               >
                 <option value="">Select Semester</option>
                 <option value="1">Semester 1</option>
@@ -374,7 +374,7 @@ const HodStudents = () => {
 };
 
 const StatCard = ({ label, value, icon, color }) => (
-  <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100 flex items-center gap-6">
+  <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-black flex items-center gap-6">
     <div className={`w-14 h-14 rounded-2xl bg-${color}-50 text-${color}-600 flex items-center justify-center text-2xl shadow-sm`}>
       {icon}
     </div>

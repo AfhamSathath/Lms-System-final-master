@@ -84,10 +84,10 @@ const FacultyRoster = () => {
   if (loading) return <Loader fullScreen />;
 
   return (
-    <div className="p-6 bg-slate-50 min-h-screen">
+    <div className="p-6 bg-white min-h-screen">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="bg-white rounded-3xl shadow-sm border border-slate-200 p-10 mb-8 relative overflow-hidden">
+        <div className="bg-white rounded-3xl shadow-sm border border-black p-10 mb-8 relative overflow-hidden">
           <div className="absolute top-0 right-0 p-10 opacity-5">
             <FiUsers className="text-9xl text-rose-600" />
           </div>
@@ -100,20 +100,20 @@ const FacultyRoster = () => {
         </div>
 
         {/* Controls */}
-        <div className="bg-white rounded-[2.5rem] p-6 shadow-sm border border-slate-200 mb-8 grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="bg-white rounded-[2.5rem] p-6 shadow-sm border border-black mb-8 grid grid-cols-1 md:grid-cols-4 gap-4">
            <div className="md:col-span-2 relative">
               <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
               <input 
                 type="text" 
                 placeholder="Search by name, ID or email..."
-                className="w-full pl-12 pr-6 py-4 bg-slate-50 border-none rounded-2xl font-bold focus:ring-2 focus:ring-rose-500 transition-all shadow-inner"
+                className="w-full pl-12 pr-6 py-4 bg-white border-none rounded-2xl font-bold focus:ring-2 focus:ring-rose-500 transition-all shadow-inner"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
            </div>
            <div>
               <select 
-                className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl font-black uppercase text-[10px] tracking-widest focus:ring-2 focus:ring-rose-500 appearance-none cursor-pointer"
+                className="w-full px-6 py-4 bg-white border-none rounded-2xl font-black uppercase text-[10px] tracking-widest focus:ring-2 focus:ring-rose-500 appearance-none cursor-pointer"
                 value={roleFilter}
                 onChange={(e) => setRoleFilter(e.target.value)}
               >
@@ -125,7 +125,7 @@ const FacultyRoster = () => {
            </div>
            <div>
               <select 
-                className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl font-black uppercase text-[10px] tracking-widest focus:ring-2 focus:ring-rose-500 appearance-none cursor-pointer"
+                className="w-full px-6 py-4 bg-white border-none rounded-2xl font-black uppercase text-[10px] tracking-widest focus:ring-2 focus:ring-rose-500 appearance-none cursor-pointer"
                 value={deptFilter}
                 onChange={(e) => setDeptFilter(e.target.value)}
               >
@@ -136,10 +136,10 @@ const FacultyRoster = () => {
         </div>
 
         {/* List */}
-        <div className="bg-white rounded-[3rem] shadow-sm border border-slate-200 overflow-hidden mb-12">
+        <div className="bg-white rounded-[3rem] shadow-sm border border-black overflow-hidden mb-12">
            <table className="w-full text-left">
               <thead>
-                <tr className="bg-slate-50/50 border-b border-slate-100">
+                <tr className="bg-white/50 border-b border-black">
                   <th className="px-10 py-6 text-[11px] font-black uppercase tracking-widest text-slate-400">User Identity</th>
                   <th className="px-10 py-6 text-[11px] font-black uppercase tracking-widest text-slate-400">Department</th>
                   <th className="px-10 py-6 text-[11px] font-black uppercase tracking-widest text-slate-400">Role</th>
@@ -148,7 +148,7 @@ const FacultyRoster = () => {
               </thead>
               <tbody className="divide-y divide-slate-50">
                 {filteredRoster.map(u => (
-                  <tr key={u._id} className="hover:bg-slate-50/30 transition-colors group">
+                  <tr key={u._id} className="hover:bg-white/30 transition-colors group">
                     <td className="px-10 py-6">
                        <div className="flex items-center gap-4">
                           <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black text-lg shadow-inner ${u.role === 'student' ? 'bg-indigo-50 text-indigo-600' : 'bg-rose-50 text-rose-600'}`}>
@@ -183,7 +183,7 @@ const FacultyRoster = () => {
                     <td className="px-10 py-6 text-right">
                        <button 
                          onClick={() => { setEditingUser(u); setShowEditModal(true); }}
-                         className="p-3 bg-slate-50 text-slate-400 rounded-2xl hover:bg-rose-600 hover:text-white transition-all transform active:scale-95 group-hover:shadow-lg group-hover:shadow-rose-100"
+                         className="p-3 bg-white text-slate-400 rounded-2xl hover:bg-rose-600 hover:text-white transition-all transform active:scale-95 group-hover:shadow-lg group-hover:shadow-rose-100"
                        >
                          <FiEdit />
                        </button>
@@ -198,7 +198,7 @@ const FacultyRoster = () => {
       {/* Edit Modal */}
       <Modal isOpen={showEditModal} onClose={() => setShowEditModal(false)} title="Move Department">
          <form onSubmit={handleUpdateUser} className="space-y-6 pt-4">
-            <div className="p-6 bg-slate-50 rounded-[2.5rem] flex items-center gap-4 mb-4">
+            <div className="p-6 bg-white rounded-[2.5rem] flex items-center gap-4 mb-4">
                <div className="w-16 h-16 bg-white rounded-3xl shadow-sm flex items-center justify-center text-rose-600 text-2xl font-black">
                   {editingUser?.name?.[0]}
                </div>
@@ -211,7 +211,7 @@ const FacultyRoster = () => {
             <div className="space-y-2">
                <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Assign to Department</label>
                <select 
-                 className="w-full px-6 py-5 bg-slate-50 border-none rounded-[2rem] font-black uppercase text-xs focus:ring-2 focus:ring-rose-500 appearance-none cursor-pointer"
+                 className="w-full px-6 py-5 bg-white border-none rounded-[2rem] font-black uppercase text-xs focus:ring-2 focus:ring-rose-500 appearance-none cursor-pointer"
                  value={editingUser?.department || ''}
                  onChange={(e) => setEditingUser({...editingUser, department: e.target.value})}
                  required

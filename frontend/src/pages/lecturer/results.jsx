@@ -51,7 +51,7 @@ const LecturerResults = () => {
   if (loading) return <Loader fullScreen />;
 
   return (
-    <div className="container mx-auto px-4 py-8 bg-slate-50 min-h-screen">
+    <div className="container mx-auto px-4 py-8 bg-white min-h-screen">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-8">
         <div>
           <button
@@ -65,11 +65,11 @@ const LecturerResults = () => {
         </div>
 
         <div className="grid grid-cols-1 gap-4 w-full sm:w-auto">
-          <div className="bg-white rounded-3xl p-4 shadow-lg border border-slate-100">
+          <div className="bg-white rounded-3xl p-4 shadow-lg border border-black">
             <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Published results</p>
             <p className="text-3xl font-black text-slate-900">{filteredResults.length}</p>
           </div>
-          <div className="bg-white rounded-3xl p-4 shadow-lg border border-slate-100">
+          <div className="bg-white rounded-3xl p-4 shadow-lg border border-black">
             <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Subjects covered</p>
             <p className="text-3xl font-black text-slate-900">{new Set(filteredResults.map(r => r.subject?._id)).size}</p>
           </div>
@@ -77,7 +77,7 @@ const LecturerResults = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-        <div className="lg:col-span-2 bg-white rounded-[3rem] shadow-2xl border border-slate-100 p-6">
+        <div className="lg:col-span-2 bg-white rounded-[3rem] shadow-2xl border border-black p-6">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
             <div>
               <h2 className="text-xl font-bold text-slate-900">Results Ledger</h2>
@@ -90,13 +90,13 @@ const LecturerResults = () => {
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder="Search student, subject, or code"
-                  className="w-full md:w-[260px] pl-12 pr-4 py-3 rounded-3xl border border-slate-200 focus:ring-2 focus:ring-indigo-100 focus:border-indigo-300"
+                  className="w-full md:w-[260px] pl-12 pr-4 py-3 rounded-3xl border border-black focus:ring-2 focus:ring-indigo-100 focus:border-indigo-300"
                 />
               </div>
               <select
                 value={selectedBatch}
                 onChange={(e) => setSelectedBatch(e.target.value)}
-                className="w-full sm:w-[180px] rounded-3xl border border-slate-200 px-6 py-3 bg-white text-slate-700 font-bold focus:ring-2 focus:ring-indigo-100 focus:border-indigo-300 outline-none transition-all appearance-none"
+                className="w-full sm:w-[180px] rounded-3xl border border-black px-6 py-3 bg-white text-slate-700 font-bold focus:ring-2 focus:ring-indigo-100 focus:border-indigo-300 outline-none transition-all appearance-none"
               >
                 <option value="All">All Batches</option>
                 {batches.map(batch => (
@@ -108,7 +108,7 @@ const LecturerResults = () => {
 
           <div className="overflow-x-auto">
             <table className="min-w-full border-separate border-spacing-0">
-              <thead className="bg-slate-50 text-left text-[10px] uppercase tracking-[0.28em] text-slate-400">
+              <thead className="bg-white text-left text-[10px] uppercase tracking-[0.28em] text-slate-400">
                 <tr>
                   <th className="px-6 py-5">Student</th>
                   <th className="px-6 py-5">Subject</th>
@@ -126,7 +126,7 @@ const LecturerResults = () => {
                     </td>
                   </tr>
                 ) : filteredResults.map((result) => (
-                  <tr key={result._id} className="hover:bg-slate-50 transition-colors">
+                  <tr key={result._id} className="hover:bg-white transition-colors">
                     <td className="px-6 py-5">
                       <p className="font-semibold text-slate-900">{result.student?.name || 'Unknown'}</p>
                       <p className="text-xs text-slate-400">{result.student?.studentId}</p>
@@ -147,7 +147,7 @@ const LecturerResults = () => {
         </div>
 
         <div className="lg:col-span-1 space-y-6">
-          <div className="bg-white rounded-[3rem] shadow-2xl border border-slate-100 p-6">
+          <div className="bg-white rounded-[3rem] shadow-2xl border border-black p-6">
             <h3 className="text-lg font-bold text-slate-900 mb-3">Quick actions</h3>
             <button
               onClick={() => navigate('/lecturer/dashboard')}
@@ -174,18 +174,18 @@ const LecturerResults = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-[3rem] shadow-2xl border border-slate-100 p-6">
+      <div className="bg-white rounded-[3rem] shadow-2xl border border-black p-6">
         <h2 className="text-lg font-bold text-slate-900 mb-4">Subject filter</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="rounded-3xl border border-slate-200 p-5 bg-slate-50">
+          <div className="rounded-3xl border border-black p-5 bg-white">
             <label className="text-[10px] uppercase tracking-[0.28em] text-slate-400 font-black">Selected Subject</label>
             <div className="mt-3 text-slate-900 text-base font-semibold">{subjectName || 'All subjects'}</div>
           </div>
-          <div className="rounded-3xl border border-slate-200 p-5">
+          <div className="rounded-3xl border border-black p-5">
             <label className="text-[10px] uppercase tracking-[0.28em] text-slate-400 font-black">Results loaded</label>
             <div className="mt-3 text-slate-900 text-base font-semibold">{results.length}</div>
           </div>
-          <div className="rounded-3xl border border-slate-200 p-5 bg-slate-50">
+          <div className="rounded-3xl border border-black p-5 bg-white">
             <label className="text-[10px] uppercase tracking-[0.28em] text-slate-400 font-black">Search term</label>
             <div className="mt-3 text-slate-900 text-base font-semibold">{searchTerm || 'None'}</div>
           </div>

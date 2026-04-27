@@ -61,7 +61,7 @@ const CreditProgress = () => {
   if (loading) return <Loader fullScreen />;
 
   return (
-    <div className="p-6 bg-slate-50 min-h-screen">
+    <div className="p-6 bg-white min-h-screen">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
@@ -69,7 +69,7 @@ const CreditProgress = () => {
              <h1 className="text-4xl font-black text-slate-800 tracking-tighter uppercase leading-none mb-2">Academic Summary</h1>
              <p className="text-slate-400 font-bold uppercase tracking-[0.2em] text-xs">Real-time credit tracking & GPA analysis</p>
            </div>
-           <button onClick={() => navigate(-1)} className="flex items-center gap-2 px-6 py-3 bg-white border border-slate-200 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-slate-50 transition-all shadow-sm">
+           <button onClick={() => navigate(-1)} className="flex items-center gap-2 px-6 py-3 bg-white border border-black rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-white transition-all shadow-sm">
              <FiArrowLeft /> Go Back
            </button>
         </div>
@@ -102,7 +102,7 @@ const CreditProgress = () => {
 
         {/* Breakdown */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2 bg-white rounded-[2.5rem] shadow-sm border border-slate-200 overflow-hidden">
+            <div className="lg:col-span-2 bg-white rounded-[2.5rem] shadow-sm border border-black overflow-hidden">
                 <div className="px-10 py-8 border-b border-slate-50 flex justify-between items-center">
                     <h3 className="font-black text-slate-800 uppercase tracking-widest text-xs">Module Breakdown</h3>
                     <FiBarChart2 className="text-slate-200 text-2xl" />
@@ -110,7 +110,7 @@ const CreditProgress = () => {
                 <div className="overflow-x-auto">
                    <table className="w-full text-left">
                      <thead>
-                       <tr className="bg-slate-50/50">
+                       <tr className="bg-white/50">
                          <th className="px-10 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Subject</th>
                          <th className="px-10 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Credits</th>
                          <th className="px-10 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Grade</th>
@@ -119,7 +119,7 @@ const CreditProgress = () => {
                      </thead>
                      <tbody className="divide-y divide-slate-50">
                         {data.enrollments.map((e, idx) => (
-                          <tr key={idx} className="hover:bg-slate-50/30 transition-colors">
+                          <tr key={idx} className="hover:bg-white/30 transition-colors">
                             <td className="px-10 py-6">
                                <p className="font-black text-slate-700 uppercase tracking-tight text-sm">{e.course?.name}</p>
                                <p className="text-[10px] font-bold text-slate-400 lowercase">{e.course?.code}</p>
@@ -168,7 +168,7 @@ const CreditProgress = () => {
 };
 
 const StatCard = ({ label, value, suffix, icon, color, footer }) => (
-  <div className="bg-white rounded-[2.5rem] p-10 shadow-sm border border-slate-200 relative overflow-hidden group">
+  <div className="bg-white rounded-[2.5rem] p-10 shadow-sm border border-black relative overflow-hidden group">
     <div className={`absolute -right-4 -top-4 w-24 h-24 bg-${color}-50 rounded-full opacity-50 group-hover:scale-150 transition-transform duration-700`}></div>
     <div className="relative z-10">
       <div className={`w-14 h-14 bg-${color}-50 text-${color}-600 rounded-2xl flex items-center justify-center text-2xl mb-6 shadow-inner`}>

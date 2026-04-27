@@ -110,7 +110,7 @@ const LecturerProfile = () => {
                   </button>
                   <button
                     onClick={handleCancel}
-                    className="flex items-center px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
+                    className="flex items-center px-4 py-2 bg-white0 text-white rounded-lg hover:bg-gray-600 transition-colors"
                   >
                     <FiX className="mr-2" />
                     Cancel
@@ -173,7 +173,7 @@ const LecturerProfile = () => {
                     value={formData.name}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                    className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                   />
                 </div>
                 <div>
@@ -185,7 +185,7 @@ const LecturerProfile = () => {
                     type="email"
                     value={user?.email}
                     disabled
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-500"
+                    className="w-full px-4 py-2 border border-black rounded-lg bg-white border border-black text-gray-500"
                   />
                 </div>
                 <div>
@@ -200,7 +200,7 @@ const LecturerProfile = () => {
                     value={formData.phone}
                     onChange={handleChange}
                     placeholder="Enter phone number"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                    className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                   />
                 </div>
                 <div>
@@ -211,7 +211,7 @@ const LecturerProfile = () => {
                     type="text"
                     value={user?.department}
                     disabled
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-500"
+                    className="w-full px-4 py-2 border border-black rounded-lg bg-white border border-black text-gray-500"
                   />
                 </div>
                 <div className="md:col-span-2">
@@ -226,7 +226,7 @@ const LecturerProfile = () => {
                     onChange={handleChange}
                     rows="3"
                     placeholder="Enter your address"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                    className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                   />
                 </div>
               </form>
@@ -238,7 +238,7 @@ const LecturerProfile = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
           <div className="bg-white rounded-xl shadow-lg p-6">
             <div className="flex items-center mb-3">
-              <div className="p-2 bg-green-100 rounded-lg">
+              <div className="p-2 bg-white border border-black rounded-lg">
                 <FiBook className="h-5 w-5 text-green-600" />
               </div>
               <h3 className="ml-3 font-semibold text-gray-800">Teaching Info</h3>
@@ -251,7 +251,7 @@ const LecturerProfile = () => {
 
           <div className="bg-white rounded-xl shadow-lg p-6">
             <div className="flex items-center mb-3">
-              <div className="p-2 bg-blue-100 rounded-lg">
+              <div className="p-2 bg-white border border-black rounded-lg">
                 <FiPhone className="h-5 w-5 text-blue-600" />
               </div>
               <h3 className="ml-3 font-semibold text-gray-800">Contact Info</h3>
@@ -264,7 +264,7 @@ const LecturerProfile = () => {
 
           <div className="bg-white rounded-xl shadow-lg p-6">
             <div className="flex items-center mb-3">
-              <div className="p-2 bg-purple-100 rounded-lg">
+              <div className="p-2 bg-white border border-black rounded-lg">
                 <FiMapPin className="h-5 w-5 text-purple-600" />
               </div>
               <h3 className="ml-3 font-semibold text-gray-800">Address</h3>

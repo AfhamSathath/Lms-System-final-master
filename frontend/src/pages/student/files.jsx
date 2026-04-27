@@ -107,7 +107,7 @@ const StudentFiles = () => {
   }
 
   return (
-      <div className="container mx-auto px-4 py-8 bg-slate-50 min-h-screen">
+      <div className="container mx-auto px-4 py-8 bg-white min-h-screen">
         {/* Header */}
         <div className="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
@@ -116,7 +116,7 @@ const StudentFiles = () => {
           </div>
           
           <div className="flex gap-4">
-             <div className="bg-white px-6 py-4 rounded-3xl shadow-xl border border-slate-100 hidden sm:block">
+             <div className="bg-white px-6 py-4 rounded-3xl shadow-xl border border-black hidden sm:block">
                 <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Available Files</p>
                 <p className="text-xl font-black text-slate-800">{filteredFiles.length}</p>
              </div>
@@ -125,7 +125,7 @@ const StudentFiles = () => {
 
         {/* Premium Academic Filters */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12 animate-in fade-in slide-in-from-top-4 duration-1000">
-           <div className="bg-white rounded-[2rem] shadow-xl p-8 border border-slate-100 relative overflow-hidden group">
+           <div className="bg-white rounded-[2rem] shadow-xl p-8 border border-black relative overflow-hidden group">
               <div className="absolute top-0 right-0 p-8 opacity-[0.02] group-hover:scale-125 transition-transform duration-1000">
                  <FiBook className="h-32 w-32" />
               </div>
@@ -183,7 +183,7 @@ const StudentFiles = () => {
                 placeholder="Search files by name or subject..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-3 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
             <div className="relative">
@@ -194,7 +194,7 @@ const StudentFiles = () => {
                 name="subject-filter"
                 value={selectedSubject}
                 onChange={(e) => setSelectedSubject(e.target.value)}
-                className="w-full pl-10 pr-8 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white"
+                className="w-full pl-10 pr-8 py-3 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white"
               >
                 <option value="all">All Subjects</option>
                 {subjects
@@ -214,11 +214,11 @@ const StudentFiles = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredFiles.map(file => (
               <div key={file._id} className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-                <div className="bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-4">
+                <div className="bg-white border border-black px-6 py-4">
                   <div className="flex items-center">
                     <span className="text-3xl mr-3">{getFileIcon(file.mimeType)}</span>
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-lg font-semibold text-white truncate">
+                      <h3 className="text-lg font-semibold text-slate-900 truncate">
                         {file.originalName}
                       </h3>
                     </div>
@@ -247,7 +247,7 @@ const StudentFiles = () => {
                       </span>
                     </div>
                     {file.description && (
-                      <p className="text-sm text-gray-500 mt-2 p-2 bg-gray-50 rounded">
+                      <p className="text-sm text-gray-500 mt-2 p-2 bg-white rounded">
                         {file.description}
                       </p>
                     )}

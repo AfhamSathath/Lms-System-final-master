@@ -122,12 +122,12 @@ const ExamOfficerDashboard = () => {
             placeholder="Filter by subject code..."
             value={filterSubject}
             onChange={(e) => setFilterSubject(e.target.value)}
-            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+            className="flex-1 px-4 py-2 border border-black rounded-lg focus:ring-2 focus:ring-blue-500"
           />
           <select
             value={filterDepartment}
             onChange={(e) => setFilterDepartment(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+            className="px-4 py-2 border border-black rounded-lg focus:ring-2 focus:ring-blue-500"
           >
             <option value="">All Departments</option>
             <option value="Engineering">Engineering</option>
@@ -163,7 +163,7 @@ const ExamOfficerDashboard = () => {
                     {exam.department}
                   </td>
                   <td className="px-6 py-4 text-sm">
-                    <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-bold">
+                    <span className="px-3 py-1 bg-white border border-black text-slate-800 rounded-full text-xs font-bold">
                       PAID ✓
                     </span>
                   </td>
@@ -211,7 +211,7 @@ const ExamOfficerDashboard = () => {
                     type="date"
                     value={examDate}
                     onChange={(e) => setExamDate(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-2 border border-black rounded-lg focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
 
@@ -223,7 +223,7 @@ const ExamOfficerDashboard = () => {
                     type="time"
                     value={examTime}
                     onChange={(e) => setExamTime(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-2 border border-black rounded-lg focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
 
@@ -234,7 +234,7 @@ const ExamOfficerDashboard = () => {
                   <select
                     value={venue}
                     onChange={(e) => setVenue(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-2 border border-black rounded-lg focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="">Select Venue</option>
                     {availableVenues.map(v => (
@@ -247,7 +247,7 @@ const ExamOfficerDashboard = () => {
               <div className="flex gap-4 mt-6">
                 <button
                   onClick={() => setScheduleModal(null)}
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 font-semibold hover:bg-gray-50"
+                  className="flex-1 px-4 py-2 border border-black rounded-lg text-gray-700 font-semibold hover:bg-white"
                 >
                   Cancel
                 </button>
@@ -284,7 +284,7 @@ const ExamOfficerDashboard = () => {
             placeholder="Filter by subject or student..."
             value={filterSubject}
             onChange={(e) => setFilterSubject(e.target.value)}
-            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+            className="flex-1 px-4 py-2 border border-black rounded-lg focus:ring-2 focus:ring-blue-500"
           />
           <button className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-semibold flex items-center gap-2">
             <Download size={18} />
@@ -308,7 +308,7 @@ const ExamOfficerDashboard = () => {
                       <p className="font-bold text-gray-900">{exam.subjectCode}</p>
                       <p className="text-sm text-gray-600">{exam.subjectName}</p>
                     </div>
-                    <button className="p-1 hover:bg-gray-100 rounded">
+                    <button className="p-1 hover:bg-white border border-black rounded">
                       <Eye size={18} className="text-gray-500" />
                     </button>
                   </div>
@@ -329,10 +329,10 @@ const ExamOfficerDashboard = () => {
                   </div>
 
                   <div className="mt-4 pt-3 border-t flex gap-2">
-                    <button className="flex-1 px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200 font-semibold">
+                    <button className="flex-1 px-2 py-1 text-xs bg-white border border-black text-slate-700 rounded hover:bg-white border border-black font-semibold">
                       Download Admit
                     </button>
-                    <button className="flex-1 px-2 py-1 text-xs bg-green-100 text-green-700 rounded hover:bg-green-200 font-semibold">
+                    <button className="flex-1 px-2 py-1 text-xs bg-white border border-black text-slate-700 rounded hover:bg-white border border-black font-semibold">
                       Mark Completed
                     </button>
                   </div>
@@ -408,7 +408,7 @@ const ExamOfficerDashboard = () => {
           <h3 className="font-bold text-lg text-gray-900 mb-4">Venue Availability</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {availableVenues.map(venue => (
-              <div key={venue} className="flex items-center justify-between p-3 bg-gray-50 rounded border border-gray-200">
+              <div key={venue} className="flex items-center justify-between p-3 bg-white rounded border border-black">
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 bg-green-500 rounded-full"></div>
                   <span className="text-gray-900 font-medium">{venue}</span>
@@ -463,7 +463,7 @@ const ExamOfficerDashboard = () => {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 border-b border-gray-200">
+      <div className="flex gap-2 border-b border-black">
         {[
           { id: 'readyToSchedule', label: `Ready to Schedule (${readyToSchedule.length})` },
           { id: 'scheduled', label: `Scheduled (${scheduledExams.length})` },

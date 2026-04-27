@@ -10,6 +10,7 @@ const AdminAttendanceDetails = () => {
   const [enrollments, setEnrollments] = useState([]);
   const [selectedEnrollment, setSelectedEnrollment] = useState(null);
   const [attendanceDetails, setAttendanceDetails] = useState(null);
+  const [academicSummary, setAcademicSummary] = useState(null);
   const [loading, setLoading] = useState(true);
   const [detailsLoading, setDetailsLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -34,11 +35,30 @@ const AdminAttendanceDetails = () => {
     }
   };
 
+  const fetchAcademicSummary = async (studentId) => {
+    try {
+      const response = await api.get(`/api/results/transcript/${studentId}`);
+      if (response.data && response.data.success) {
+        setAcademicSummary(response.data.transcript);
+      } else {
+        setAcademicSummary(null);
+      }
+    } catch (error) {
+      console.error('Error fetching academic summary:', error);
+      setAcademicSummary(null);
+    }
+  };
+
   const fetchAttendanceDetails = async (enrollmentId) => {
     setDetailsLoading(true);
+    setAcademicSummary(null);
     try {
       const response = await api.get(`/api/enrollments/${enrollmentId}/attendance-details`);
       setAttendanceDetails(response.data);
+      
+      if (response.data?.enrollment?.student?._id) {
+        fetchAcademicSummary(response.data.enrollment.student._id);
+      }
     } catch (error) {
       console.error('Error fetching attendance details:', error);
       toast.error('Failed to load attendance details');
@@ -57,8 +77,8 @@ const AdminAttendanceDetails = () => {
       filtered = filtered.filter(enrollment =>
         enrollment.student?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         enrollment.student?.studentId?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        enrollment.course?.courseName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        enrollment.course?.courseCode?.toLowerCase().includes(searchTerm.toLowerCase())
+        enrollment.course?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        enrollment.course?.code?.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
@@ -92,8 +112,15 @@ const AdminAttendanceDetails = () => {
   };
 
   const getCourses = () => {
-    const courses = [...new Set(enrollments.map(e => e.course).filter(Boolean))];
-    return courses;
+    const uniqueCourses = [];
+    const courseIds = new Set();
+    enrollments.forEach(e => {
+      if (e.course && !courseIds.has(e.course._id)) {
+        courseIds.add(e.course._id);
+        uniqueCourses.push(e.course);
+      }
+    });
+    return uniqueCourses;
   };
 
   const getBatches = () => {
@@ -106,8 +133,8 @@ const AdminAttendanceDetails = () => {
       case 'present': return 'bg-emerald-100 text-emerald-700';
       case 'absent': return 'bg-rose-100 text-rose-700';
       case 'late': return 'bg-amber-100 text-amber-700';
-      case 'excused': return 'bg-blue-100 text-blue-700';
-      default: return 'bg-gray-100 text-gray-700';
+      case 'excused': return 'bg-white border border-black text-slate-700';
+      default: return 'bg-white border border-black text-gray-700';
     }
   };
 
@@ -136,7 +163,7 @@ const AdminAttendanceDetails = () => {
       </div>
 
       {/* Search and Filters */}
-      <div className="bg-white rounded-2xl shadow-xl p-6 mb-8 border border-gray-100">
+      <div className="bg-white rounded-2xl shadow-xl p-6 mb-8 border border-black">
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
           <div className="relative">
             <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -145,14 +172,14 @@ const AdminAttendanceDetails = () => {
               placeholder="Search students or courses..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              className="w-full pl-10 pr-4 py-3 border border-black rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
             />
           </div>
 
           <select
             value={departmentFilter}
             onChange={(e) => setDepartmentFilter(e.target.value)}
-            className="px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+            className="px-4 py-3 border border-black rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
           >
             <option value="">All Departments</option>
             {departments.map(dept => (
@@ -163,12 +190,12 @@ const AdminAttendanceDetails = () => {
           <select
             value={courseFilter}
             onChange={(e) => setCourseFilter(e.target.value)}
-            className="px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+            className="px-4 py-3 border border-black rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
           >
             <option value="">All Courses</option>
             {courses.map(course => (
               <option key={course._id} value={course._id}>
-                {course.courseCode} - {course.courseName}
+                {course.code} - {course.name}
               </option>
             ))}
           </select>
@@ -176,7 +203,7 @@ const AdminAttendanceDetails = () => {
           <select
             value={batchFilter}
             onChange={(e) => setBatchFilter(e.target.value)}
-            className="px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+            className="px-4 py-3 border border-black rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
           >
             <option value="">All Batches</option>
             {batches.map(batch => (
@@ -191,7 +218,7 @@ const AdminAttendanceDetails = () => {
               setCourseFilter('');
               setBatchFilter('');
             }}
-            className="px-4 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors"
+            className="px-4 py-3 bg-white border border-black text-gray-700 rounded-xl hover:bg-gray-200 transition-colors"
           >
             Clear Filters
           </button>
@@ -200,7 +227,7 @@ const AdminAttendanceDetails = () => {
 
       {/* Statistics Overview */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
+        <div className="bg-white rounded-2xl shadow-xl p-6 border border-black">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Total Records</p>
@@ -210,7 +237,7 @@ const AdminAttendanceDetails = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
+        <div className="bg-white rounded-2xl shadow-xl p-6 border border-black">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Avg Attendance</p>
@@ -224,7 +251,7 @@ const AdminAttendanceDetails = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
+        <div className="bg-white rounded-2xl shadow-xl p-6 border border-black">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Discrepancies</p>
@@ -238,7 +265,7 @@ const AdminAttendanceDetails = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
+        <div className="bg-white rounded-2xl shadow-xl p-6 border border-black">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Under Review</p>
@@ -268,7 +295,7 @@ const AdminAttendanceDetails = () => {
                 className={`bg-white rounded-xl shadow-lg p-4 border-2 cursor-pointer transition-all hover:shadow-xl ${
                   selectedEnrollment === enrollment._id
                     ? 'border-indigo-500 bg-indigo-50'
-                    : 'border-gray-100 hover:border-gray-300'
+                    : 'border-black hover:border-black'
                 }`}
               >
                 <div className="flex justify-between items-start mb-3">
@@ -285,8 +312,8 @@ const AdminAttendanceDetails = () => {
 
                 <div className="flex justify-between items-center">
                   <div>
-                    <p className="font-medium text-gray-700">{enrollment.course?.courseCode}</p>
-                    <p className="text-sm text-gray-600">{enrollment.course?.courseName}</p>
+                    <p className="font-medium text-gray-700">{enrollment.course?.code}</p>
+                    <p className="text-sm text-gray-600">{enrollment.course?.name}</p>
                   </div>
                   <div className="flex gap-1">
                     {enrollment.attendance?.some(r => r.studentConfirmed && r.status === 'absent') && (
@@ -311,21 +338,72 @@ const AdminAttendanceDetails = () => {
               <p className="text-gray-600 mt-4">Loading attendance details...</p>
             </div>
           ) : attendanceDetails ? (
-            <div className="bg-white rounded-xl shadow-lg border border-gray-100">
+            <div className="bg-white rounded-xl shadow-lg border border-black">
               {/* Header */}
-              <div className="bg-gradient-to-r from-indigo-600 to-purple-700 px-6 py-5 text-white">
+              <div className="bg-white border border-black px-6 py-5 text-slate-900">
                 <div className="flex justify-between items-center mb-2">
                   <h4 className="text-xl font-bold">{attendanceDetails.enrollment.student.name}</h4>
-                  <span className="text-indigo-100">{attendanceDetails.enrollment.student.studentId}</span>
+                  <span className="text-indigo-100 bg-white/20 px-2 py-1 rounded-md text-sm">{attendanceDetails.enrollment.student.studentId}</span>
                 </div>
-                <p className="text-indigo-100">{attendanceDetails.enrollment.course.courseName}</p>
-                <p className="text-sm text-indigo-200">
-                  {attendanceDetails.enrollment.academicYear} - Semester {attendanceDetails.enrollment.semester}
+                <p className="text-indigo-50 font-medium text-lg leading-snug">
+                  {attendanceDetails.enrollment.course.code} - {attendanceDetails.enrollment.course.name}
                 </p>
+                <div className="flex justify-between items-center mt-3">
+                  <p className="text-sm text-indigo-200">
+                    {attendanceDetails.enrollment.academicYear} | Semester {attendanceDetails.enrollment.semester} | Department: {attendanceDetails.enrollment.student.department || 'N/A'}
+                  </p>
+                  {academicSummary && (
+                    <div className="bg-white text-slate-700 px-3 py-1 rounded-lg shadow-sm flex items-center gap-2">
+                      <span className="text-xs font-semibold uppercase tracking-wider">CGPA</span>
+                      <span className="text-lg font-bold">{academicSummary.cgpa ? academicSummary.cgpa.toFixed(2) : 'N/A'}</span>
+                    </div>
+                  )}
+                </div>
               </div>
 
+              {/* Academic Summary Detailed */}
+              {academicSummary && (
+                <div className="p-6 border-b border-black bg-white/50">
+                  <h5 className="font-bold text-gray-700 mb-4 flex items-center">
+                    <FiBook className="mr-2 text-indigo-500" />
+                    Academic Profile Summary
+                  </h5>
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div className="bg-white p-4 rounded-xl border border-black shadow-sm flex flex-col justify-center items-center">
+                      <div className="text-xs text-gray-500 uppercase tracking-widest font-semibold mb-1">Total Credits</div>
+                      <div className="text-2xl font-black text-slate-800">
+                        {academicSummary.totalCredits || 0}
+                      </div>
+                    </div>
+                    <div className="bg-white p-4 rounded-xl border border-black shadow-sm flex flex-col justify-center items-center">
+                      <div className="text-xs text-gray-500 uppercase tracking-widest font-semibold mb-1">Total Points</div>
+                      <div className="text-2xl font-black text-slate-800">
+                        {academicSummary.totalGradePoints ? academicSummary.totalGradePoints.toFixed(1) : 0}
+                      </div>
+                    </div>
+                    <div className="col-span-2 bg-white p-4 rounded-xl border border-black shadow-sm">
+                      <div className="text-xs text-gray-500 uppercase tracking-widest font-semibold mb-2">Program Snapshot</div>
+                      <div className="space-y-1">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-600">Current Course:</span>
+                          <span className="font-medium text-gray-800 truncate pl-2" title={attendanceDetails.enrollment.course.name}>
+                            {attendanceDetails.enrollment.course.name}
+                          </span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-600">Department:</span>
+                          <span className="font-medium text-gray-800">
+                            {attendanceDetails.enrollment.student.department || 'N/A'}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Statistics */}
-              <div className="p-6 border-b border-gray-100">
+              <div className="p-6 border-b border-black">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div className="text-center">
                     <div className="text-2xl font-bold text-emerald-600">{attendanceDetails.statistics.present}</div>
@@ -348,15 +426,15 @@ const AdminAttendanceDetails = () => {
                 <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="bg-blue-50 p-3 rounded-lg text-center">
                     <div className="text-lg font-bold text-blue-600">{attendanceDetails.statistics.confirmedByStudent}</div>
-                    <div className="text-xs text-blue-700">Student Confirmed</div>
+                    <div className="text-xs text-slate-700">Student Confirmed</div>
                   </div>
-                  <div className="bg-purple-50 p-3 rounded-lg text-center">
+                  <div className="bg-white border border-black p-3 rounded-lg text-center">
                     <div className="text-lg font-bold text-purple-600">{attendanceDetails.statistics.reviewedByHOD}</div>
-                    <div className="text-xs text-purple-700">HOD Reviewed</div>
+                    <div className="text-xs text-slate-700">HOD Reviewed</div>
                   </div>
                   <div className="bg-red-50 p-3 rounded-lg text-center">
                     <div className="text-lg font-bold text-red-600">{attendanceDetails.statistics.discrepancies}</div>
-                    <div className="text-xs text-red-700">Discrepancies</div>
+                    <div className="text-xs text-slate-700">Discrepancies</div>
                   </div>
                 </div>
               </div>
@@ -369,7 +447,7 @@ const AdminAttendanceDetails = () => {
                 </h5>
                 <div className="space-y-3 max-h-80 overflow-y-auto">
                   {attendanceDetails.attendance.map((record, idx) => (
-                    <div key={idx} className="bg-gray-50 rounded-lg p-4 border border-gray-100">
+                    <div key={idx} className="bg-white rounded-lg p-4 border border-black">
                       <div className="flex justify-between items-start mb-2">
                         <div className="flex items-center gap-3">
                           {getStatusIcon(record.status)}
@@ -384,13 +462,13 @@ const AdminAttendanceDetails = () => {
                             </span>
                             <div className="flex items-center gap-2 mt-1">
                               {record.studentConfirmed && (
-                                <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs">
+                                <span className="inline-flex items-center gap-1 px-2 py-1 bg-white border border-black text-slate-700 rounded-full text-xs">
                                   <FiCheckCircle className="w-3 h-3" />
                                   Student Confirmed
                                 </span>
                               )}
                               {record.updatedByHOD && (
-                                <span className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs">
+                                <span className="inline-flex items-center gap-1 px-2 py-1 bg-white border border-black text-slate-700 rounded-full text-xs">
                                   <FiCheckCircle className="w-3 h-3" />
                                   HOD Reviewed
                                 </span>
@@ -404,7 +482,7 @@ const AdminAttendanceDetails = () => {
                       </div>
 
                       {record.remarks && (
-                        <div className="mt-2 p-2 bg-white rounded border-l-4 border-gray-300">
+                        <div className="mt-2 p-2 bg-white rounded border-l-4 border-black">
                           <p className="text-sm text-gray-700">
                             <strong>Lecturer:</strong> {record.remarks}
                           </p>
@@ -413,15 +491,15 @@ const AdminAttendanceDetails = () => {
 
                       {record.studentRemarks && (
                         <div className="mt-2 p-2 bg-blue-50 rounded border-l-4 border-blue-300">
-                          <p className="text-sm text-blue-800">
+                          <p className="text-sm text-slate-800">
                             <strong>Student:</strong> {record.studentRemarks}
                           </p>
                         </div>
                       )}
 
                       {record.hodRemarks && (
-                        <div className="mt-2 p-2 bg-purple-50 rounded border-l-4 border-purple-300">
-                          <p className="text-sm text-purple-800">
+                        <div className="mt-2 p-2 bg-white border border-black rounded border-l-4 border-purple-300">
+                          <p className="text-sm text-slate-800">
                             <strong>HOD:</strong> {record.hodRemarks}
                           </p>
                         </div>
@@ -432,7 +510,7 @@ const AdminAttendanceDetails = () => {
               </div>
             </div>
           ) : (
-            <div className="bg-white rounded-xl shadow-lg p-8 text-center border border-gray-100">
+            <div className="bg-white rounded-xl shadow-lg p-8 text-center border border-black">
               <FiBarChart2 className="w-12 h-12 text-gray-300 mx-auto mb-4" />
               <h4 className="text-lg font-bold text-gray-800 mb-2">Select a Record</h4>
               <p className="text-gray-600">Click on a student record to view detailed attendance information</p>

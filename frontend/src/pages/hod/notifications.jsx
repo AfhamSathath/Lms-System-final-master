@@ -138,15 +138,15 @@ const HodNotifications = () => {
 
   return (
     <div className="container mx-auto px-6 py-8">
-      <div className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl p-6 mb-8 text-white flex justify-between items-center">
+      <div className="bg-white border border-black rounded-2xl p-6 mb-8 text-slate-900 flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold">HOD Notifications ({unreadCount} unread)</h1>
-          <p className="text-purple-100">Send important department announcements</p>
+          <p className="text-slate-500">Send important department announcements</p>
         </div>
         <div className="flex gap-3">
-          <button onClick={handleMarkAllAsRead} className="bg-white text-purple-700 px-4 py-2 rounded-lg">Mark All</button>
+          <button onClick={handleMarkAllAsRead} className="bg-white text-slate-700 px-4 py-2 rounded-lg">Mark All</button>
           <button onClick={handleClearAll} className="bg-red-500 text-white px-4 py-2 rounded-lg">Clear All</button>
-          <button onClick={() => setShowModal(true)} className="bg-white text-purple-700 px-4 py-2 rounded-lg flex items-center">
+          <button onClick={() => setShowModal(true)} className="bg-white text-slate-700 px-4 py-2 rounded-lg flex items-center">
             <FiPlus className="mr-1" /> New
           </button>
         </div>
@@ -157,7 +157,7 @@ const HodNotifications = () => {
       ) : (
         <div className="space-y-4">
           {sortedNotifications.map((notif) => (
-            <div key={notif._id} className={`p-4 rounded-xl shadow ${notif.isRead ? 'bg-gray-100' : 'bg-purple-50'}`}>
+            <div key={notif._id} className={`p-4 rounded-xl shadow ${notif.isRead ? 'bg-white border border-black' : 'bg-purple-50'}`}>
               <div className="flex justify-between items-center">
                 <div>
                   <h3 className="font-semibold">{notif.title}</h3>
@@ -179,16 +179,16 @@ const HodNotifications = () => {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-sm text-gray-600">Title</label>
-              <input value={formData.title} name="title" onChange={handleChange} className="w-full border border-gray-300 rounded-lg px-3 py-2" required />
+              <input value={formData.title} name="title" onChange={handleChange} className="w-full border border-black rounded-lg px-3 py-2" required />
             </div>
             <div>
               <label className="block text-sm text-gray-600">Message</label>
-              <textarea value={formData.message} name="message" onChange={handleChange} className="w-full border border-gray-300 rounded-lg px-3 py-2" rows={4} required />
+              <textarea value={formData.message} name="message" onChange={handleChange} className="w-full border border-black rounded-lg px-3 py-2" rows={4} required />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
                 <label className="block text-sm text-gray-600">Role (Optional)</label>
-                <select name="role" value={formData.role} onChange={handleChange} className="w-full border border-gray-300 rounded-lg px-3 py-2">
+                <select name="role" value={formData.role} onChange={handleChange} className="w-full border border-black rounded-lg px-3 py-2">
                   <option value="">General (all users)</option>
                   <option value="student">Student</option>
                   <option value="lecturer">Lecturer</option>
@@ -199,12 +199,12 @@ const HodNotifications = () => {
               </div>
               <div>
                 <label className="block text-sm text-gray-600">Link (Optional)</label>
-                <input value={formData.link} name="link" onChange={handleChange} className="w-full border border-gray-300 rounded-lg px-3 py-2" />
+                <input value={formData.link} name="link" onChange={handleChange} className="w-full border border-black rounded-lg px-3 py-2" />
               </div>
             </div>
 
             <div className="flex justify-end gap-2">
-              <button type="button" onClick={() => setShowModal(false)} className="px-4 py-2 border border-gray-300 rounded-lg">
+              <button type="button" onClick={() => setShowModal(false)} className="px-4 py-2 border border-black rounded-lg">
                 Cancel
               </button>
               <button type="submit" disabled={sending} className="px-4 py-2 bg-purple-600 text-white rounded-lg">

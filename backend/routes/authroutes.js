@@ -12,10 +12,11 @@ const registerValidation = [
   body('role').isIn(['student', 'lecturer', 'admin', 'hod', 'dean', 'registrar', 'bursar', 'exam_officer', 'librarian']).withMessage('Invalid role'),
   body('studentId').if(body('role').equals('student')).notEmpty().withMessage('Student ID is required for students'),
   body('lecturerId').if(body('role').isIn(['lecturer', 'hod', 'dean', 'registrar', 'bursar', 'exam_officer', 'librarian'])).notEmpty().withMessage('Employee ID is required for staff roles'),
-  body('department').if(body('role').not().equals('admin')).notEmpty().withMessage('Department is required'),
-  body('semester').if(body('role').equals('student')).isInt({ min: 1, max: 8 }).withMessage('Semester must be between 1-8'),
-  body('yearOfStudy').if(body('role').equals('student')).isInt({ min: 1, max: 5 }).withMessage('Year of study must be between 1-5'),
-  body('gender').optional().isIn(['male', 'female', 'other']).withMessage('Gender must be male, female, or other')
+  body('department').if(body('role').not().isIn(['admin', 'registrar', 'bursar', 'exam_officer', 'librarian'])).notEmpty().withMessage('Department is required'),
+  body('batch').if(body('role').equals('student')).notEmpty().withMessage('Batch is required for students'),
+  body('semester').if(body('role').equals('student')).optional({ values: 'falsy' }).isInt({ min: 1, max: 8 }).withMessage('Semester must be between 1-8'),
+  body('yearOfStudy').if(body('role').equals('student')).optional({ values: 'falsy' }).isInt({ min: 1, max: 5 }).withMessage('Year of study must be between 1-5'),
+  body('gender').optional({ values: 'falsy' }).isIn(['male', 'female', 'other']).withMessage('Gender must be male, female, or other')
 ];
 
 // Validation rules for login
@@ -36,9 +37,9 @@ router.use(protect);
 // User profile routes
 router.get('/me', authController.getMe);
 
-// Admin, HOD, Dean, Registrar, and Lecturer routes
-router.get('/users', authorize('admin', 'hod', 'dean', 'registrar', 'lecturer'), authController.getAllUsers);
-router.get('/users/:id', authorize('admin', 'dean', 'hod', 'registrar', 'lecturer'), authController.getUserById);
+// Admin, HOD, Dean, Registrar, Lecturer, and Student routes
+router.get('/users', authorize('admin', 'hod', 'dean', 'registrar', 'lecturer', 'student'), authController.getAllUsers);
+router.get('/users/:id', authorize('admin', 'dean', 'hod', 'registrar', 'lecturer', 'student'), authController.getUserById);
 router.put('/users/:id', authorize('admin', 'dean', 'hod', 'registrar'), authController.updateUser);
 router.put('/users/:id/toggle-status', authorize('admin', 'dean', 'hod', 'registrar'), authController.toggleUserStatus);
 router.delete('/users/:id', authorize('admin'), authController.deleteUser);

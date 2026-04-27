@@ -44,90 +44,102 @@ const ResetPassword = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-800 via-purple-700 to-pink-600 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full">
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center h-20 w-20 rounded-full bg-white bg-opacity-20 backdrop-blur-lg mb-4 shadow-xl">
-             <div className="bg-white p-4 rounded-full shadow-lg">
-                <FiLock className="h-8 w-8 text-pink-600" />
-             </div>
+    <div className="min-h-screen flex flex-col bg-white">
+      {/* Top Navbar */}
+      <nav className="w-full bg-white shadow-sm border-b border-black fixed top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-start">
+          <div className="flex items-center space-x-4">
+            <img src="/esn.webp" alt="Eastern University Logo" className="h-14 w-14 object-contain rounded-full shadow-sm bg-white p-1 border border-black" />
+            <h1 className="text-slate-900 text-lg sm:text-2xl font-bold tracking-wide uppercase">
+              Trincomalee Campus Eastern University MIS Portal
+            </h1>
           </div>
-          <h2 className="text-4xl font-extrabold text-white mb-2 tracking-tight">
-            Reset Password
-          </h2>
-          <p className="text-lg text-white text-opacity-80">
-            Securely update your portal credentials.
-          </p>
         </div>
+      </nav>
 
-        <div className="bg-white bg-opacity-10 backdrop-blur-lg rounded-3xl shadow-2xl p-10 border border-white border-opacity-20 animate-fade-in">
-          {!submitted ? (
-            <form className="space-y-6" onSubmit={handleSubmit}>
-              <div>
-                <label className="block text-sm font-black text-white mb-3 uppercase tracking-widest">
-                  New Password
-                </label>
-                <div className="relative">
-                  <FiLock className="absolute top-1/2 left-4 -translate-y-1/2 text-white/50" />
-                  <input
-                    name="password"
-                    type={showPassword ? 'text' : 'password'}
-                    required
-                    value={formData.password}
-                    onChange={handleChange}
-                    className="block w-full pl-12 pr-12 py-4 border border-white/20 rounded-2xl bg-white/10 text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-white transition-all font-mono"
-                    placeholder="••••••••"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute top-1/2 right-4 -translate-y-1/2 text-white/50 hover:text-white"
-                  >
-                    {showPassword ? <FiEyeOff /> : <FiEye />}
-                  </button>
+      <div className="flex-grow flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 mt-20">
+        <div className="max-w-md w-full">
+          <div className="text-center mb-8">
+            <h2 className="text-4xl font-extrabold text-slate-900 mb-2">
+              Reset Password
+            </h2>
+            <p className="text-lg text-slate-500">
+              Securely update your portal credentials.
+            </p>
+          </div>
+
+          <div className="bg-white rounded-2xl shadow-xl p-8 border border-black">
+            {!submitted ? (
+              <form className="space-y-6" onSubmit={handleSubmit}>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-3 uppercase tracking-widest">
+                    New Password
+                  </label>
+                  <div className="relative">
+                    <FiLock className="absolute top-1/2 left-4 -translate-y-1/2 text-slate-400" />
+                    <input
+                      name="password"
+                      type={showPassword ? 'text' : 'password'}
+                      required
+                      value={formData.password}
+                      onChange={handleChange}
+                      className="block w-full pl-12 pr-12 py-4 border border-black rounded-lg bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-red-900 transition-all font-mono"
+                      placeholder="••••••••"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute top-1/2 right-4 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                    >
+                      {showPassword ? <FiEyeOff /> : <FiEye />}
+                    </button>
+                  </div>
                 </div>
-              </div>
 
-              <div>
-                <label className="block text-sm font-black text-white mb-3 uppercase tracking-widest">
-                  Confirm Password
-                </label>
-                <div className="relative">
-                  <FiLock className="absolute top-1/2 left-4 -translate-y-1/2 text-white/50" />
-                  <input
-                    name="confirmPassword"
-                    type={showPassword ? 'text' : 'password'}
-                    required
-                    value={formData.confirmPassword}
-                    onChange={handleChange}
-                    className="block w-full pl-12 pr-12 py-4 border border-white/20 rounded-2xl bg-white/10 text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-white transition-all font-mono"
-                    placeholder="••••••••"
-                  />
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-3 uppercase tracking-widest">
+                    Confirm Password
+                  </label>
+                  <div className="relative">
+                    <FiLock className="absolute top-1/2 left-4 -translate-y-1/2 text-slate-400" />
+                    <input
+                      name="confirmPassword"
+                      type={showPassword ? 'text' : 'password'}
+                      required
+                      value={formData.confirmPassword}
+                      onChange={handleChange}
+                      className="block w-full pl-12 pr-12 py-4 border border-black rounded-lg bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-red-900 transition-all font-mono"
+                      placeholder="••••••••"
+                    />
+                  </div>
                 </div>
-              </div>
 
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full py-4 px-4 rounded-2xl shadow-xl text-sm font-black text-white bg-gradient-to-r from-pink-600 to-indigo-600 hover:scale-105 active:scale-95 transition-all transform disabled:opacity-50 uppercase tracking-widest"
-              >
-                {loading ? 'Securing Update...' : 'Update Password'}
-              </button>
-            </form>
-          ) : (
-            <div className="text-center py-10">
-              <div className="flex justify-center mb-6 text-emerald-400">
-                <FiCheckCircle className="h-20 w-20 animate-bounce" />
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full flex justify-center py-4 px-4 rounded-lg shadow-sm text-sm font-black text-white bg-red-900 hover:bg-red-800 border border-black focus:outline-none transition-all transform hover:-translate-y-0.5 disabled:opacity-50 uppercase tracking-widest"
+                >
+                  {loading ? 'Securing Update...' : 'Update Password'}
+                </button>
+
+                <div className="text-center mt-6">
+                  <Link to="/login" className="inline-flex items-center text-sm font-bold text-slate-600 hover:text-red-900 transition-all gap-2">
+                    Back to Login
+                  </Link>
+                </div>
+              </form>
+            ) : (
+              <div className="text-center py-10">
+                <div className="flex justify-center mb-6 text-emerald-600">
+                  <FiCheckCircle className="h-16 w-16" />
+                </div>
+                <h3 className="text-2xl font-bold text-slate-900 mb-4 uppercase tracking-widest">Success!</h3>
+                <p className="text-slate-600 mb-8 font-medium">
+                  Your password has been securely updated. Redirecting to login...
+                </p>
               </div>
-              <h3 className="text-2xl font-black text-white mb-4 uppercase tracking-widest">Success!</h3>
-              <p className="text-white text-opacity-80 mb-8 font-medium">
-                Your password has been securely updated. Redirecting to login...
-              </p>
-              <div className="w-full bg-white/10 h-1 rounded-full overflow-hidden">
-                <div className="h-full bg-emerald-400 animate-loading-bar"></div>
-              </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
     </div>

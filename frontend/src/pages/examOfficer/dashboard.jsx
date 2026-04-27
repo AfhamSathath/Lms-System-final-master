@@ -49,7 +49,7 @@ const ExamOfficerDashboard = () => {
              <input 
                 type="text" 
                 placeholder="Search Student Index or Script Batch ID..." 
-                className="w-full bg-white pl-14 pr-8 py-4 rounded-3xl shadow-sm border border-gray-100 focus:outline-none focus:ring-4 focus:ring-indigo-100 transition-all font-bold placeholder:text-gray-300"
+                className="w-full bg-white pl-14 pr-8 py-4 rounded-3xl shadow-sm border border-black focus:outline-none focus:ring-4 focus:ring-indigo-100 transition-all font-bold placeholder:text-gray-300"
              />
           </div>
         </div>
@@ -70,7 +70,7 @@ const ExamOfficerDashboard = () => {
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.1 }}
-            className="bg-white p-10 rounded-[45px] shadow-sm border border-gray-100 flex items-center gap-8 relative overflow-hidden group"
+            className="bg-white p-10 rounded-[45px] shadow-sm border border-black flex items-center gap-8 relative overflow-hidden group"
           >
             <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity transform rotate-12 scale-150">
                <stat.icon size={100} />
@@ -86,7 +86,7 @@ const ExamOfficerDashboard = () => {
         ))}
       </div>
 
-      <div className="bg-white p-12 rounded-[50px] shadow-sm border border-gray-100">
+      <div className="bg-white p-12 rounded-[50px] shadow-sm border border-black">
          <div className="flex justify-between items-center mb-10">
             <h2 className="text-2xl font-black text-[#1B2559] uppercase tracking-wide">Live Marking Queue</h2>
             <p className="text-indigo-600 font-black cursor-pointer hover:underline cursor-pointer">View Global Schedule</p>
@@ -116,7 +116,7 @@ const ExamOfficerDashboard = () => {
                   </div>
                   
                   <button className={`w-full py-4 rounded-2xl font-black transition-all ${
-                     item.progress === 100 ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20' : 'bg-white text-[#1B2559] border border-gray-200'
+                     item.progress === 100 ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20' : 'bg-white text-[#1B2559] border border-black'
                   }`}>
                      {item.progress === 100 ? 'Certify Grade Book' : 'Track Marker Daily'}
                   </button>

@@ -47,15 +47,15 @@ router.post(
     body('role').isIn(['student', 'lecturer', 'admin', 'hod', 'dean', 'registrar', 'bursar', 'exam_officer', 'librarian']).withMessage('Invalid role'),
     body('studentId').if(body('role').equals('student')).notEmpty().withMessage('Student ID is required for students'),
     body('lecturerId').if(body('role').isIn(['lecturer', 'hod', 'dean', 'registrar', 'bursar', 'exam_officer', 'librarian'])).notEmpty().withMessage('Employee ID is required for staff roles'),
-    body('department').if(body('role').not().equals('admin')).notEmpty().withMessage('Department is required'),
+    body('department').if(body('role').not().isIn(['admin', 'registrar', 'bursar', 'exam_officer', 'librarian'])).notEmpty().withMessage('Department is required'),
 
-    body('qualifications').optional().isString().withMessage('Qualifications must be a string'),
-    body('specialization').optional().isString().withMessage('Specialization must be a string'),
-    body('gender').optional().isIn(['male', 'female', 'other']).withMessage('Gender must be male, female, or other'),
-    body('phone').optional().isMobilePhone().withMessage('Invalid phone number'),
-    body('address').optional().isString().withMessage('Address must be a string'),
-    body('emergencyContact').optional().isString().withMessage('Emergency contact must be a string'),
-    body('emergencyContactPhone').optional().isMobilePhone().withMessage('Invalid emergency contact phone')
+    body('qualifications').optional({ values: 'falsy' }).isString().withMessage('Qualifications must be a string'),
+    body('specialization').optional({ values: 'falsy' }).isString().withMessage('Specialization must be a string'),
+    body('gender').optional({ values: 'falsy' }).isIn(['male', 'female', 'other']).withMessage('Gender must be male, female, or other'),
+    body('phone').optional({ values: 'falsy' }).isMobilePhone().withMessage('Invalid phone number'),
+    body('address').optional({ values: 'falsy' }).isString().withMessage('Address must be a string'),
+    body('emergencyContact').optional({ values: 'falsy' }).isString().withMessage('Emergency contact must be a string'),
+    body('emergencyContactPhone').optional({ values: 'falsy' }).isMobilePhone().withMessage('Invalid emergency contact phone')
   ],
   userController.registerUser
 );
@@ -82,18 +82,18 @@ router.post(
     body('role').isIn(['student', 'lecturer', 'admin', 'hod', 'dean', 'registrar', 'bursar', 'exam_officer', 'librarian']).withMessage('Invalid role'),
     body('studentId').if(body('role').equals('student')).notEmpty().withMessage('Student ID is required for students'),
     body('lecturerId').if(body('role').isIn(['lecturer', 'hod', 'dean', 'registrar', 'bursar', 'exam_officer', 'librarian'])).notEmpty().withMessage('Employee ID is required for staff roles'),
-    body('department').if(body('role').not().equals('admin')).notEmpty().withMessage('Department is required'),
+    body('department').if(body('role').not().isIn(['admin', 'registrar', 'bursar', 'exam_officer', 'librarian'])).notEmpty().withMessage('Department is required'),
     body('batch').if(body('role').equals('student')).notEmpty().withMessage('Batch is required for students'),
-    body('yearOfStudy').if(body('role').equals('student')).optional().isInt({ min: 1, max: 5 }).withMessage('Year of study must be between 1-5'),
-    body('semester').if(body('role').equals('student')).optional().isInt({ min: 1, max: 8 }).withMessage('Semester must be between 1-8'),
+    body('yearOfStudy').if(body('role').equals('student')).optional({ values: 'falsy' }).isInt({ min: 1, max: 5 }).withMessage('Year of study must be between 1-5'),
+    body('semester').if(body('role').equals('student')).optional({ values: 'falsy' }).isInt({ min: 1, max: 8 }).withMessage('Semester must be between 1-8'),
 
-    body('qualifications').optional().isString().withMessage('Qualifications must be a string'),
-    body('specialization').optional().isString().withMessage('Specialization must be a string'),
-    body('gender').optional().isIn(['male', 'female', 'other']).withMessage('Gender must be male, female, or other'),
-    body('phone').optional().isMobilePhone().withMessage('Invalid phone number'),
-    body('address').optional().isString().withMessage('Address must be a string'),
-    body('emergencyContact').optional().isString().withMessage('Emergency contact must be a string'),
-    body('emergencyContactPhone').optional().isMobilePhone().withMessage('Invalid emergency contact phone')
+    body('qualifications').optional({ values: 'falsy' }).isString().withMessage('Qualifications must be a string'),
+    body('specialization').optional({ values: 'falsy' }).isString().withMessage('Specialization must be a string'),
+    body('gender').optional({ values: 'falsy' }).isIn(['male', 'female', 'other']).withMessage('Gender must be male, female, or other'),
+    body('phone').optional({ values: 'falsy' }).isMobilePhone().withMessage('Invalid phone number'),
+    body('address').optional({ values: 'falsy' }).isString().withMessage('Address must be a string'),
+    body('emergencyContact').optional({ values: 'falsy' }).isString().withMessage('Emergency contact must be a string'),
+    body('emergencyContactPhone').optional({ values: 'falsy' }).isMobilePhone().withMessage('Invalid emergency contact phone')
   ],
   userController.createUser
 );
@@ -139,14 +139,14 @@ router.post(
     body('name').notEmpty(),
     body('email').isEmail(),
     body('password').isLength({ min: 6 }),
-    body('role').isIn(['student', 'lecturer', 'admin', 'hod', 'dean']),
+    body('role').isIn(['student', 'lecturer', 'admin', 'hod', 'dean', 'registrar', 'bursar', 'exam_officer', 'librarian']),
     body('studentId').if(body('role').equals('student')).notEmpty(),
-    body('lecturerId').if(body('role').equals('lecturer')).notEmpty(),
-    body('department').if(body('role').not().equals('admin')).notEmpty(),
+    body('lecturerId').if(body('role').isIn(['lecturer', 'hod', 'dean', 'registrar', 'bursar', 'exam_officer', 'librarian'])).notEmpty(),
+    body('department').if(body('role').not().isIn(['admin', 'registrar', 'bursar', 'exam_officer', 'librarian'])).notEmpty(),
 
-    body('qualifications').if(body('role').equals('lecturer')).notEmpty(),
-    body('specialization').if(body('role').equals('lecturer')).notEmpty(),
-    body('gender').isIn(['male', 'female', 'other'])
+    body('qualifications').optional({ values: 'falsy' }),
+    body('specialization').optional({ values: 'falsy' }),
+    body('gender').optional({ values: 'falsy' }).isIn(['male', 'female', 'other'])
   ],
   userController.createUser
 );

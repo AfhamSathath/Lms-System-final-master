@@ -51,7 +51,7 @@ const LecturerProgress = () => {
       ) : (
         <div className="bg-white rounded-xl shadow-md overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gray-50 border-b">
+            <thead className="bg-white border-b">
               <tr>
                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Subject</th>
                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700">Year/Sem</th>
@@ -61,7 +61,7 @@ const LecturerProgress = () => {
             </thead>
             <tbody>
               {assignments.map(a => (
-                <tr key={a._id} className="border-b hover:bg-gray-50">
+                <tr key={a._id} className="border-b hover:bg-white">
                   <td className="px-6 py-4">{a.subject?.name || 'N/A'}</td>
                   <td className="px-6 py-4 text-sm">
                     {a.academicYear} / Sem {a.semester}
@@ -80,7 +80,7 @@ const LecturerProgress = () => {
                   <td className="px-6 py-4 text-sm">
                     <button
                       onClick={() => setSelected(a)}
-                      className="text-blue-600 hover:text-blue-800 flex items-center gap-1"
+                      className="text-blue-600 hover:text-slate-800 flex items-center gap-1"
                     >
                       <FiTrendingUp /> Update
                     </button>
@@ -168,7 +168,7 @@ const ProgressModal = ({ assignment, onCancel, onSubmit }) => {
             <button
               type="button"
               onClick={onCancel}
-              className="px-6 py-2 border rounded-lg text-gray-700 hover:bg-gray-50"
+              className="px-6 py-2 border rounded-lg text-gray-700 hover:bg-white"
             >
               Cancel
             </button>

@@ -75,8 +75,9 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           {
             category: 'Academics',
             items: [
-
-              { name: 'Upload Materials', path: 'files', icon: FiUpload },
+              { name: 'Subject Materials', path: 'subjectMaterials', icon: FiBook },
+              { name: 'Assignments', path: 'assignments', icon: FiClipboard },
+              { name: 'File Storage', path: 'files', icon: FiUpload },
               { name: 'Exam Schedule', path: 'timetable', icon: FiCalendar },
             ]
           },
@@ -84,6 +85,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
             category: 'Student Management',
             items: [
               { name: 'Subject Enrollment', path: 'enrollment', icon: FiUsers },
+              { name: 'Global Attendance', path: 'attendance-details', icon: FiCheckSquare },
               { name: 'Student Results', path: 'results', icon: FiStar },
               { name: 'Progress', path: 'progress', icon: FiTrendingUp },
             ]
@@ -182,7 +184,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           {
             category: 'Personnel', items: [
               { name: 'User Management', path: 'users', icon: FiUsers },
-              { name: 'File Management', path: 'files', icon: FiFile },
+
             ]
           },
           {
@@ -218,28 +220,36 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
 
         return [
           { category: 'Main', items: common },
-          { category: 'Portfolio Management', items: [
-            { name: 'Curriculum & Subjects', path: 'subjects', icon: FiLayers },
-            { name: 'Staff Assignments', path: 'lecturers', icon: FiBriefcase },
-            { name: 'Student Roster', path: 'students', icon: FiUsers },
-            { name: 'Staff Directory', path: 'staff', icon: FiUsers },
-          ]},
-          { category: 'Academic Review', items: [
-            { name: 'Attendance Oversight', path: 'attendance-review', icon: FiCheckSquare },
-            { name: 'Student Results', path: 'results', icon: FiTrendingUp },
-            { name: 'Medical Approvals', path: 'medical', icon: FiActivity },
-            { name: 'Repeat Registrations', path: 'repeats', icon: FiRefreshCw },
-          ]},
-          { category: 'My Teaching Office', items: [
-            ...(hodDynamicSubjects.length > 0 ? hodDynamicSubjects : []),
-            { name: 'Course Enrollment', path: 'enrollment', icon: FiPlus },
-            { name: 'Lecture materials', path: 'files', icon: FiUpload },
-          ]},
-          { category: 'Administration', items: [
-            { name: 'Exam Timetable', path: 'timetable', icon: FiCalendar },
-            { name: 'Notifications', path: 'notifications', icon: FiBell },
-            { name: 'My Profile', path: 'profile', icon: FiUser }
-          ]}
+          {
+            category: 'Portfolio Management', items: [
+              { name: 'Curriculum & Subjects', path: 'subjects', icon: FiLayers },
+              { name: 'Staff Assignments', path: 'lecturers', icon: FiBriefcase },
+              { name: 'Student Roster', path: 'students', icon: FiUsers },
+              { name: 'Staff Directory', path: 'staff', icon: FiUsers },
+            ]
+          },
+          {
+            category: 'Academic Review', items: [
+              { name: 'Attendance Oversight', path: 'attendance-review', icon: FiCheckSquare },
+              { name: 'Student Results', path: 'results', icon: FiTrendingUp },
+              { name: 'Medical Approvals', path: 'medical', icon: FiActivity },
+              { name: 'Repeat Registrations', path: 'repeats', icon: FiRefreshCw },
+            ]
+          },
+          {
+            category: 'My Teaching Office', items: [
+              ...(hodDynamicSubjects.length > 0 ? hodDynamicSubjects : []),
+              { name: 'Course Enrollment', path: 'enrollment', icon: FiPlus },
+              { name: 'Lecture materials', path: 'files', icon: FiUpload },
+            ]
+          },
+          {
+            category: 'Administration', items: [
+              { name: 'Exam Timetable', path: 'timetable', icon: FiCalendar },
+              { name: 'Notifications', path: 'notifications', icon: FiBell },
+              { name: 'My Profile', path: 'profile', icon: FiUser }
+            ]
+          }
         ];
       case 'dean':
         return [...common,
@@ -248,6 +258,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         { name: 'Faculty Roster', path: 'roster', icon: FiUsers },
         { name: 'Attendance Oversight', path: 'attendance', icon: FiCheckSquare },
         { name: 'Quality Audit', path: 'audit', icon: FiCheckSquare },
+        { name: 'Exam Timetable', path: 'timetables', icon: FiCalendar },
         { name: 'Reports', path: 'reports', icon: FiBarChart2 },
         { name: 'My Profile', path: 'profile', icon: FiUser }
         ];
@@ -295,17 +306,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
   };
 
   const getRoleColor = () => {
-    switch (user?.role) {
-      case 'student': return 'from-blue-600 to-purple-600';
-      case 'lecturer': return 'from-emerald-600 to-teal-700';
-      case 'admin': return 'from-purple-600 to-pink-600';
-      case 'hod': return 'from-yellow-500 to-amber-600';
-      case 'dean': return 'from-red-600 to-rose-700';
-      case 'registrar': return 'from-cyan-600 to-blue-600';
-      case 'bursar': return 'from-emerald-600 to-green-600';
-      case 'exam_officer': return 'from-indigo-600 to-violet-700';
-      default: return 'from-gray-600 to-gray-800';
-    }
+    return 'from-red-700 to-red-800';
   };
 
   const renderNavItem = (item, parentCategoryIndex = null, itemIndex = null) => {
@@ -318,13 +319,13 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           <button
             onClick={() => toggleSecondaryMenu(item.name)}
             className={`w-full flex items-center mx-2 px-3 py-2.5 rounded-xl transition-all duration-300 group
-                 ${isExpanded ? 'bg-slate-100 text-emerald-700' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'}`}
+                 ${isExpanded ? 'bg-red-900 text-white' : 'text-red-100 hover:bg-red-900/50 hover:text-white'}`}
           >
-            <Icon className={`h-[18px] w-[18px] ${isOpen ? 'mr-3' : 'mx-auto'} text-slate-500 group-hover:text-emerald-500 transition-colors`} />
+            <Icon className={`h-[18px] w-[18px] ${isOpen ? 'mr-3' : 'mx-auto'} text-red-200 group-hover:text-white transition-colors`} />
             {isOpen && <span className="text-[14px] font-medium tracking-wide truncate">{item.name}</span>}
             {isOpen && (
               <span className="ml-auto">
-                {isExpanded ? <FiChevronUp className="h-4 w-4" /> : <FiChevronDown className="h-4 w-4 text-slate-400" />}
+                {isExpanded ? <FiChevronUp className="h-4 w-4" /> : <FiChevronDown className="h-4 w-4 text-red-300" />}
               </span>
             )}
           </button>
@@ -339,7 +340,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                     <Link
                       to={`/${user.role === 'admin' ? 'registrar' : user.role}/${subItem.path}`}
                       className={`flex items-center px-3 py-2 rounded-lg transition-colors text-xs font-semibold
-                            ${isSubActive ? `text-emerald-600 bg-emerald-50/50` : 'text-slate-500 hover:bg-slate-50 hover:text-emerald-600'}`}
+                            ${isSubActive ? `text-white bg-red-800` : 'text-red-200 hover:bg-red-900/50 hover:text-white'}`}
                     >
                       <SubIcon className="h-3.5 w-3.5 mr-2" />
                       {subItem.name}
@@ -362,7 +363,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           className={`flex items-center mx-2 px-3 py-2.5 rounded-xl transition-all duration-300 group relative
             ${isActive
               ? `bg-gradient-to-r ${getRoleColor()} text-white shadow-md`
-              : 'text-slate-600 hover:bg-slate-100/80 hover:text-slate-900'}`}
+              : 'text-red-100 hover:bg-red-900/50 hover:text-white'}`}
           title={!isOpen ? item.name : ''}
         >
           <Icon className={`h-[18px] w-[18px] transition-transform duration-300 ${!isActive && 'group-hover:scale-110'} ${isOpen ? 'mr-3' : 'mx-auto'}`} />
@@ -385,34 +386,34 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       )}
 
       <aside
-        className={`fixed top-0 left-0 z-30 h-screen transition-all duration-300 ease-in-out
-        ${isOpen ? 'w-64' : 'w-20'} bg-white border-r border-slate-200/80 shadow-[4px_0_24px_rgba(0,0,0,0.02)] text-slate-800 flex flex-col`}
+        className={`fixed top-0 left-0 z-40 h-screen transition-all duration-300 ease-in-out
+        ${isOpen ? 'w-64' : 'w-20'} bg-red-950 border-r border-red-900 shadow-md text-slate-100 flex flex-col`}
       >
         <button
           onClick={toggleSidebar}
-          className={`absolute -right-4 top-10 bg-white rounded-full w-8 h-8 flex items-center justify-center shadow-[0_4px_12px_rgba(0,0,0,0.08)] border border-slate-200/50 hover:bg-slate-50 hover:scale-110 transition-all duration-300 z-50 lg:flex hidden group`}
+          className={`absolute -right-4 top-10 bg-red-900 rounded-full w-8 h-8 flex items-center justify-center shadow-md border border-red-800 hover:bg-red-800 hover:scale-110 transition-all duration-300 z-50 lg:flex hidden group`}
           aria-label={isOpen ? "Collapse Sidebar" : "Expand Sidebar"}
         >
-          <div className="text-slate-500 transition-transform duration-500 group-hover:text-emerald-600">
+          <div className="text-red-100 transition-transform duration-500 group-hover:text-white">
             {isOpen ? <FiChevronLeft className="h-5 w-5" /> : <FiChevronRight className="h-5 w-5" />}
           </div>
         </button>
 
-        <div className={`flex items-center justify-center py-6 border-b border-slate-100 ${isOpen ? 'px-4' : 'px-2'}`}>
+        <div className={`flex items-center justify-center py-6 border-b border-red-900/50 ${isOpen ? 'px-4' : 'px-2'}`}>
           <div className={`bg-gradient-to-br ${getRoleColor()} rounded-xl flex items-center justify-center shadow-sm
             ${isOpen ? 'w-10 h-10' : 'w-10 h-10'}`}>
             <span className="text-white font-bold text-lg tracking-wider">LMS</span>
           </div>
           {isOpen && (
             <div className="ml-3 flex flex-col">
-              <span className="font-bold text-slate-900 text-[15px] leading-tight">EUSL Portal</span>
-              <span className="text-xs text-slate-500 font-medium capitalize tracking-wide">{['admin', 'registrar'].includes(user.role) ? 'Registrar' : user.role}</span>
+              <span className="font-bold text-white text-[15px] leading-tight">EUSL Portal</span>
+              <span className="text-xs text-red-200 font-medium capitalize tracking-wide">{['admin', 'registrar'].includes(user.role) ? 'Registrar' : user.role}</span>
             </div>
           )}
         </div>
 
         <div className={`py-4 ${isOpen ? 'px-4' : 'px-2'} mb-2`}>
-          <div className={`flex items-center ${!isOpen && 'justify-center'} p-2 rounded-2xl bg-slate-50 border border-slate-100/50`}>
+          <div className={`flex items-center ${!isOpen && 'justify-center'} p-2 rounded-2xl bg-red-900/40 border border-red-800/50`}>
             <div className={`relative bg-gradient-to-tr ${getRoleColor()} rounded-full flex items-center justify-center overflow-hidden shrink-0 shadow-sm
               ${isOpen ? 'w-10 h-10' : 'w-9 h-9'}`}>
               {user.profilePicture ? (
@@ -428,9 +429,9 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
             </div>
             {isOpen && (
               <div className="ml-3 min-w-0 flex-1">
-                <p className="font-semibold text-slate-800 text-sm truncate">{user.name}</p>
-                <p className="text-[11px] text-slate-500 font-medium truncate flex items-center mt-0.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-green-500 mr-1.5"></span> Online
+                <p className="font-semibold text-white text-sm truncate">{user.name}</p>
+                <p className="text-[11px] text-red-200 font-medium truncate flex items-center mt-0.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-green-400 mr-1.5"></span> Online
                 </p>
               </div>
             )}
@@ -444,10 +445,10 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                 <React.Fragment key={`cat-${index}`}>
                   {isOpen && index !== 0 && (
                     <li className="px-5 pt-4 pb-1">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{categoryGroup.category}</span>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-red-400">{categoryGroup.category}</span>
                     </li>
                   )}
-                  {!isOpen && index !== 0 && <li className="my-3 border-t border-slate-100 mx-4"></li>}
+                  {!isOpen && index !== 0 && <li className="my-3 border-t border-red-900/50 mx-4"></li>}
 
                   {categoryGroup.items.map((item, idx) => renderNavItem(item, index, idx))}
                 </React.Fragment>
@@ -458,11 +459,11 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           </ul>
         </nav>
 
-        <div className="p-3 border-t border-slate-100 bg-slate-50/50 mt-auto">
+        <div className="p-3 border-t border-red-900/50 bg-red-950 mt-auto">
           <button
             onClick={handleLogout}
             className={`flex items-center w-full px-3 py-2.5 rounded-xl transition-all duration-200 group
-              ${isOpen ? 'bg-red-50/50 text-red-600 hover:bg-red-100' : 'justify-center text-red-500 hover:bg-red-50'}`}
+              ${isOpen ? 'bg-red-900 text-red-100 hover:bg-red-800 hover:text-white' : 'justify-center text-red-200 hover:bg-red-800 hover:text-white'}`}
             title={!isOpen ? 'Logout' : ''}
           >
             <FiLogOut className={`h-[18px] w-[18px] transition-transform duration-200 group-hover:-translate-x-1 ${isOpen ? 'mr-3' : ''}`} />

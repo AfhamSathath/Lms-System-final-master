@@ -156,6 +156,10 @@ exports.createRepeatRegistration = async (req, res, next) => {
 
     const registration = await RepeatSubjectRegistration.create(registrationData);
 
+    if (studentUser) {
+      emailService.sendRepeatRegistrationDraftConfirmation(studentUser, registration).catch(err => console.error('Repeat Reg Draft Confirmation Email Failed:', err));
+    }
+
     res.status(201).json({
       success: true,
       data: registration
@@ -206,6 +210,11 @@ exports.submitRepeatRegistration = async (req, res, next) => {
       if (lecturer) {
         await emailService.sendRepeatSubjectSubmissionToLecturer(lecturer, registration);
       }
+    }
+
+    const student = await User.findById(req.user.id);
+    if (student) {
+      await emailService.sendRepeatRegistrationSubmissionConfirmation(student, registration).catch(err => console.error('Repeat Reg Submission Confirmation Email Failed:', err));
     }
 
     res.status(200).json({
@@ -594,7 +603,7 @@ exports.registrarApproveApplication = async (req, res, next) => {
     if (action === 'APPROVE') {
       await emailService.sendRepeatApplicationRegistrarApproved(registration);
     } else {
-      await emailService.sendRepeatApplicationRejected(registration, 'Registrar', reason);
+      await emailService.sendRepeatApplicationRejectedByRegistrar(registration.student, registration, reason).catch(err => console.error('Registrar Rejection Email Failed:', err));
     }
 
     res.status(200).json({
@@ -918,7 +927,13 @@ exports.bursarAllocateFees = async (req, res, next) => {
     await registration.save();
     
     const student = await User.findById(registration.student);
-    await emailService.sendRepeatApplicationFeeAllocated(student, registration);
+    await emailService.sendRepeatApplicationFeeAllocated(student, registration).catch(err => console.error('Fee Allocated Email Failed:', err));
+
+    // Notify Exam Officers about the generated voucher
+    const examOfficers = await User.find({ role: 'exam_officer' });
+    for (const officer of examOfficers) {
+      emailService.sendRepeatPaymentVoucherToExamOfficer(officer, student, registration, invoiceNumber).catch(err => console.error('Voucher Email Failed:', err));
+    }
 
     res.status(200).json({
       success: true,
@@ -1059,7 +1074,8 @@ exports.verifyPayment = async (req, res, next) => {
       });
       
       const student = await User.findById(registration.student);
-      await emailService.sendRepeatFinalApprovalNotification(student, registration);
+      await emailService.sendRepeatFeePaymentConfirmation(student, registration).catch(err => console.error('Fee Receipt Email Failed:', err));
+      await emailService.sendRepeatFinalApprovalNotification(student, registration).catch(err => console.error('Final Approval Email Failed:', err));
     } else {
       registration.registrationStatus = 'REJECTED';
       registration.feeStatus = 'PAYMENT_REJECTED';

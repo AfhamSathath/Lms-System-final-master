@@ -533,24 +533,24 @@ const RegistrarSubjects = () => {
   // Get color for year badge
   const getYearColor = (year) => {
     const colors = {
-      '1st Year': 'bg-blue-100 text-blue-800',
-      '2nd Year': 'bg-green-100 text-green-800',
-      '3rd Year': 'bg-purple-100 text-purple-800',
-      '4th Year': 'bg-orange-100 text-orange-800'
+      '1st Year': 'bg-white border border-black text-slate-800',
+      '2nd Year': 'bg-white border border-black text-slate-800',
+      '3rd Year': 'bg-white border border-black text-slate-800',
+      '4th Year': 'bg-white border border-black text-slate-800'
     };
-    return colors[year] || 'bg-gray-100 text-gray-800';
+    return colors[year] || 'bg-white border border-black text-gray-800';
   };
 
   // Get color for category badge
   const getCategoryColor = (category) => {
     const colors = {
-      'Lecture': 'bg-indigo-100 text-indigo-800',
-      'Practical': 'bg-green-100 text-green-800',
-      'General': 'bg-yellow-100 text-yellow-800',
-      'Management': 'bg-purple-100 text-purple-800',
-      'Project': 'bg-pink-100 text-pink-800'
+      'Lecture': 'bg-white border border-black text-slate-800',
+      'Practical': 'bg-white border border-black text-slate-800',
+      'General': 'bg-white border border-black text-slate-800',
+      'Management': 'bg-white border border-black text-slate-800',
+      'Project': 'bg-white border border-black text-slate-800'
     };
-    return colors[category] || 'bg-gray-100 text-gray-800';
+    return colors[category] || 'bg-white border border-black text-gray-800';
   };
 
   if (loading) return <Loader fullScreen />;
@@ -559,10 +559,10 @@ const RegistrarSubjects = () => {
     <div className="container mx-auto px-4 py-8 transition-all duration-300">
 
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl shadow-xl p-6 mb-8 text-white flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div className="bg-white border border-black rounded-2xl shadow-xl p-6 mb-8 text-slate-900 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div className="flex-1 min-w-0">
           <h1 className="text-2xl md:text-3xl font-bold truncate">Subject Management</h1>
-          <p className="text-blue-100 truncate mt-1">Manage subjects across 3 departments • 4 years • 8 semesters</p>
+          <p className="text-slate-500 truncate mt-1">Manage subjects across 3 departments • 4 years • 8 semesters</p>
         </div>
         <div className="flex flex-wrap gap-3">
           <button
@@ -594,7 +594,7 @@ const RegistrarSubjects = () => {
           </button>
           <button
             onClick={fetchData}
-            className="bg-white text-purple-600 px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors flex items-center text-sm"
+            className="bg-white text-purple-600 px-4 py-2 rounded-lg hover:bg-white border border-black transition-colors flex items-center text-sm"
             title="Refresh"
           >
             <FiRefreshCw className="mr-2" /> Refresh
@@ -654,7 +654,7 @@ const RegistrarSubjects = () => {
               placeholder="Search subjects by name, code, or department..."
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full pl-10 pr-4 py-3 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
             />
           </div>
 
@@ -664,7 +664,7 @@ const RegistrarSubjects = () => {
             <select
               value={selectedYear}
               onChange={e => setSelectedYear(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full pl-10 pr-4 py-3 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
             >
               <option value="all">All Years</option>
               {academicYears.map(year => <option key={year} value={year}>{year}</option>)}
@@ -677,7 +677,7 @@ const RegistrarSubjects = () => {
             <select
               value={selectedSemester}
               onChange={e => setSelectedSemester(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full pl-10 pr-4 py-3 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
             >
               <option value="all">All Semesters</option>
               {semesters.map(sem => <option key={sem} value={sem}>Semester {sem}</option>)}
@@ -690,7 +690,7 @@ const RegistrarSubjects = () => {
             <select
               value={selectedDepartment}
               onChange={e => setSelectedDepartment(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full pl-10 pr-4 py-3 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
             >
               <option value="all">All Departments</option>
               {departments.map(dept => <option key={dept} value={dept}>{dept}</option>)}
@@ -703,7 +703,7 @@ const RegistrarSubjects = () => {
             <select
               value={selectedCategory}
               onChange={e => setSelectedCategory(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full pl-10 pr-4 py-3 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
             >
               <option value="all">All Categories</option>
               {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
@@ -721,7 +721,7 @@ const RegistrarSubjects = () => {
               setSelectedDepartment('all');
               setSelectedCategory('all');
             }}
-            className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+            className="px-4 py-2 bg-white border border-black text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
           >
             Clear All Filters
           </button>
@@ -732,7 +732,7 @@ const RegistrarSubjects = () => {
       <div className="bg-white rounded-xl shadow-lg overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+            <thead className="bg-white">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subject</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Code</th>
@@ -747,10 +747,10 @@ const RegistrarSubjects = () => {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredSubjects.map(s => (
-                <tr key={s._id} className="hover:bg-gray-50">
+                <tr key={s._id} className="hover:bg-white">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
-                      <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
+                      <div className="h-8 w-8 rounded-full bg-white border border-black flex items-center justify-center">
                         <FiBook className="h-4 w-4 text-blue-600" />
                       </div>
                       <div className="ml-3">
@@ -764,11 +764,11 @@ const RegistrarSubjects = () => {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
+                    <span className="px-2 py-1 text-xs font-semibold rounded-full bg-white border border-black text-gray-800">
                       {s.code}
                     </span>
                     {s.practicalCode && (
-                      <span className="ml-1 px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                      <span className="ml-1 px-2 py-1 text-xs font-semibold rounded-full bg-white border border-black text-slate-800">
                         {s.practicalCode}
                       </span>
                     )}
@@ -849,7 +849,7 @@ const RegistrarSubjects = () => {
                 onChange={handleInputChange}
                 required
                 disabled={departmentLocked || user.role === 'hod'}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:bg-gray-100"
+                className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:bg-white border border-black"
               >
                 {departments.map(dept => <option key={dept} value={dept}>{dept}</option>)}
               </select>
@@ -861,7 +861,7 @@ const RegistrarSubjects = () => {
                 value={formData.year}
                 onChange={handleInputChange}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
               >
                 <option value="">Select Year</option>
                 {academicYears.map(year => <option key={year} value={year}>{year}</option>)}
@@ -874,7 +874,7 @@ const RegistrarSubjects = () => {
                 value={formData.semester}
                 onChange={handleInputChange}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
               >
                 <option value="">Select Semester</option>
                 {semesters.map(sem => <option key={sem} value={sem}>Semester {sem}</option>)}
@@ -890,7 +890,7 @@ const RegistrarSubjects = () => {
                 <select
                   onChange={handleSubjectSelect}
                   value={formData.code}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 appearance-none"
+                  className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 appearance-none"
                   disabled={!formData.year || !formData.semester}
                 >
                   <option value="">
@@ -922,7 +922,7 @@ const RegistrarSubjects = () => {
                 onChange={handleInputChange}
                 required
                 placeholder="e.g., Data Structures & Algorithms"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
               />
             </div>
             <div>
@@ -934,7 +934,7 @@ const RegistrarSubjects = () => {
                 onChange={handleInputChange}
                 required
                 placeholder="e.g., CO1222"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
               />
             </div>
             <div>
@@ -948,7 +948,7 @@ const RegistrarSubjects = () => {
                 max="5"
                 required
                 placeholder="3"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
               />
             </div>
             <div>
@@ -958,7 +958,7 @@ const RegistrarSubjects = () => {
                 value={formData.category}
                 onChange={handleInputChange}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
               >
                 {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
               </select>
@@ -969,7 +969,7 @@ const RegistrarSubjects = () => {
                 name="lecturer"
                 value={formData.lecturer}
                 onChange={handleInputChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
               >
                 <option value="">Select Lecturer</option>
                 {lecturers.map(l => (
@@ -989,7 +989,7 @@ const RegistrarSubjects = () => {
                 name="hasPractical"
                 checked={formData.hasPractical}
                 onChange={handleInputChange}
-                className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
+                className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-black rounded"
               />
               <label className="ml-2 block text-sm text-gray-700">
                 This subject has practical work
@@ -1006,7 +1006,7 @@ const RegistrarSubjects = () => {
                     value={formData.practicalCode}
                     onChange={handleInputChange}
                     placeholder="e.g., CO1212"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                   />
                 </div>
               </div>
@@ -1021,7 +1021,7 @@ const RegistrarSubjects = () => {
               onChange={handleInputChange}
               rows="3"
               placeholder="Enter subject description..."
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
             />
           </div>
 
@@ -1029,7 +1029,7 @@ const RegistrarSubjects = () => {
             <button
               type="button"
               onClick={() => { setShowAddModal(false); resetForm(); }}
-              className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+              className="px-4 py-2 border border-black rounded-lg text-gray-700 hover:bg-white"
             >
               Cancel
             </button>
@@ -1060,7 +1060,7 @@ const RegistrarSubjects = () => {
                 onChange={handleInputChange}
                 required
                 disabled={user.role === 'hod'}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:bg-gray-100"
+                className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:bg-white border border-black"
               >
                 {departments.map(dept => <option key={dept} value={dept}>{dept}</option>)}
               </select>
@@ -1072,7 +1072,7 @@ const RegistrarSubjects = () => {
                 value={formData.year}
                 onChange={handleInputChange}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
               >
                 <option value="">Select Year</option>
                 {academicYears.map(year => <option key={year} value={year}>{year}</option>)}
@@ -1085,7 +1085,7 @@ const RegistrarSubjects = () => {
                 value={formData.semester}
                 onChange={handleInputChange}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
               >
                 <option value="">Select Semester</option>
                 {semesters.map(sem => <option key={sem} value={sem}>Semester {sem}</option>)}
@@ -1100,7 +1100,7 @@ const RegistrarSubjects = () => {
                 value={formData.name}
                 onChange={handleInputChange}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
               />
             </div>
             <div>
@@ -1111,7 +1111,7 @@ const RegistrarSubjects = () => {
                 value={formData.code}
                 onChange={handleInputChange}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
               />
             </div>
             <div>
@@ -1124,7 +1124,7 @@ const RegistrarSubjects = () => {
                 min="1"
                 max="5"
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
               />
             </div>
             <div>
@@ -1134,7 +1134,7 @@ const RegistrarSubjects = () => {
                 value={formData.category}
                 onChange={handleInputChange}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
               >
                 {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
               </select>
@@ -1145,7 +1145,7 @@ const RegistrarSubjects = () => {
                 name="lecturer"
                 value={formData.lecturer}
                 onChange={handleInputChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
               >
                 <option value="">Select Lecturer</option>
                 {lecturers.map(l => (
@@ -1165,7 +1165,7 @@ const RegistrarSubjects = () => {
                 name="hasPractical"
                 checked={formData.hasPractical}
                 onChange={handleInputChange}
-                className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
+                className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-black rounded"
               />
               <label className="ml-2 block text-sm text-gray-700">
                 This subject has practical work
@@ -1181,7 +1181,7 @@ const RegistrarSubjects = () => {
                     name="practicalCode"
                     value={formData.practicalCode}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                   />
                 </div>
               </div>
@@ -1195,7 +1195,7 @@ const RegistrarSubjects = () => {
               value={formData.description}
               onChange={handleInputChange}
               rows="3"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
             />
           </div>
 
@@ -1203,7 +1203,7 @@ const RegistrarSubjects = () => {
             <button
               type="button"
               onClick={() => { setShowEditModal(false); setSelectedSubject(null); resetForm(); }}
-              className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+              className="px-4 py-2 border border-black rounded-lg text-gray-700 hover:bg-white"
             >
               Cancel
             </button>
@@ -1235,7 +1235,7 @@ const RegistrarSubjects = () => {
             <select
               value={seedOption}
               onChange={e => setSeedOption(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
             >
               <option value="all">All Departments</option>
               {departments.map(dept => <option key={dept} value={dept}>{dept}</option>)}
@@ -1248,7 +1248,7 @@ const RegistrarSubjects = () => {
                 <FiAlertCircle className="h-5 w-5 text-yellow-400" />
               </div>
               <div className="ml-3">
-                <p className="text-sm text-yellow-700">
+                <p className="text-sm text-slate-700">
                   This action will create multiple subjects at once. Please ensure you want to proceed.
                 </p>
               </div>
@@ -1258,7 +1258,7 @@ const RegistrarSubjects = () => {
           <div className="flex justify-end space-x-3">
             <button
               onClick={() => setShowSeedModal(false)}
-              className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+              className="px-4 py-2 border border-black rounded-lg text-gray-700 hover:bg-white"
             >
               Cancel
             </button>
@@ -1286,7 +1286,7 @@ const RegistrarSubjects = () => {
               type="file"
               accept=".csv"
               onChange={e => setBulkFile(e.target.files[0])}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
             />
             <p className="text-xs text-gray-500 mt-1">
               Upload CSV with columns: name, code, credits, year, semester, department, category, hasPractical, practicalCode, description
@@ -1297,7 +1297,7 @@ const RegistrarSubjects = () => {
             <button
               type="button"
               onClick={handleDownloadTemplate}
-              className="px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 flex items-center"
+              className="px-4 py-2 bg-white border border-black rounded-lg hover:bg-gray-200 flex items-center"
             >
               <FiDownload className="mr-2" /> Download Template
             </button>
@@ -1305,7 +1305,7 @@ const RegistrarSubjects = () => {
               <button
                 type="button"
                 onClick={() => { setShowBulkUploadModal(false); setBulkFile(null); }}
-                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                className="px-4 py-2 border border-black rounded-lg text-gray-700 hover:bg-white"
               >
                 Cancel
               </button>
@@ -1417,7 +1417,7 @@ const RegistrarSubjects = () => {
         <div className="flex justify-end border-t pt-4 mt-4">
           <button
             onClick={() => setShowDepartmentViewModal(false)}
-            className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
+            className="px-4 py-2 bg-white border border-black text-gray-700 rounded-lg hover:bg-gray-200"
           >
             Close
           </button>
@@ -1451,19 +1451,19 @@ const RegistrarSubjects = () => {
                   <div className="p-4">
                     {/* Overview Stats */}
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-                      <div className="bg-gray-50 rounded-lg p-3">
+                      <div className="bg-white rounded-lg p-3">
                         <p className="text-xs text-gray-500">Total Subjects</p>
                         <p className="text-xl font-bold text-gray-800">{yearStats.totalSubjects}</p>
                       </div>
-                      <div className="bg-gray-50 rounded-lg p-3">
+                      <div className="bg-white rounded-lg p-3">
                         <p className="text-xs text-gray-500">Semester 1</p>
                         <p className="text-xl font-bold text-blue-600">{yearStats.semester1}</p>
                       </div>
-                      <div className="bg-gray-50 rounded-lg p-3">
+                      <div className="bg-white rounded-lg p-3">
                         <p className="text-xs text-gray-500">Semester 2</p>
                         <p className="text-xl font-bold text-green-600">{yearStats.semester2}</p>
                       </div>
-                      <div className="bg-gray-50 rounded-lg p-3">
+                      <div className="bg-white rounded-lg p-3">
                         <p className="text-xs text-gray-500">Total Credits</p>
                         <p className="text-xl font-bold text-purple-600">{yearStats.totalCredits}</p>
                       </div>
@@ -1474,7 +1474,7 @@ const RegistrarSubjects = () => {
                       <h4 className="font-semibold mb-2">By Department</h4>
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                         {Object.entries(yearStats.byDepartment).map(([dept, deptStats]) => (
-                          <div key={dept} className="bg-gray-50 rounded-lg p-3">
+                          <div key={dept} className="bg-white rounded-lg p-3">
                             <p className="font-medium text-sm">{dept}</p>
                             <div className="mt-2 space-y-1">
                               <div className="flex justify-between text-xs">
@@ -1546,7 +1546,7 @@ const RegistrarSubjects = () => {
         <div className="flex justify-end border-t pt-4 mt-4">
           <button
             onClick={() => setShowStatsModal(false)}
-            className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
+            className="px-4 py-2 bg-white border border-black text-gray-700 rounded-lg hover:bg-gray-200"
           >
             Close
           </button>

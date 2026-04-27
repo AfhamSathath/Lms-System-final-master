@@ -492,23 +492,23 @@ const HodSubjects = () => {
 
   const getYearColor = (year) => {
     const colors = {
-      '1st Year': 'bg-blue-100 text-blue-800',
-      '2nd Year': 'bg-green-100 text-green-800',
-      '3rd Year': 'bg-purple-100 text-purple-800',
-      '4th Year': 'bg-orange-100 text-orange-800'
+      '1st Year': 'bg-white border border-black text-slate-800',
+      '2nd Year': 'bg-white border border-black text-slate-800',
+      '3rd Year': 'bg-white border border-black text-slate-800',
+      '4th Year': 'bg-white border border-black text-slate-800'
     };
-    return colors[year] || 'bg-gray-100 text-gray-800';
+    return colors[year] || 'bg-white border border-black text-gray-800';
   };
 
   const getCategoryColor = (category) => {
     const colors = {
-      'Lecture': 'bg-indigo-100 text-indigo-800',
-      'Practical': 'bg-green-100 text-green-800',
-      'General': 'bg-yellow-100 text-yellow-800',
-      'Management': 'bg-purple-100 text-purple-800',
-      'Project': 'bg-pink-100 text-pink-800'
+      'Lecture': 'bg-white border border-black text-slate-800',
+      'Practical': 'bg-white border border-black text-slate-800',
+      'General': 'bg-white border border-black text-slate-800',
+      'Management': 'bg-white border border-black text-slate-800',
+      'Project': 'bg-white border border-black text-slate-800'
     };
-    return colors[category] || 'bg-gray-100 text-gray-800';
+    return colors[category] || 'bg-white border border-black text-gray-800';
   };
 
   const handleAssignClick = (subject) => {
@@ -536,10 +536,10 @@ const HodSubjects = () => {
   if (loading) return <Loader fullScreen />;
 
   return (
-    <div className="p-6 bg-slate-50 min-h-screen">
+    <div className="p-6 bg-white min-h-screen">
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
-        <div className="bg-white rounded-[2.5rem] shadow-sm border border-slate-200 p-8 mb-8">
+        <div className="bg-white rounded-[2.5rem] shadow-sm border border-black p-8 mb-8">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
             <div>
               <h1 className="text-3xl font-black text-slate-800 tracking-tighter uppercase">Subject Management</h1>
@@ -554,7 +554,7 @@ const HodSubjects = () => {
               </button>
               <button
                 onClick={fetchData}
-                className="px-6 py-3 bg-indigo-50 text-indigo-600 rounded-2xl font-bold hover:bg-indigo-100 transition-all flex items-center gap-2"
+                className="px-6 py-3 bg-indigo-50 text-indigo-600 rounded-2xl font-bold hover:bg-white border border-black transition-all flex items-center gap-2"
               >
                 <FiRefreshCw /> Refresh
               </button>
@@ -567,7 +567,7 @@ const HodSubjects = () => {
               <input 
                 type="text" 
                 placeholder="Search subjects..."
-                className="pl-12 pr-6 py-4 bg-slate-50 border-none rounded-2xl font-bold focus:ring-2 focus:ring-indigo-500 w-full transition-all shadow-inner"
+                className="pl-12 pr-6 py-4 bg-white border-none rounded-2xl font-bold focus:ring-2 focus:ring-indigo-500 w-full transition-all shadow-inner"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -575,7 +575,7 @@ const HodSubjects = () => {
             <select
               value={selectedYear}
               onChange={e => setSelectedYear(e.target.value)}
-              className="px-6 py-4 bg-slate-50 border-none rounded-2xl font-bold focus:ring-2 focus:ring-indigo-500 w-full transition-all shadow-inner appearance-none cursor-pointer"
+              className="px-6 py-4 bg-white border-none rounded-2xl font-bold focus:ring-2 focus:ring-indigo-500 w-full transition-all shadow-inner appearance-none cursor-pointer"
             >
               <option value="all">All Years</option>
               {academicYears.map(year => <option key={year} value={year}>{year}</option>)}
@@ -583,7 +583,7 @@ const HodSubjects = () => {
             <select
               value={selectedSemester}
               onChange={e => setSelectedSemester(e.target.value)}
-              className="px-6 py-4 bg-slate-50 border-none rounded-2xl font-bold focus:ring-2 focus:ring-indigo-500 w-full transition-all shadow-inner appearance-none cursor-pointer"
+              className="px-6 py-4 bg-white border-none rounded-2xl font-bold focus:ring-2 focus:ring-indigo-500 w-full transition-all shadow-inner appearance-none cursor-pointer"
             >
               <option value="all">All Semesters</option>
               {semesters.map(sem => <option key={sem} value={sem}>Semester {sem}</option>)}
@@ -591,7 +591,7 @@ const HodSubjects = () => {
             <select
               value={selectedCategory}
               onChange={e => setSelectedCategory(e.target.value)}
-              className="px-6 py-4 bg-slate-50 border-none rounded-2xl font-bold focus:ring-2 focus:ring-indigo-500 w-full transition-all shadow-inner appearance-none cursor-pointer"
+              className="px-6 py-4 bg-white border-none rounded-2xl font-bold focus:ring-2 focus:ring-indigo-500 w-full transition-all shadow-inner appearance-none cursor-pointer"
             >
               <option value="all">All Categories</option>
               {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
@@ -608,7 +608,7 @@ const HodSubjects = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.05 }}
-                className="bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-sm hover:shadow-xl transition-all group overflow-hidden relative"
+                className="bg-white rounded-[2.5rem] p-8 border border-black shadow-sm hover:shadow-xl transition-all group overflow-hidden relative"
               >
                 <div className="flex justify-between items-start mb-6">
                   <div className="w-14 h-14 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center text-xl shadow-inner group-hover:bg-indigo-600 group-hover:text-white transition-all duration-500">
@@ -633,9 +633,9 @@ const HodSubjects = () => {
                   <span className="text-[10px] font-black uppercase text-slate-400">{subject.credits} Credits</span>
                 </div>
 
-                <div className="bg-slate-50 rounded-2xl p-4 flex items-center justify-between mb-8 group-hover:bg-indigo-50/50 transition-colors">
+                <div className="bg-white rounded-2xl p-4 flex items-center justify-between mb-8 group-hover:bg-indigo-50/50 transition-colors">
                   <div className="flex items-center gap-3 text-left">
-                    <div className="w-8 h-8 rounded-lg bg-white border border-slate-100 flex items-center justify-center text-xs text-slate-400">
+                    <div className="w-8 h-8 rounded-lg bg-white border border-black flex items-center justify-center text-xs text-slate-400">
                       <FiUser />
                     </div>
                     <div>
@@ -671,7 +671,7 @@ const HodSubjects = () => {
         </div>
 
         {filteredSubjects.length === 0 && (
-          <div className="text-center py-20 bg-white rounded-[2.5rem] mt-8 border border-dashed border-slate-200">
+          <div className="text-center py-20 bg-white rounded-[2.5rem] mt-8 border border-dashed border-black">
             <FiBook className="h-16 w-16 text-slate-200 mx-auto mb-4" />
             <p className="text-slate-400 font-bold mb-6">No subjects found for this criteria</p>
             <button
@@ -699,7 +699,7 @@ const HodSubjects = () => {
                 value={formData.year}
                 onChange={handleInputChange}
                 required
-                className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl font-bold focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-5 py-4 bg-white border-none rounded-2xl font-bold focus:ring-2 focus:ring-indigo-500"
               >
                 <option value="">Select Year</option>
                 {academicYears.map(year => <option key={year} value={year}>{year}</option>)}
@@ -712,7 +712,7 @@ const HodSubjects = () => {
                 value={formData.semester}
                 onChange={handleInputChange}
                 required
-                className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl font-bold focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-5 py-4 bg-white border-none rounded-2xl font-bold focus:ring-2 focus:ring-indigo-500"
               >
                 <option value="">Select Semester</option>
                 {semesters.map(sem => <option key={sem} value={sem}>Semester {sem}</option>)}
@@ -751,7 +751,7 @@ const HodSubjects = () => {
                 onChange={handleInputChange}
                 required
                 placeholder="Full subject name"
-                className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl font-bold focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-5 py-4 bg-white border-none rounded-2xl font-bold focus:ring-2 focus:ring-indigo-500"
               />
             </div>
             <div className="space-y-1">
@@ -763,7 +763,7 @@ const HodSubjects = () => {
                 onChange={handleInputChange}
                 required
                 placeholder="e.g. CO1221"
-                className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl font-bold focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-5 py-4 bg-white border-none rounded-2xl font-bold focus:ring-2 focus:ring-indigo-500"
               />
             </div>
             <div className="space-y-1">
@@ -777,7 +777,7 @@ const HodSubjects = () => {
                 max="8"
                 required
                 placeholder="1-8"
-                className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl font-bold focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-5 py-4 bg-white border-none rounded-2xl font-bold focus:ring-2 focus:ring-indigo-500"
               />
             </div>
             <div className="space-y-1">
@@ -787,7 +787,7 @@ const HodSubjects = () => {
                 value={formData.category}
                 onChange={handleInputChange}
                 required
-                className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl font-bold focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-5 py-4 bg-white border-none rounded-2xl font-bold focus:ring-2 focus:ring-indigo-500"
               >
                 {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
               </select>
@@ -798,7 +798,7 @@ const HodSubjects = () => {
                 name="lecturer"
                 value={formData.lecturer}
                 onChange={handleInputChange}
-                className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl font-bold focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-5 py-4 bg-white border-none rounded-2xl font-bold focus:ring-2 focus:ring-indigo-500"
               >
                 <option value="">Leave Unassigned</option>
                 {lecturers.map(l => (
@@ -810,7 +810,7 @@ const HodSubjects = () => {
             </div>
           </div>
 
-          <div className="bg-slate-50 p-6 rounded-[2rem] space-y-4">
+          <div className="bg-white p-6 rounded-[2rem] space-y-4">
             <div className="flex items-center gap-3">
               <input
                 type="checkbox"
@@ -831,7 +831,7 @@ const HodSubjects = () => {
                   value={formData.practicalCode}
                   onChange={handleInputChange}
                   placeholder="e.g. CO1211"
-                  className="w-full px-5 py-4 bg-white border border-slate-200 rounded-2xl font-bold focus:ring-2 focus:ring-indigo-500 mt-1"
+                  className="w-full px-5 py-4 bg-white border border-black rounded-2xl font-bold focus:ring-2 focus:ring-indigo-500 mt-1"
                 />
               </div>
             )}
@@ -858,7 +858,7 @@ const HodSubjects = () => {
                 value={formData.year}
                 onChange={handleInputChange}
                 required
-                className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl font-bold focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-5 py-4 bg-white border-none rounded-2xl font-bold focus:ring-2 focus:ring-indigo-500"
               >
                 {academicYears.map(year => <option key={year} value={year}>{year}</option>)}
               </select>
@@ -870,7 +870,7 @@ const HodSubjects = () => {
                 value={formData.semester}
                 onChange={handleInputChange}
                 required
-                className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl font-bold focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-5 py-4 bg-white border-none rounded-2xl font-bold focus:ring-2 focus:ring-indigo-500"
               >
                 {semesters.map(sem => <option key={sem} value={sem}>Semester {sem}</option>)}
               </select>
@@ -884,7 +884,7 @@ const HodSubjects = () => {
                 value={formData.name}
                 onChange={handleInputChange}
                 required
-                className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl font-bold focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-5 py-4 bg-white border-none rounded-2xl font-bold focus:ring-2 focus:ring-indigo-500"
               />
             </div>
             <div className="space-y-1">
@@ -895,7 +895,7 @@ const HodSubjects = () => {
                 value={formData.code}
                 onChange={handleInputChange}
                 required
-                className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl font-bold focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-5 py-4 bg-white border-none rounded-2xl font-bold focus:ring-2 focus:ring-indigo-500"
               />
             </div>
             <div className="space-y-1">
@@ -907,7 +907,7 @@ const HodSubjects = () => {
                 onChange={handleInputChange}
                 min="1"
                 required
-                className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl font-bold focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-5 py-4 bg-white border-none rounded-2xl font-bold focus:ring-2 focus:ring-indigo-500"
               />
             </div>
             <div className="space-y-1">
@@ -917,7 +917,7 @@ const HodSubjects = () => {
                 value={formData.category}
                 onChange={handleInputChange}
                 required
-                className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl font-bold focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-5 py-4 bg-white border-none rounded-2xl font-bold focus:ring-2 focus:ring-indigo-500"
               >
                 {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
               </select>
@@ -928,7 +928,7 @@ const HodSubjects = () => {
                 name="lecturer"
                 value={formData.lecturer}
                 onChange={handleInputChange}
-                className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl font-bold focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-5 py-4 bg-white border-none rounded-2xl font-bold focus:ring-2 focus:ring-indigo-500"
               >
                 <option value="">Unassigned</option>
                 {lecturers.map(l => (
@@ -984,14 +984,14 @@ const HodSubjects = () => {
         title="Bulk Import Subjects"
       >
         <form onSubmit={handleBulkUpload} className="space-y-6 pt-4">
-          <div className="p-8 border-4 border-dashed border-slate-100 rounded-[2.5rem] text-center hover:border-indigo-200 transition-colors group relative cursor-pointer">
+          <div className="p-8 border-4 border-dashed border-black rounded-[2.5rem] text-center hover:border-indigo-200 transition-colors group relative cursor-pointer">
             <input
               type="file"
               accept=".csv"
               onChange={e => setBulkFile(e.target.files[0])}
               className="absolute inset-0 opacity-0 cursor-pointer"
             />
-            <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-4 group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors">
+            <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center text-2xl mx-auto mb-4 group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors">
               <FiUpload />
             </div>
             <p className="font-black uppercase text-[10px] tracking-widest text-slate-400">
@@ -1027,7 +1027,7 @@ const HodSubjects = () => {
          <form onSubmit={handleAssignSubmit} className="space-y-6 pt-4">
             <div className="p-6 bg-indigo-50 border border-indigo-100 rounded-[2rem] flex items-center gap-4 mb-4">
                <div className="bg-white p-3 rounded-2xl text-indigo-600 text-xl shadow-sm"><FiInfo /></div>
-               <p className="text-xs font-bold text-indigo-700 leading-tight">Assigning a lecturer gives them grading and enrollment control for this subject.</p>
+               <p className="text-xs font-bold text-slate-700 leading-tight">Assigning a lecturer gives them grading and enrollment control for this subject.</p>
             </div>
 
             <div className="space-y-2">

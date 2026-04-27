@@ -41,13 +41,13 @@ const StudentMahapolaDetails = () => {
       </div>
 
       {applications.length === 0 ? (
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-8 text-center">
+        <div className="bg-white rounded-xl shadow-sm border border-black p-8 text-center">
           <p className="text-slate-500">You have not submitted any applications yet.</p>
         </div>
       ) : (
         <div className="space-y-4">
           {applications.map((app) => (
-            <div key={app._id} className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition">
+            <div key={app._id} className="bg-white rounded-xl shadow-sm border border-black overflow-hidden hover:shadow-md transition">
               <div className="p-6">
                 <div className="flex justify-between items-start mb-4">
                   <div>
@@ -62,7 +62,7 @@ const StudentMahapolaDetails = () => {
                   </span>
                 </div>
                 
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 bg-slate-50 p-4 rounded-lg">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 bg-white p-4 rounded-lg">
                   <div>
                     <p className="text-xs text-slate-500 uppercase tracking-wider">Installment Month</p>
                     <p className="text-sm font-medium text-slate-800 mt-1">{app.installmentMonth}</p>

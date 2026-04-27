@@ -92,12 +92,7 @@ const Navbar = () => {
   };
 
   const getRoleColor = () => {
-    switch (user?.role) {
-      case 'student': return 'bg-blue-600';
-      case 'lecturer': return 'bg-green-600';
-      case 'admin': return 'bg-purple-600';
-      default: return 'bg-gray-600';
-    }
+    return 'bg-red-800';
   };
 
   // Close profile menu when clicking outside
@@ -123,7 +118,7 @@ const Navbar = () => {
     <>
       <Sidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
       <nav
-        className="bg-white/95 border border-slate-200/70 backdrop-blur-xl fixed top-0 right-0 z-30 transition-all duration-300 shadow-[0_20px_60px_-30px_rgba(15,23,42,0.12)]"
+        className="bg-white/95 border border-black/70 backdrop-blur-xl fixed top-0 right-0 z-30 transition-all duration-300 shadow-[0_20px_60px_-30px_rgba(15,23,42,0.12)]"
         style={{ left: getNavbarMargin(), width: `calc(100% - ${getNavbarMargin()})` }}
       >
         <div className="px-4 sm:px-6 lg:px-8 h-full">
@@ -134,7 +129,7 @@ const Navbar = () => {
                 <FiMenu className="h-5 w-5" />
               </button>
 
-              <Link to={getDashboardPath()} className="ml-2 flex items-center hover:text-cyan-600 transition-colors">
+              <Link to={getDashboardPath()} className="ml-2 flex items-center hover:text-slate-800 transition-colors">
                 <FiHome className="h-4 w-4 text-slate-500 mr-2 hidden sm:block" />
                 <div className="min-w-0">
                   <h2 className="text-base sm:text-lg font-semibold text-slate-900 truncate">
@@ -149,10 +144,10 @@ const Navbar = () => {
             <div className="flex items-center space-x-2 sm:space-x-3">
               {/* Notifications */}
               <div className="relative">
-                <Link to={`/${user.role}/notifications`} className="p-2 text-slate-600 hover:text-cyan-600 hover:bg-slate-100 rounded-2xl relative block transition-all duration-200">
+                <Link to={`/${user.role}/notifications`} className="p-2 text-slate-600 hover:text-slate-800 hover:bg-red-50 rounded-2xl relative block transition-all duration-200">
                   <FiBell className="h-5 w-5" />
                   {unreadCount > 0 && (
-                    <span className="absolute -top-1 -right-1 inline-flex items-center justify-center px-1.5 h-5 min-w-[20px] text-xs font-bold leading-none text-white bg-red-500 rounded-full">
+                    <span className="absolute -top-1 -right-1 inline-flex items-center justify-center px-1.5 h-5 min-w-[20px] text-xs font-bold leading-none text-white bg-red-600 rounded-full">
                       {unreadCount > 99 ? '99+' : unreadCount}
                     </span>
                   )}
@@ -177,8 +172,8 @@ const Navbar = () => {
                 </button>
 
                 {showProfileMenu && (
-                  <div className="absolute right-0 mt-2 w-64 bg-white/95 rounded-[1.5rem] py-2 z-50 border border-slate-200/70 shadow-[0_20px_60px_-40px_rgba(15,23,42,0.12)] backdrop-blur-xl">
-                    <button onClick={() => handleNavigation(getProfilePath())} className="flex items-center w-full px-4 py-2 text-sm text-slate-700 hover:bg-cyan-50 hover:text-cyan-600">
+                  <div className="absolute right-0 mt-2 w-64 bg-white/95 rounded-[1.5rem] py-2 z-50 border border-black/70 shadow-[0_20px_60px_-40px_rgba(15,23,42,0.12)] backdrop-blur-xl">
+                    <button onClick={() => handleNavigation(getProfilePath())} className="flex items-center w-full px-4 py-2 text-sm text-slate-700 hover:bg-red-50 hover:text-slate-800">
                       <FiUser className="mr-3 h-4 w-4" /> Your Profile
                     </button>
                     <button onClick={handleLogout} className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50">

@@ -47,31 +47,31 @@ const AdminRepeatApprovals = () => {
   if (loading) return <Loader fullScreen />;
 
   return (
-    <div className="container mx-auto px-4 py-8 bg-slate-50 min-h-screen">
+    <div className="container mx-auto px-4 py-8 bg-white min-h-screen">
       <div className="mb-12">
         <h1 className="text-4xl font-extrabold text-slate-800 tracking-tight font-outfit uppercase tracking-widest leading-none">Repeat Approval Worklist</h1>
         <p className="text-slate-500 mt-2 font-medium italic">Monitor academic regists for course retakes and credit recovery.</p>
       </div>
 
-      <div className="bg-white rounded-[4rem] shadow-2xl border border-slate-100 overflow-hidden">
+      <div className="bg-white rounded-[4rem] shadow-2xl border border-black overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left">
-            <thead className="bg-slate-50 px-10">
+            <thead className="bg-white px-10">
               <tr>
-                <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">Student Info</th>
-                <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">Course Detail</th>
-                <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">Academic State</th>
-                <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">Fee Stat</th>
-                <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">Work-Status</th>
-                <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">Registry Control</th>
+                <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-black">Student Info</th>
+                <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-black">Course Detail</th>
+                <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-black">Academic State</th>
+                <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-black">Fee Stat</th>
+                <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-black">Work-Status</th>
+                <th className="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-black">Registry Control</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
               {repeats.map((repeat) => (
-                <tr key={repeat._id} className="hover:bg-slate-50/50 transition-colors">
+                <tr key={repeat._id} className="hover:bg-white/50 transition-colors">
                   <td className="px-10 py-8">
                      <div className="flex items-center gap-4">
-                        <div className="h-10 w-10 bg-indigo-100 rounded-[1rem] flex items-center justify-center text-indigo-600 font-black">
+                        <div className="h-10 w-10 bg-white border border-black rounded-[1rem] flex items-center justify-center text-indigo-600 font-black">
                            {repeat.student?.name?.charAt(0)}
                         </div>
                         <div>
@@ -81,8 +81,8 @@ const AdminRepeatApprovals = () => {
                      </div>
                   </td>
                   <td className="px-10 py-8">
-                     <p className="text-md font-extrabold text-slate-700">{repeat.course?.courseName}</p>
-                     <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest italic">{repeat.course?.courseCode}</p>
+                     <p className="text-md font-extrabold text-slate-700">{repeat.course?.name}</p>
+                     <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest italic">{repeat.course?.code}</p>
                   </td>
                   <td className="px-10 py-8">
                      <div className="flex items-center gap-3">
@@ -96,7 +96,7 @@ const AdminRepeatApprovals = () => {
                         <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{repeat.feeStatus}</span>
                      </div>
                   </td>
-                  <td className="px-10 py-8 text-center bg-slate-50/20">
+                  <td className="px-10 py-8 text-center bg-white/20">
                      <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest inline-flex items-center gap-1.5 ${
                         repeat.approvalStatus === 'approved' ? 'bg-emerald-100 text-emerald-700' :
                         repeat.approvalStatus === 'rejected' ? 'bg-rose-100 text-rose-700' :

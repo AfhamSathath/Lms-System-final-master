@@ -190,12 +190,12 @@ const AdminNotifications = () => {
   return (
     <div className="container mx-auto px-6 py-8">
       {/* HEADER */}
-      <div className="bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl p-6 mb-8 text-white flex justify-between items-center">
+      <div className="bg-white border border-black rounded-2xl p-6 mb-8 text-slate-900 flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold">
             Admin Notifications ({unreadCount} unread)
           </h1>
-          <p className="text-purple-100">
+          <p className="text-slate-500">
             Send and manage system notifications
           </p>
         </div>
@@ -233,7 +233,7 @@ const AdminNotifications = () => {
           sortedNotifications.map((notif) => (
             <div
               key={notif._id}
-              className={`p-4 rounded-xl shadow ${notif.isRead ? "bg-gray-100" : "bg-purple-50"
+              className={`p-4 rounded-xl shadow ${notif.isRead ? "bg-white border border-black" : "bg-purple-50"
                 }`}
             >
               <div className="flex justify-between">

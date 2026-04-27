@@ -85,7 +85,7 @@ const RevenueManagement = () => {
   };
 
   return (
-    <div className="p-12 bg-slate-50/50 min-h-screen font-outfit">
+    <div className="p-12 bg-white/50 min-h-screen font-outfit">
       <header className="flex flex-col md:flex-row justify-between md:items-end gap-10 mb-14">
         <div>
            <h1 className="text-5xl font-black text-slate-900 leading-tight uppercase tracking-tighter italic">Institutional <span className="text-emerald-600 underline underline-offset-8 decoration-emerald-100">Revenue Ledger</span></h1>
@@ -137,14 +137,14 @@ const RevenueManagement = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-[4rem] shadow-2xl shadow-slate-100 border border-slate-100 overflow-hidden relative">
-         <div className="p-10 bg-slate-50 border-b border-slate-100 flex flex-col md:flex-row justify-between items-center gap-8 px-14">
+      <div className="bg-white rounded-[4rem] shadow-2xl shadow-slate-100 border border-black overflow-hidden relative">
+         <div className="p-10 bg-white border-b border-black flex flex-col md:flex-row justify-between items-center gap-8 px-14">
             <h2 className="text-2xl font-black text-slate-800 uppercase tracking-tighter italic scale-x-110 origin-left flex items-center gap-4">
                <FiTrendingUp className="text-emerald-500" /> Global Transaction Registry
             </h2>
             <div className="relative w-full md:w-96">
                <FiSearch className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400" />
-               <input type="text" placeholder="Trace ID, Student Name, Faculty..." className="w-full pl-14 pr-8 py-5 rounded-2xl bg-white border-2 border-slate-100 focus:outline-none focus:border-emerald-500 transition-all font-bold text-sm" />
+               <input type="text" placeholder="Trace ID, Student Name, Faculty..." className="w-full pl-14 pr-8 py-5 rounded-2xl bg-white border-2 border-black focus:outline-none focus:border-emerald-500 transition-all font-bold text-sm" />
             </div>
          </div>
 
@@ -168,7 +168,7 @@ const RevenueManagement = () => {
                        <p className="font-black text-slate-300 uppercase tracking-widest text-xs italic">No matching records indexed in the current ledger</p>
                     </td></tr>
                   ) : filteredFinances.map((f, i) => (
-                    <tr key={f._id} className="group hover:bg-slate-50 transition-all">
+                    <tr key={f._id} className="group hover:bg-white transition-all">
                        <td className="px-10 py-8">
                           <p className="font-black text-slate-800 uppercase tracking-tighter group-hover:text-emerald-600 transition-colors">FIN-{f._id.slice(-6).toUpperCase()}</p>
                           <p className="text-[10px] font-bold text-slate-400 italic mt-1">Processed: {new Date(f.createdAt).toLocaleDateString()}</p>
@@ -254,7 +254,7 @@ const RevenueManagement = () => {
                       </button>
                    </div>
 
-                   <div className="bg-slate-50 rounded-[2.5rem] p-10 space-y-8 border border-slate-100 mb-auto">
+                   <div className="bg-white rounded-[2.5rem] p-10 space-y-8 border border-black mb-auto">
                       <div>
                          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 italic flex items-center gap-2">
                            <FiFileText /> Revenue Item

@@ -253,6 +253,15 @@ exports.deleteSubject = async (req, res, next) => {
     subject.isActive = false;
     await subject.save();
 
+    // Notify enrolled students
+    const enrollments = await Enrollment.find({ course: subject._id }).populate('student');
+    const emailService = require('../utils/emailService');
+    for (const enrollment of enrollments) {
+      if (enrollment.student) {
+        emailService.sendCourseCancellationEmail(enrollment.student, subject).catch(err => console.error('Course Cancellation Email Failed:', err));
+      }
+    }
+
     res.json({
       success: true,
       message: 'Subject deleted successfully',

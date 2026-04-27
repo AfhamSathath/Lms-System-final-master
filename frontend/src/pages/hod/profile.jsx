@@ -126,7 +126,7 @@ const HodProfile = () => {
           </form>
         )}
 
-        <div className="mt-8 bg-gray-100 p-4 rounded-lg">
+        <div className="mt-8 bg-white border border-black p-4 rounded-lg">
           <h2 className="font-semibold">Change Password</h2>
           <form onSubmit={submitPassword} className="grid grid-cols-1 gap-3 mt-3">
             <input

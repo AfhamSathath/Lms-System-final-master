@@ -120,7 +120,7 @@ function App() {
   return (
     <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <AuthProvider>
-        <div className="min-h-screen text-slate-900 bg-slate-50">
+        <div className="min-h-screen text-slate-900 bg-white">
           <Routes>
             {/* Login Page - No navbar needed for auth pages */}
             <Route path="/" element={<Login />} />
@@ -255,7 +255,8 @@ function MainRoutes() {
         <Route path="subject/:id/attendance" element={<SubjectAttendanceSessions />} />
         <Route path="results" element={<HodResults />} />
         <Route path="files" element={<HodFiles />} />
-        <Route path="timetable" element={<HodTimetable />} />
+        <Route path="timetable" element={<RegistrarTimetables />} />
+        <Route path="timetables" element={<RegistrarTimetables />} />
         <Route path="notifications" element={<HodNotifications />} />
         <Route path="repeats" element={<HodRepeatApprovals />} />
         <Route path="attendance-review" element={<HODAttendanceReview />} />
@@ -271,6 +272,8 @@ function MainRoutes() {
         <Route path="roster" element={<FacultyRoster />} />
         <Route path="audit" element={<DeanAudit />} />
         <Route path="reports" element={<DeanReports />} />
+        <Route path="timetables" element={<RegistrarTimetables />} />
+        <Route path="timetable" element={<RegistrarTimetables />} />
         <Route path="attendance" element={<RegistrarAttendanceDetails />} />
         <Route path="profile" element={<HodProfile />} />
       </Route>
@@ -290,6 +293,8 @@ function MainRoutes() {
         <Route path="certification" element={<ExamOfficerCertification />} />
         <Route path="repeats" element={<ExamOfficerRepeatApprovals />} />
         <Route path="verify-payments" element={<ExamOfficerVerifyPayments />} />
+        <Route path="timetables" element={<RegistrarTimetables />} />
+        <Route path="timetable" element={<RegistrarTimetables />} />
         <Route path="profile" element={<RegistrarProfile />} />
       </Route>
 

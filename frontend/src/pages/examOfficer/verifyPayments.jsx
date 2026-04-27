@@ -48,7 +48,7 @@ const ExamOfficerVerifyPayments = () => {
   if (loading) return <Loader fullScreen />;
 
   return (
-    <div className="p-8 max-w-[1440px] mx-auto min-h-screen bg-slate-50/50">
+    <div className="p-8 max-w-[1440px] mx-auto min-h-screen bg-white/50">
       <header className="mb-14">
         <h1 className="text-4xl font-black text-slate-800 tracking-tight uppercase mb-2">Payment Verification</h1>
         <p className="text-slate-500 font-medium italic">Validate student repeat fee payments and finalize registration.</p>
@@ -62,7 +62,7 @@ const ExamOfficerVerifyPayments = () => {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               key={app._id}
-              className="bg-white rounded-[3rem] p-10 shadow-xl border border-slate-100 flex flex-col group relative overflow-hidden h-[450px]"
+              className="bg-white rounded-[3rem] p-10 shadow-xl border border-black flex flex-col group relative overflow-hidden h-[450px]"
             >
               <div className="flex justify-between items-start mb-8">
                 <div className="h-16 w-16 rounded-3xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-black text-xl shadow-inner group-hover:scale-110 transition-transform">
@@ -77,7 +77,7 @@ const ExamOfficerVerifyPayments = () => {
               <h3 className="text-2xl font-black text-slate-800 leading-tight mb-1">{app.student?.name}</h3>
               <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-8 italic">{app.student?.studentId} • {app.student?.department}</p>
 
-               <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100 space-y-4 mb-8">
+               <div className="p-6 bg-white rounded-2xl border border-black space-y-4 mb-8">
                 <div className="flex items-center gap-3">
                    <FiBook className="text-indigo-400" />
                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest truncate">{app.subjectCode} - {app.subjectName}</p>
@@ -88,7 +88,7 @@ const ExamOfficerVerifyPayments = () => {
                 </div>
 
                 {/* Workflow Summary */}
-                <div className="pt-4 border-t border-slate-200 mt-4 space-y-4">
+                <div className="pt-4 border-t border-black mt-4 space-y-4">
                    <div>
                       <div className="flex justify-between items-center text-[7px] font-black uppercase tracking-[0.2em] text-slate-400 mb-1">
                          <span>Stage 1: Lecturer Approval</span>
@@ -127,8 +127,8 @@ const ExamOfficerVerifyPayments = () => {
         </AnimatePresence>
 
         {applications.length === 0 && (
-          <div className="col-span-full py-40 text-center bg-white rounded-[4rem] border border-slate-200 border-dashed">
-             <div className="h-24 w-24 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6 text-slate-300 shadow-inner">
+          <div className="col-span-full py-40 text-center bg-white rounded-[4rem] border border-black border-dashed">
+             <div className="h-24 w-24 bg-white rounded-full flex items-center justify-center mx-auto mb-6 text-slate-300 shadow-inner">
                 <FiCheck size={48} strokeWidth={4} />
              </div>
              <h3 className="text-3xl font-black text-slate-800 tracking-tighter uppercase mb-2">Clean Queue</h3>
@@ -146,7 +146,7 @@ const ExamOfficerVerifyPayments = () => {
             className="bg-white rounded-[3.5rem] w-full max-w-4xl overflow-hidden shadow-2xl flex flex-col md:flex-row h-full max-h-[85vh]"
           >
             {/* Receipt Preview */}
-            <div className="md:w-1/2 bg-slate-100 relative overflow-hidden flex items-center justify-center border-r border-slate-200">
+            <div className="md:w-1/2 bg-slate-100 relative overflow-hidden flex items-center justify-center border-r border-black">
                {receiptModal.app.paymentProof ? (
                  <img
                     src={`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/${receiptModal.app.paymentProof}`}
@@ -174,7 +174,7 @@ const ExamOfficerVerifyPayments = () => {
                </div>
 
                <div className="space-y-6 mb-12">
-                  <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100">
+                  <div className="p-6 bg-white rounded-2xl border border-black">
                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 italic">Submission Info</p>
                      <p className="text-lg font-extrabold text-slate-700 leading-tight mb-2 italic underline decoration-slate-200 decoration-4 underline-offset-4">{receiptModal.app.student?.name}</p>
                      <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">{receiptModal.app.subjectCode} • {receiptModal.app.subjectName}</p>
@@ -194,7 +194,7 @@ const ExamOfficerVerifyPayments = () => {
                     value={receiptModal.comments}
                     onChange={(e) => setReceiptModal({ ...receiptModal, comments: e.target.value })}
                     placeholder="Enter any verification notes or reasons for rejection..."
-                    className="w-full h-32 bg-slate-50 border-2 border-slate-100 rounded-2xl p-6 focus:border-indigo-500 outline-none transition-all resize-none font-bold text-slate-700"
+                    className="w-full h-32 bg-white border-2 border-black rounded-2xl p-6 focus:border-indigo-500 outline-none transition-all resize-none font-bold text-slate-700"
                   />
                </div>
 
@@ -210,7 +210,7 @@ const ExamOfficerVerifyPayments = () => {
                   <button
                     onClick={() => handleVerify('REJECT')}
                     disabled={verifyingId === receiptModal.app._id}
-                    className="px-8 border-2 border-slate-100 text-slate-400 py-6 rounded-2xl font-black uppercase text-xs tracking-widest hover:border-rose-200 hover:text-rose-500 transition-all active:scale-95"
+                    className="px-8 border-2 border-black text-slate-400 py-6 rounded-2xl font-black uppercase text-xs tracking-widest hover:border-rose-200 hover:text-rose-500 transition-all active:scale-95"
                   >
                     <FiX size={18} strokeWidth={4} />
                   </button>

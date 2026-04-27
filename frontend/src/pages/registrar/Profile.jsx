@@ -130,7 +130,7 @@ const AdminProfile = () => {
         {/* Profile Card */}
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
           {/* Cover Photo */}
-          <div className="h-32 bg-gradient-to-r from-purple-600 to-pink-600 relative">
+          <div className="h-32 bg-white border border-black relative">
             <button
               onClick={() => setShowPasswordModal(true)}
               className="absolute bottom-4 right-4 bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-4 py-2 rounded-lg transition-colors flex items-center text-sm"
@@ -173,7 +173,7 @@ const AdminProfile = () => {
                   </button>
                   <button
                     onClick={handleCancel}
-                    className="flex items-center px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
+                    className="flex items-center px-4 py-2 bg-white0 text-white rounded-lg hover:bg-gray-600 transition-colors"
                   >
                     <FiX className="mr-2" />
                     Cancel
@@ -235,7 +235,7 @@ const AdminProfile = () => {
                     value={formData.name}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                   />
                 </div>
                 <div className="md:col-span-2">
@@ -247,7 +247,7 @@ const AdminProfile = () => {
                     type="email"
                     value={user?.email}
                     disabled
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-500"
+                    className="w-full px-4 py-2 border border-black rounded-lg bg-white border border-black text-gray-500"
                   />
                 </div>
                 <div>
@@ -261,7 +261,7 @@ const AdminProfile = () => {
                     value={formData.phone}
                     onChange={handleChange}
                     placeholder="Enter phone number"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                   />
                 </div>
                 <div>
@@ -272,7 +272,7 @@ const AdminProfile = () => {
                     type="text"
                     value={user?.role}
                     disabled
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-500 capitalize"
+                    className="w-full px-4 py-2 border border-black rounded-lg bg-white border border-black text-gray-500 capitalize"
                   />
                 </div>
                 <div className="md:col-span-2">
@@ -286,7 +286,7 @@ const AdminProfile = () => {
                     onChange={handleChange}
                     rows="3"
                     placeholder="Tell us about yourself"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                   />
                 </div>
                 <div className="md:col-span-2">
@@ -300,7 +300,7 @@ const AdminProfile = () => {
                     onChange={handleChange}
                     rows="2"
                     placeholder="Enter your address"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                   />
                 </div>
               </form>
@@ -312,7 +312,7 @@ const AdminProfile = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
           <div className="bg-white rounded-xl shadow-lg p-6">
             <div className="flex items-center mb-3">
-              <div className="p-2 bg-purple-100 rounded-lg">
+              <div className="p-2 bg-white border border-black rounded-lg">
                 <FiShield className="h-5 w-5 text-purple-600" />
               </div>
               <h3 className="ml-3 font-semibold text-gray-800">Admin Privileges</h3>
@@ -327,7 +327,7 @@ const AdminProfile = () => {
 
           <div className="bg-white rounded-xl shadow-lg p-6">
             <div className="flex items-center mb-3">
-              <div className="p-2 bg-blue-100 rounded-lg">
+              <div className="p-2 bg-white border border-black rounded-lg">
                 <FiPhone className="h-5 w-5 text-blue-600" />
               </div>
               <h3 className="ml-3 font-semibold text-gray-800">Contact Information</h3>
@@ -379,7 +379,7 @@ const AdminProfile = () => {
                       value={passwordData.currentPassword}
                       onChange={handlePasswordChange}
                       required
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 pr-10"
+                      className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 pr-10"
                     />
                     <button
                       type="button"
@@ -403,7 +403,7 @@ const AdminProfile = () => {
                       onChange={handlePasswordChange}
                       required
                       minLength="6"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 pr-10"
+                      className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 pr-10"
                     />
                     <button
                       type="button"
@@ -426,7 +426,7 @@ const AdminProfile = () => {
                       value={passwordData.confirmPassword}
                       onChange={handlePasswordChange}
                       required
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 pr-10"
+                      className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 pr-10"
                     />
                     <button
                       type="button"
@@ -442,7 +442,7 @@ const AdminProfile = () => {
                   <button
                     type="button"
                     onClick={() => setShowPasswordModal(false)}
-                    className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                    className="px-4 py-2 border border-black text-gray-700 rounded-lg hover:bg-white"
                   >
                     Cancel
                   </button>

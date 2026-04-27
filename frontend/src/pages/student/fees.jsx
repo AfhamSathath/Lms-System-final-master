@@ -236,16 +236,16 @@ const StudentFees = () => {
     switch (status) {
       case 'paid': return 'bg-emerald-100 text-emerald-700 border-emerald-200 shadow-[0_4px_14px_rgba(16,185,129,0.15)]';
       case 'overdue': return 'bg-rose-100 text-rose-700 border-rose-200 animate-pulse';
-      case 'payment_submitted': return 'bg-indigo-100 text-indigo-700 border-indigo-200';
+      case 'payment_submitted': return 'bg-white border border-black text-slate-700 border-indigo-200';
       case 'partially_paid': return 'bg-amber-100 text-amber-700 border-amber-200';
-      default: return 'bg-slate-100 text-slate-500 border-slate-200';
+      default: return 'bg-slate-100 text-slate-500 border-black';
     }
   };
 
   if (loading) return <Loader fullScreen />;
 
   return (
-    <div className="container mx-auto px-4 py-12 bg-slate-50/30 min-h-screen font-outfit">
+    <div className="container mx-auto px-4 py-12 bg-white/30 min-h-screen font-outfit">
       <header className="mb-14 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
            <h1 className="text-5xl font-black text-slate-900 tracking-tighter uppercase mb-2 italic">Student <span className="text-indigo-600">Finances</span></h1>
@@ -253,7 +253,7 @@ const StudentFees = () => {
         </div>
         
         <div className="flex gap-4">
-           <div className="bg-white px-8 py-5 rounded-[2.5rem] shadow-2xl border border-slate-100 flex items-center gap-6">
+           <div className="bg-white px-8 py-5 rounded-[2.5rem] shadow-2xl border border-black flex items-center gap-6">
               <div className="text-right">
                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 italic">Total Outstanding</p>
                  <p className="text-3xl font-black text-slate-900 tracking-tighter">LKR {totalDue.toLocaleString()}</p>
@@ -268,8 +268,8 @@ const StudentFees = () => {
       </header>
 
       <div className="grid grid-cols-1 gap-12">
-        <div className="bg-white rounded-[4rem] shadow-2xl overflow-hidden border border-slate-100 relative group">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-slate-50 -mr-32 -mt-32 rounded-full group-hover:scale-110 transition-transform duration-1000 opacity-50"></div>
+        <div className="bg-white rounded-[4rem] shadow-2xl overflow-hidden border border-black relative group">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-white -mr-32 -mt-32 rounded-full group-hover:scale-110 transition-transform duration-1000 opacity-50"></div>
           
           <div className="px-12 py-10 border-b border-slate-50 flex justify-between items-center relative z-10">
              <h3 className="text-2xl font-black text-slate-800 tracking-tight flex items-center gap-4">
@@ -284,7 +284,7 @@ const StudentFees = () => {
           <div className="overflow-x-auto relative z-10">
             <table className="w-full text-left">
               <thead>
-                <tr className="bg-slate-50/50">
+                <tr className="bg-white/50">
                   <th className="px-12 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Revenue Item & Desc</th>
                   <th className="px-12 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Timeframe</th>
                   <th className="px-12 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Amount (LKR)</th>
@@ -294,14 +294,14 @@ const StudentFees = () => {
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {finances.map((item) => (
-                  <tr key={item._id} className="hover:bg-slate-50 group/row transition-all duration-300">
+                  <tr key={item._id} className="hover:bg-white group/row transition-all duration-300">
                     <td className="px-12 py-10">
                        <p className="font-extrabold text-slate-800 text-lg leading-tight group-hover/row:text-indigo-600 transition-colors uppercase tracking-tight">{item.title.replace('_', ' ')}</p>
                        <p className="text-slate-400 text-[11px] mt-1.5 font-bold italic tracking-wide">{item.description || 'General Institutional Fee'}</p>
                     </td>
                     <td className="px-12 py-10">
                        <div className="flex flex-col gap-1.5">
-                          <span className="px-3 py-1 bg-indigo-50 text-indigo-700 rounded-lg text-[9px] font-black uppercase tracking-widest w-fit">Sem 0{item.semester} • {item.academicYear}</span>
+                          <span className="px-3 py-1 bg-indigo-50 text-slate-700 rounded-lg text-[9px] font-black uppercase tracking-widest w-fit">Sem 0{item.semester} • {item.academicYear}</span>
                           <div className="flex items-center text-slate-400 text-[10px] font-bold gap-2 italic">
                              <FiClock size={12} className={new Date(item.dueDate) < new Date() && item.status !== 'paid' ? 'text-rose-500' : ''} />
                              Due: {new Date(item.dueDate).toLocaleDateString()}
@@ -377,7 +377,7 @@ const StudentFees = () => {
 
                <div className="p-10">
                   {/* Method Tabs */}
-                  <div className="flex gap-4 mb-8 bg-slate-50 p-2 rounded-[1.5rem] border-2 border-slate-100">
+                  <div className="flex gap-4 mb-8 bg-white p-2 rounded-[1.5rem] border-2 border-black">
                      <button 
                         onClick={() => setPaymentModal({ ...paymentModal, method: 'online' })}
                         className={`flex-1 py-4 rounded-[1.5rem] text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-3 transition-all ${paymentModal.method === 'online' ? 'bg-white shadow-xl text-indigo-600' : 'text-slate-400 hover:text-slate-600'}`}
@@ -394,7 +394,7 @@ const StudentFees = () => {
 
                   {paymentModal.method === 'online' ? (
                     <div className="space-y-8 py-4">
-                       <div className="p-10 bg-slate-50 rounded-[2.5rem] border-4 border-dashed border-slate-200 text-center">
+                       <div className="p-10 bg-white rounded-[2.5rem] border-4 border-dashed border-black text-center">
                           <FiShield size={48} className="mx-auto mb-6 text-indigo-400" />
                           <h4 className="text-xl font-black text-slate-800 uppercase tracking-tight mb-2 italic">Simulated Online Gateway</h4>
                           <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest leading-relaxed">Proceeding will simulate a successful card transaction for testing purposes. Real-world implementation would redirect to Stripe/Payhere.</p>
@@ -422,7 +422,7 @@ const StudentFees = () => {
                              />
                              <label 
                                 htmlFor="slip-upload"
-                                className="w-full h-32 bg-slate-50 border-4 border-dashed border-slate-200 rounded-[1.5rem] flex flex-col items-center justify-center cursor-pointer group-hover:border-emerald-400 transition-all group-hover:bg-emerald-50/30"
+                                className="w-full h-32 bg-white border-4 border-dashed border-black rounded-[1.5rem] flex flex-col items-center justify-center cursor-pointer group-hover:border-emerald-400 transition-all group-hover:bg-emerald-50/30"
                              >
                                 {paymentModal.file ? (
                                    <div className="flex items-center gap-4 text-emerald-600 font-black text-sm px-6">
@@ -444,7 +444,7 @@ const StudentFees = () => {
                           <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] ml-2 mb-2 block italic">Reference Number (Optional)</label>
                           <input 
                              type="text"
-                             className="w-full bg-slate-50 border-4 border-slate-100 rounded-2xl py-4 px-6 text-xs font-bold text-slate-700 outline-none focus:border-emerald-500 transition-all"
+                             className="w-full bg-white border-4 border-black rounded-2xl py-4 px-6 text-xs font-bold text-slate-700 outline-none focus:border-emerald-500 transition-all"
                              placeholder="e.g. SLIP-X09231"
                              value={paymentModal.transactionId}
                              onChange={(e) => setPaymentModal({ ...paymentModal, transactionId: e.target.value })}

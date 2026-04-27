@@ -264,12 +264,12 @@ const LecturerManagement = () => {
 
   const getStatusColor = (status) => {
     const colors = {
-      assigned: 'bg-blue-100 text-blue-800',
-      active: 'bg-green-100 text-green-800',
-      completed: 'bg-purple-100 text-purple-800',
-      suspended: 'bg-red-100 text-red-800'
+      assigned: 'bg-white border border-black text-slate-800',
+      active: 'bg-white border border-black text-slate-800',
+      completed: 'bg-white border border-black text-slate-800',
+      suspended: 'bg-white border border-black text-slate-800'
     };
-    return colors[status] || 'bg-gray-100 text-gray-800';
+    return colors[status] || 'bg-white border border-black text-gray-800';
   };
 
   if (loading) return <Loader fullScreen />;
@@ -277,13 +277,13 @@ const LecturerManagement = () => {
   return (
     <div className="p-6">
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-2xl shadow-lg p-6 mb-8 text-white">
+      <div className="bg-white border border-black rounded-2xl shadow-lg p-6 mb-8 text-slate-900">
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-bold flex items-center gap-2">
               <FiUser /> Lecturer Management
             </h1>
-            <p className="text-blue-100 mt-1">Assign subjects and manage lecturer curriculum</p>
+            <p className="text-slate-500 mt-1">Assign subjects and manage lecturer curriculum</p>
           </div>
           <button
             onClick={() => toggleModal('assign', true)}
@@ -354,7 +354,7 @@ const LecturerManagement = () => {
               academicYear: 'all',
               status: 'all'
             })}
-            className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
+            className="px-4 py-2 bg-white border border-black text-gray-700 rounded-lg hover:bg-gray-200"
           >
             Clear Filters
           </button>
@@ -364,12 +364,12 @@ const LecturerManagement = () => {
       {/* Assignments Table */}
       <div className="bg-white rounded-xl shadow-md overflow-x-auto">
         <table className="w-full">
-          <thead className="bg-gray-50 border-b">
+          <thead className="bg-white border-b">
             <tr>
               <th className="px-6 py-3 text-left">
                 <input
                   type="checkbox"
-                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  className="rounded border-black text-blue-600 focus:ring-blue-500"
                   onChange={handleSelectAllAssignments}
                   checked={selectedAssignmentIds.length === filteredAssignments.length && filteredAssignments.length > 0}
                 />
@@ -388,7 +388,7 @@ const LecturerManagement = () => {
                 <td className="px-6 py-4">
                   <input
                     type="checkbox"
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    className="rounded border-black text-blue-600 focus:ring-blue-500"
                     checked={selectedAssignmentIds.includes(assignment._id)}
                     onChange={() => handleSelectAssignment(assignment._id)}
                   />
@@ -427,7 +427,7 @@ const LecturerManagement = () => {
                         setSelectedAssignment(assignment);
                         toggleModal('progress', true);
                       }}
-                      className="text-blue-600 hover:text-blue-800"
+                      className="text-blue-600 hover:text-slate-800"
                     >
                       <FiTrendingUp size={18} />
                     </button>
@@ -457,7 +457,7 @@ const LecturerManagement = () => {
                       </button>
                       <button
                         onClick={() => handleDelete(assignment._id)}
-                        className="text-red-600 hover:text-red-800"
+                        className="text-red-600 hover:text-slate-800"
                       >
                         <FiTrash2 size={18} />
                       </button>
@@ -750,7 +750,7 @@ const AssignModal = ({ isOpen, onClose, formData, setFormData, onSubmit, lecture
             <button
               type="button"
               onClick={onClose}
-              className="px-6 py-2 border rounded-lg text-gray-700 hover:bg-gray-50"
+              className="px-6 py-2 border rounded-lg text-gray-700 hover:bg-white"
             >
               Cancel
             </button>
@@ -845,7 +845,7 @@ const ProgressModal = ({ isOpen, onClose, assignment, onUpdate }) => {
             <button
               type="button"
               onClick={onClose}
-              className="px-6 py-2 border rounded-lg text-gray-700 hover:bg-gray-50"
+              className="px-6 py-2 border rounded-lg text-gray-700 hover:bg-white"
             >
               Cancel
             </button>
@@ -879,7 +879,7 @@ const EditModal = ({ isOpen, onClose, formData, setFormData, onSubmit, lecturers
           </button>
         </div>
 
-        <div className="bg-slate-50 p-4 rounded-xl mb-6 border border-slate-100">
+        <div className="bg-white p-4 rounded-xl mb-6 border border-black">
           <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-1">Subject</p>
           <p className="font-bold text-slate-700">{assignment.subject?.code} - {assignment.subject?.name}</p>
           <div className="flex gap-4 mt-2">
@@ -895,7 +895,7 @@ const EditModal = ({ isOpen, onClose, formData, setFormData, onSubmit, lecturers
               <select
                 value={formData.lecturerId}
                 onChange={(e) => setFormData(p => ({ ...p, lecturerId: e.target.value }))}
-                className="w-full px-4 py-3 bg-slate-50 border-slate-200 rounded-xl font-bold focus:ring-2 focus:ring-amber-500 outline-none"
+                className="w-full px-4 py-3 bg-white border-black rounded-xl font-bold focus:ring-2 focus:ring-amber-500 outline-none"
                 required
               >
                 {lecturers.map(l => (
@@ -910,7 +910,7 @@ const EditModal = ({ isOpen, onClose, formData, setFormData, onSubmit, lecturers
                 type="date"
                 value={formData.startDate}
                 onChange={(e) => setFormData(p => ({ ...p, startDate: e.target.value }))}
-                className="w-full px-4 py-3 bg-slate-50 border-slate-200 rounded-xl font-bold focus:ring-2 focus:ring-amber-500"
+                className="w-full px-4 py-3 bg-white border-black rounded-xl font-bold focus:ring-2 focus:ring-amber-500"
                 required
               />
             </div>
@@ -921,7 +921,7 @@ const EditModal = ({ isOpen, onClose, formData, setFormData, onSubmit, lecturers
                 type="date"
                 value={formData.endDate}
                 onChange={(e) => setFormData(p => ({ ...p, endDate: e.target.value }))}
-                className="w-full px-4 py-3 bg-slate-50 border-slate-200 rounded-xl font-bold focus:ring-2 focus:ring-amber-500"
+                className="w-full px-4 py-3 bg-white border-black rounded-xl font-bold focus:ring-2 focus:ring-amber-500"
                 required
               />
             </div>
@@ -932,7 +932,7 @@ const EditModal = ({ isOpen, onClose, formData, setFormData, onSubmit, lecturers
                 type="number"
                 value={formData.totalLectures}
                 onChange={(e) => setFormData(p => ({ ...p, totalLectures: e.target.value }))}
-                className="w-full px-4 py-3 bg-slate-50 border-slate-200 rounded-xl font-bold focus:ring-2 focus:ring-amber-500"
+                className="w-full px-4 py-3 bg-white border-black rounded-xl font-bold focus:ring-2 focus:ring-amber-500"
                 min="1"
               />
             </div>
@@ -943,7 +943,7 @@ const EditModal = ({ isOpen, onClose, formData, setFormData, onSubmit, lecturers
                 type="number"
                 value={formData.totalPracticals}
                 onChange={(e) => setFormData(p => ({ ...p, totalPracticals: e.target.value }))}
-                className="w-full px-4 py-3 bg-slate-50 border-slate-200 rounded-xl font-bold focus:ring-2 focus:ring-amber-500"
+                className="w-full px-4 py-3 bg-white border-black rounded-xl font-bold focus:ring-2 focus:ring-amber-500"
                 min="0"
               />
             </div>
@@ -954,7 +954,7 @@ const EditModal = ({ isOpen, onClose, formData, setFormData, onSubmit, lecturers
                 type="number"
                 value={formData.totalAssignments}
                 onChange={(e) => setFormData(p => ({ ...p, totalAssignments: e.target.value }))}
-                className="w-full px-4 py-3 bg-slate-50 border-slate-200 rounded-xl font-bold focus:ring-2 focus:ring-amber-500"
+                className="w-full px-4 py-3 bg-white border-black rounded-xl font-bold focus:ring-2 focus:ring-amber-500"
                 min="0"
               />
             </div>
@@ -964,7 +964,7 @@ const EditModal = ({ isOpen, onClose, formData, setFormData, onSubmit, lecturers
               <select
                 value={formData.minimumQualification}
                 onChange={(e) => setFormData(p => ({ ...p, minimumQualification: e.target.value }))}
-                className="w-full px-4 py-3 bg-slate-50 border-slate-200 rounded-xl font-bold focus:ring-2 focus:ring-amber-500"
+                className="w-full px-4 py-3 bg-white border-black rounded-xl font-bold focus:ring-2 focus:ring-amber-500"
               >
                 <option value="B.Tech">B.Tech</option>
                 <option value="M.Tech">M.Tech</option>
@@ -980,7 +980,7 @@ const EditModal = ({ isOpen, onClose, formData, setFormData, onSubmit, lecturers
             <textarea
               value={formData.notes}
               onChange={(e) => setFormData(p => ({ ...p, notes: e.target.value }))}
-              className="w-full px-4 py-3 bg-slate-50 border-slate-200 rounded-xl font-bold focus:ring-2 focus:ring-amber-500"
+              className="w-full px-4 py-3 bg-white border-black rounded-xl font-bold focus:ring-2 focus:ring-amber-500"
               rows="3"
             />
           </div>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FiCheckCircle, FiXCircle, FiEye, FiActivity } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 
@@ -61,11 +61,11 @@ const AdminMedicalApprovals = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+      <div className="bg-white rounded-xl shadow-sm border border-black overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-slate-50 border-b border-slate-200">
+              <tr className="bg-white border-b border-black">
                 <th className="p-4 font-semibold text-sm text-slate-600">Student Info</th>
                 <th className="p-4 font-semibold text-sm text-slate-600">Illness & MC Info</th>
                 <th className="p-4 font-semibold text-sm text-slate-600">Leave Dates</th>
@@ -79,7 +79,7 @@ const AdminMedicalApprovals = () => {
                   <td colSpan="5" className="p-8 text-center text-slate-500">Loading...</td>
                 </tr>
               ) : medicals.map((req) => (
-                <tr key={req._id} className="hover:bg-slate-50 transition-colors">
+                <tr key={req._id} className="hover:bg-white transition-colors">
                   <td className="p-4">
                     <div className="font-medium text-slate-800">{req.fullName}</div>
                     <div className="text-sm text-slate-500">{req.registrationNumber} | {req.faculty}</div>
@@ -96,7 +96,7 @@ const AdminMedicalApprovals = () => {
                   <td className="p-4">
                     <input
                       type="text"
-                      className="border border-slate-300 rounded p-1 text-sm w-full"
+                      className="border border-black rounded p-1 text-sm w-full"
                       placeholder="Add remarks..."
                       value={remarks[req._id] || ''}
                       onChange={(e) => setRemarks({ ...remarks, [req._id]: e.target.value })}

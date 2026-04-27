@@ -90,7 +90,7 @@ const LecturerAttendance = () => {
   if (loading) return <Loader fullScreen />;
 
   return (
-    <div className="container mx-auto px-4 py-8 bg-slate-50 min-h-screen pb-32">
+    <div className="container mx-auto px-4 py-8 bg-white min-h-screen pb-32">
       <div className="mb-8 flex flex-col xl:flex-row xl:items-center justify-between gap-6">
         <div>
           <button 
@@ -105,14 +105,14 @@ const LecturerAttendance = () => {
           </p>
         </div>
         
-        <div className="bg-white p-6 rounded-[2rem] shadow-xl shadow-slate-200/50 border border-slate-100 flex flex-col sm:flex-row items-center gap-6 sm:gap-10">
+        <div className="bg-white p-6 rounded-[2rem] shadow-xl shadow-slate-200/50 border border-black flex flex-col sm:flex-row items-center gap-6 sm:gap-10">
            <div className="flex flex-col items-center sm:items-start">
               <span className="text-[10px] text-slate-400 font-black uppercase tracking-widest mb-1.5 flex items-center"><FiCalendar className="mr-1 inline" /> Session Date</span>
               <input 
                 type="date"
                 value={attendanceDate}
                 onChange={(e) => setAttendanceDate(e.target.value)}
-                className="border border-slate-200 p-2 rounded-xl text-slate-700 font-bold text-sm focus:ring-emerald-500 focus:border-emerald-500 bg-slate-50 transition-colors"
+                className="border border-black p-2 rounded-xl text-slate-700 font-bold text-sm focus:ring-emerald-500 focus:border-emerald-500 bg-white transition-colors"
               />
            </div>
            <div className="hidden sm:block h-12 w-[1px] bg-slate-200"></div>
@@ -121,7 +121,7 @@ const LecturerAttendance = () => {
               <select
                 value={selectedBatch}
                 onChange={(e) => setSelectedBatch(e.target.value)}
-                className="border border-slate-200 p-2 rounded-xl text-slate-700 font-bold text-sm focus:ring-emerald-500 focus:border-emerald-500 bg-slate-50 transition-colors outline-none"
+                className="border border-black p-2 rounded-xl text-slate-700 font-bold text-sm focus:ring-emerald-500 focus:border-emerald-500 bg-white transition-colors outline-none"
               >
                 <option value="All">All Batches</option>
                 {batches.map(b => <option key={b} value={b}>{b}</option>)}
@@ -137,7 +137,7 @@ const LecturerAttendance = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-[2rem] p-6 shadow-sm border border-slate-100 mb-8 flex flex-wrap items-center justify-between gap-4">
+      <div className="bg-white rounded-[2rem] p-6 shadow-sm border border-black mb-8 flex flex-wrap items-center justify-between gap-4">
          <p className="text-slate-500 font-bold text-sm uppercase tracking-wider">Bulk Actions ({selectedBatch})</p>
          <div className="flex gap-3">
             <button 
@@ -169,10 +169,10 @@ const LecturerAttendance = () => {
          </div>
       </div>
 
-      <div className="bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/50 overflow-hidden border border-slate-100 mb-10">
+      <div className="bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/50 overflow-hidden border border-black mb-10">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
-            <thead className="bg-slate-50 border-b border-slate-100">
+            <thead className="bg-white border-b border-black">
               <tr>
                 <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Student Info</th>
                 <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Student ID</th>
@@ -183,7 +183,7 @@ const LecturerAttendance = () => {
               {students
                 .filter(student => selectedBatch === 'All' || student.student?.batch === selectedBatch)
                 .map((student) => (
-                <tr key={student._id} className="hover:bg-slate-50/70 transition-colors">
+                <tr key={student._id} className="hover:bg-white/70 transition-colors">
                   <td className="px-8 py-5">
                     <div className="flex items-center gap-4">
                       <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-emerald-100 to-teal-100 flex items-center justify-center text-emerald-700 font-extrabold shadow-sm border border-emerald-200/50">
@@ -196,10 +196,10 @@ const LecturerAttendance = () => {
                     </div>
                   </td>
                   <td className="px-8 py-5">
-                    <span className="font-mono text-xs font-bold bg-slate-100 px-3 py-1.5 rounded-lg text-slate-600 border border-slate-200">{student.student?.studentId}</span>
+                    <span className="font-mono text-xs font-bold bg-slate-100 px-3 py-1.5 rounded-lg text-slate-600 border border-black">{student.student?.studentId}</span>
                   </td>
                   <td className="px-8 py-5">
-                    <div className="flex justify-center items-center gap-2 bg-slate-50 p-1.5 rounded-2xl border border-slate-100 w-max mx-auto">
+                    <div className="flex justify-center items-center gap-2 bg-white p-1.5 rounded-2xl border border-black w-max mx-auto">
                       <button 
                         onClick={() => toggleStatus(student._id, 'present')}
                         className={`px-5 py-2.5 rounded-[1rem] text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex-1 ${

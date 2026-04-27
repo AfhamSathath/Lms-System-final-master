@@ -46,7 +46,7 @@ const ResultCertification = () => {
         <div className="flex gap-4">
            <div className="relative">
               <FiSearch className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400" />
-              <input type="text" placeholder="Search Batch Reference..." className="pl-14 pr-8 py-5 rounded-[40px] bg-white border border-gray-100 shadow-sm focus:outline-none focus:ring-4 focus:ring-indigo-100 transition-all font-bold placeholder:text-gray-300" />
+              <input type="text" placeholder="Search Batch Reference..." className="pl-14 pr-8 py-5 rounded-[40px] bg-white border border-black shadow-sm focus:outline-none focus:ring-4 focus:ring-indigo-100 transition-all font-bold placeholder:text-gray-300" />
            </div>
            <button className="px-10 py-5 bg-indigo-600 text-white font-black rounded-[40px] shadow-2xl shadow-indigo-200 hover:bg-indigo-700 transition-all uppercase tracking-widest text-xs">
               <FiCheckCircle /> Final Certification
@@ -54,8 +54,8 @@ const ResultCertification = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-[50px] shadow-sm border border-gray-100 overflow-hidden">
-        <div className="p-10 bg-gray-50/50 border-b border-gray-100 flex justify-between items-center px-12">
+      <div className="bg-white rounded-[50px] shadow-sm border border-black overflow-hidden">
+        <div className="p-10 bg-white/50 border-b border-black flex justify-between items-center px-12">
            <h2 className="text-xl font-black text-[#1B2559] uppercase tracking-wider">Exam Batch Ledger: Review Required</h2>
            <div className="flex gap-4">
               <span className="text-indigo-600 font-bold flex items-center gap-1 text-sm bg-indigo-50 px-6 py-2 rounded-full border border-indigo-100">

@@ -1098,33 +1098,33 @@ const AdminResults = () => {
 
   const getGradeColor = (grade) => {
     const colors = {
-      'A+': 'bg-green-100 text-green-800',
-      'A': 'bg-green-100 text-green-800',
-      'A-': 'bg-green-100 text-green-800',
-      'B+': 'bg-blue-100 text-blue-800',
-      'B': 'bg-blue-100 text-blue-800',
-      'B-': 'bg-blue-100 text-blue-800',
-      'C+': 'bg-yellow-100 text-yellow-800',
-      'C': 'bg-yellow-100 text-yellow-800',
-      'C-': 'bg-orange-100 text-orange-800',
-      'D+': 'bg-orange-100 text-orange-800',
-      'D': 'bg-red-100 text-red-800',
-      'F': 'bg-red-100 text-red-800'
+      'A+': 'bg-white border border-black text-slate-800',
+      'A': 'bg-white border border-black text-slate-800',
+      'A-': 'bg-white border border-black text-slate-800',
+      'B+': 'bg-white border border-black text-slate-800',
+      'B': 'bg-white border border-black text-slate-800',
+      'B-': 'bg-white border border-black text-slate-800',
+      'C+': 'bg-white border border-black text-slate-800',
+      'C': 'bg-white border border-black text-slate-800',
+      'C-': 'bg-white border border-black text-slate-800',
+      'D+': 'bg-white border border-black text-slate-800',
+      'D': 'bg-white border border-black text-slate-800',
+      'F': 'bg-white border border-black text-slate-800'
     };
-    return colors[grade] || 'bg-gray-100 text-gray-800';
+    return colors[grade] || 'bg-white border border-black text-gray-800';
   };
 
   
   const getDepartmentColor = (department) => {
     const colors = [
-      'bg-blue-100 text-blue-800',
-      'bg-green-100 text-green-800',
-      'bg-purple-100 text-purple-800',
-      'bg-pink-100 text-pink-800',
-      'bg-yellow-100 text-yellow-800',
-      'bg-indigo-100 text-indigo-800',
-      'bg-red-100 text-red-800',
-      'bg-orange-100 text-orange-800'
+      'bg-white border border-black text-slate-800',
+      'bg-white border border-black text-slate-800',
+      'bg-white border border-black text-slate-800',
+      'bg-white border border-black text-slate-800',
+      'bg-white border border-black text-slate-800',
+      'bg-white border border-black text-slate-800',
+      'bg-white border border-black text-slate-800',
+      'bg-white border border-black text-slate-800'
     ];
     const index = (department?.length || 0) % colors.length;
     return colors[index];
@@ -1136,39 +1136,39 @@ const AdminResults = () => {
     <div className="container mx-auto px-4 py-8 transition-all duration-300">
 
       {/* Header */}
-      <div className="bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl shadow-xl p-6 mb-8 text-white flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div className="bg-white border border-black rounded-2xl shadow-xl p-6 mb-8 text-slate-900 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div className="flex-1 min-w-0">
           <h1 className="text-2xl md:text-3xl font-bold truncate">Result Management</h1>
-          <p className="text-purple-100 truncate mt-1">Manage student results and grades across 4 years (8 semesters)</p>
+          <p className="text-slate-500 truncate mt-1">Manage student results and grades across 4 years (8 semesters)</p>
         </div>
         <div className="flex space-x-3">
           <button
             onClick={handleViewYearlyStats}
-            className="bg-orange-600 text-white px-6 py-3 rounded-lg hover:bg-orange-700 transition-colors flex items-center"
+            className="bg-white text-slate-700 border border-black px-6 py-3 rounded-lg hover:bg-white transition-colors flex items-center shadow-sm"
           >
-            <FiCalendar className="mr-2" /> Yearly Stats
+            <FiCalendar className="mr-2 text-slate-400" /> Yearly Stats
           </button>
           <button
             onClick={handleViewDepartmentStats}
-            className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors flex items-center"
+            className="bg-white text-slate-700 border border-black px-6 py-3 rounded-lg hover:bg-white transition-colors flex items-center shadow-sm"
           >
-            <FiLayers className="mr-2" /> Department Stats
+            <FiLayers className="mr-2 text-slate-400" /> Department Stats
           </button>
           <button
             onClick={() => setShowBulkUploadModal(true)}
-            className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors flex items-center"
+            className="bg-white text-slate-700 border border-black px-6 py-3 rounded-lg hover:bg-white transition-colors flex items-center shadow-sm"
           >
-            <FiDownload className="mr-2" /> Bulk Upload
+            <FiDownload className="mr-2 text-slate-400" /> Bulk Upload
           </button>
           <button
             onClick={() => setShowBulkSemesterModal(true)}
-            className="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition-colors flex items-center"
+            className="bg-white text-slate-700 border border-black px-6 py-3 rounded-lg hover:bg-white transition-colors flex items-center shadow-sm"
           >
-            <FiGrid className="mr-2" /> Bulk Semester
+            <FiGrid className="mr-2 text-slate-400" /> Bulk Semester
           </button>
           <button
             onClick={() => setShowAddModal(true)}
-            className="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors flex items-center"
+            className="bg-red-900 text-white px-6 py-3 rounded-lg hover:bg-red-800 transition-colors flex items-center shadow-sm"
           >
             <FiPlus className="mr-2" /> Add Result
           </button>
@@ -1267,7 +1267,7 @@ const AdminResults = () => {
               <p className="text-gray-500 text-sm">Total Students</p>
               <p className="text-2xl font-bold text-gray-800">{students.length}</p>
             </div>
-            <div className="h-12 w-12 bg-purple-100 rounded-lg flex items-center justify-center">
+            <div className="h-12 w-12 bg-white border border-black rounded-lg flex items-center justify-center">
               <FiUsers className="h-6 w-6 text-purple-600" />
             </div>
           </div>
@@ -1278,7 +1278,7 @@ const AdminResults = () => {
               <p className="text-gray-500 text-sm">Total Results</p>
               <p className="text-2xl font-bold text-gray-800">{results.length}</p>
             </div>
-            <div className="h-12 w-12 bg-green-100 rounded-lg flex items-center justify-center">
+            <div className="h-12 w-12 bg-white border border-black rounded-lg flex items-center justify-center">
               <FiAward className="h-6 w-6 text-green-600" />
             </div>
           </div>
@@ -1289,7 +1289,7 @@ const AdminResults = () => {
               <p className="text-gray-500 text-sm">Academic Years</p>
               <p className="text-2xl font-bold text-gray-800">{academicYears.length}</p>
             </div>
-            <div className="h-12 w-12 bg-blue-100 rounded-lg flex items-center justify-center">
+            <div className="h-12 w-12 bg-white border border-black rounded-lg flex items-center justify-center">
               <FiCalendar className="h-6 w-6 text-blue-600" />
             </div>
           </div>
@@ -1304,7 +1304,7 @@ const AdminResults = () => {
                   : 0}%
               </p>
             </div>
-            <div className="h-12 w-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+            <div className="h-12 w-12 bg-white border border-black rounded-lg flex items-center justify-center">
               <FiTrendingUp className="h-6 w-6 text-yellow-600" />
             </div>
           </div>
@@ -1328,7 +1328,7 @@ const AdminResults = () => {
                   {/* Student Header */}
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center">
-                      <div className="h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center">
+                      <div className="h-10 w-10 rounded-full bg-white border border-black flex items-center justify-center">
                         <FiUser className="h-5 w-5 text-purple-600" />
                       </div>
                       <div className="ml-3">
@@ -1336,9 +1336,9 @@ const AdminResults = () => {
                         <p className="text-xs text-gray-500">{student.studentId}</p>
                       </div>
                     </div>
-                    <div className={`px-2 py-1 rounded-full text-xs font-semibold ${analysis.overall.improvementTrend === 'improving' ? 'bg-green-100 text-green-800' :
-                        analysis.overall.improvementTrend === 'declining' ? 'bg-red-100 text-red-800' :
-                          'bg-yellow-100 text-yellow-800'
+                    <div className={`px-2 py-1 rounded-full text-xs font-semibold ${analysis.overall.improvementTrend === 'improving' ? 'bg-white border border-black text-slate-800' :
+                        analysis.overall.improvementTrend === 'declining' ? 'bg-white border border-black text-slate-800' :
+                          'bg-white border border-black text-slate-800'
                       }`}>
                       {analysis.overall.improvementTrend}
                     </div>
@@ -1353,22 +1353,22 @@ const AdminResults = () => {
 
                   {/* Stats Grid */}
                   <div className="grid grid-cols-2 gap-3 mb-4">
-                    <div className="bg-gray-50 rounded-lg p-3">
+                    <div className="bg-white rounded-lg p-3">
                       <p className="text-xs text-gray-500">CGPA</p>
                       <p className="text-lg font-bold text-purple-600">{analysis.overall.cgpa}</p>
                     </div>
-                    <div className="bg-gray-50 rounded-lg p-3">
+                    <div className="bg-white rounded-lg p-3">
                       <p className="text-xs text-gray-500">Pass %</p>
                       <p className="text-lg font-bold text-green-600">{analysis.overall.passPercentage}%</p>
                     </div>
-                    <div className="bg-gray-50 rounded-lg p-3">
+                    <div className="bg-white rounded-lg p-3">
                       <p className="text-xs text-gray-500">Passed</p>
                       <div className="flex items-center">
                         <FiCheckCircle className="h-4 w-4 text-green-500 mr-1" />
                         <p className="text-lg font-bold text-gray-800">{analysis.overall.passedSubjects}</p>
                       </div>
                     </div>
-                    <div className="bg-gray-50 rounded-lg p-3">
+                    <div className="bg-white rounded-lg p-3">
                       <p className="text-xs text-gray-500">Failed</p>
                       <div className="flex items-center">
                         <FiXCircle className="h-4 w-4 text-red-500 mr-1" />
@@ -1429,7 +1429,7 @@ const AdminResults = () => {
                     </button>
                     <button
                       onClick={() => handleViewStudentAnalysis(student)}
-                      className="p-2 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
+                      className="p-2 text-purple-600 hover:bg-white border border-black rounded-lg transition-colors"
                       title="Detailed Analysis"
                     >
                       <FiPieChart className="h-4 w-4" />
@@ -1442,7 +1442,7 @@ const AdminResults = () => {
         </div>
         {students.length > 6 && (
           <div className="text-center mt-4">
-            <button className="text-purple-600 hover:text-purple-700 font-medium">
+            <button className="text-purple-600 hover:text-slate-700 font-medium">
               View All {students.length} Students
             </button>
           </div>
@@ -1460,7 +1460,7 @@ const AdminResults = () => {
               placeholder="Search by student, subject, or department..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-3 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
             />
           </div>
 
@@ -1470,7 +1470,7 @@ const AdminResults = () => {
             <select
               value={selectedYear}
               onChange={(e) => setSelectedYear(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-3 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
             >
               <option value="all">All Years</option>
               {academicYears.map(year => <option key={year} value={year}>{year}</option>)}
@@ -1483,7 +1483,7 @@ const AdminResults = () => {
             <select
               value={selectedSemester}
               onChange={(e) => setSelectedSemester(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-3 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
             >
               <option value="all">All Semesters</option>
               {semesters.map(s => <option key={s} value={s}>Semester {s}</option>)}
@@ -1496,7 +1496,7 @@ const AdminResults = () => {
             <select
               value={selectedExamType}
               onChange={(e) => setSelectedExamType(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-3 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
             >
               <option value="all">All Exam Types</option>
               {examTypes.map(type => <option key={type} value={type}>{type.charAt(0).toUpperCase() + type.slice(1)}</option>)}
@@ -1509,7 +1509,7 @@ const AdminResults = () => {
             <select
               value={selectedDepartment}
               onChange={(e) => setSelectedDepartment(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-3 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
             >
               <option value="all">All Departments</option>
               {departments.map(d => <option key={d} value={d}>{d}</option>)}
@@ -1527,7 +1527,7 @@ const AdminResults = () => {
               setSelectedExamType('all');
               setSelectedDepartment('all');
             }}
-            className="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+            className="px-6 py-2 bg-white border border-black text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
           >
             Clear All Filters
           </button>
@@ -1538,12 +1538,12 @@ const AdminResults = () => {
       <div className="bg-white rounded-xl shadow-lg overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+            <thead className="bg-white">
               <tr>
                 <th className="px-6 py-3 text-left">
                   <input
                     type="checkbox"
-                    className="rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                    className="rounded border-black text-purple-600 focus:ring-purple-500"
                     onChange={handleSelectAllResults}
                     checked={selectedResultIds.length === filteredResults.length && filteredResults.length > 0}
                   />
@@ -1574,14 +1574,14 @@ const AdminResults = () => {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <input
                         type="checkbox"
-                        className="rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                        className="rounded border-black text-purple-600 focus:ring-purple-500"
                         checked={selectedResultIds.includes(r._id)}
                         onChange={() => handleSelectResult(r._id)}
                       />
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
-                        <div className="h-8 w-8 rounded-full bg-purple-100 flex items-center justify-center">
+                        <div className="h-8 w-8 rounded-full bg-white border border-black flex items-center justify-center">
                           <FiUser className="h-4 w-4 text-purple-600" />
                         </div>
                         <div className="ml-3">
@@ -1609,7 +1609,7 @@ const AdminResults = () => {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${status === 'pass' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                      <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${status === 'pass' ? 'bg-white border border-black text-slate-800' : 'bg-white border border-black text-slate-800'
                         }`}>
                         {status}
                       </span>
@@ -1672,7 +1672,7 @@ const AdminResults = () => {
                 value={formData.student}
                 onChange={handleStudentChange}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
               >
                 <option value="">Choose a student</option>
                 {students.map(s => (
@@ -1689,7 +1689,7 @@ const AdminResults = () => {
                 value={formData.subject}
                 onChange={handleSubjectChange}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
               >
                 <option value="">Choose a subject</option>
                 {filteredSubjects.map(s => (
@@ -1712,7 +1712,7 @@ const AdminResults = () => {
                 onChange={handleInputChange}
                 required
                 disabled={lockedFields.year}
-                className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 ${lockedFields.year ? 'bg-gray-100 cursor-not-allowed' : ''
+                className={`w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 ${lockedFields.year ? 'bg-white border border-black cursor-not-allowed' : ''
                   }`}
               >
                 <option value="">Select Year</option>
@@ -1734,7 +1734,7 @@ const AdminResults = () => {
                 onChange={handleInputChange}
                 required
                 disabled={lockedFields.semester}
-                className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 ${lockedFields.semester ? 'bg-gray-100 cursor-not-allowed' : ''
+                className={`w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 ${lockedFields.semester ? 'bg-white border border-black cursor-not-allowed' : ''
                   }`}
               >
                 <option value="">Select Semester</option>
@@ -1753,7 +1753,7 @@ const AdminResults = () => {
                 value={formData.examType}
                 onChange={handleInputChange}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
               >
                 {examTypes.map(e => <option key={e} value={e}>{e.charAt(0).toUpperCase() + e.slice(1)}</option>)}
               </select>
@@ -1769,10 +1769,10 @@ const AdminResults = () => {
                 value={formData.marks}
                 onChange={handleInputChange}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
               />
               {formData.marks !== '' && (
-                <div className="mt-2 p-2 bg-gray-50 rounded-lg flex items-center gap-4">
+                <div className="mt-2 p-2 bg-white rounded-lg flex items-center gap-4">
                   <div className="text-[10px] text-gray-500 uppercase font-bold">Preview:</div>
                   <div className="flex items-center gap-2">
                     <span className="text-xs text-gray-600">Grade:</span>
@@ -1798,7 +1798,7 @@ const AdminResults = () => {
             <button
               type="button"
               onClick={() => { setShowAddModal(false); resetForm(); }}
-              className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+              className="px-4 py-2 border border-black rounded-lg text-gray-700 hover:bg-white"
             >
               Cancel
             </button>
@@ -1823,7 +1823,7 @@ const AdminResults = () => {
                 value={formData.student}
                 onChange={handleStudentChange}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
               >
                 <option value="">Choose a student</option>
                 {students.map(s => (
@@ -1840,7 +1840,7 @@ const AdminResults = () => {
                 value={formData.subject}
                 onChange={handleSubjectChange}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
               >
                 <option value="">Choose a subject</option>
                 {filteredSubjects.map(s => (
@@ -1860,7 +1860,7 @@ const AdminResults = () => {
                 onChange={handleInputChange}
                 required
                 disabled={true}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed focus:outline-none"
+                className="w-full px-4 py-2 border border-black rounded-lg bg-white border border-black cursor-not-allowed focus:outline-none"
               >
                 <option value="">Select Year</option>
                 {academicYears.map(year => <option key={year} value={year}>{year}</option>)}
@@ -1876,7 +1876,7 @@ const AdminResults = () => {
                 onChange={handleInputChange}
                 required
                 disabled={true}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed focus:outline-none"
+                className="w-full px-4 py-2 border border-black rounded-lg bg-white border border-black cursor-not-allowed focus:outline-none"
               >
                 <option value="">Select Semester</option>
                 {semesters.map(s => <option key={s} value={s}>Semester {s}</option>)}
@@ -1889,7 +1889,7 @@ const AdminResults = () => {
                 value={formData.examType}
                 onChange={handleInputChange}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
               >
                 {examTypes.map(e => <option key={e} value={e}>{e.charAt(0).toUpperCase() + e.slice(1)}</option>)}
               </select>
@@ -1905,10 +1905,10 @@ const AdminResults = () => {
                 value={formData.marks}
                 onChange={handleInputChange}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
               />
               {formData.marks !== '' && (
-                <div className="mt-2 p-2 bg-gray-50 rounded-lg flex items-center gap-4">
+                <div className="mt-2 p-2 bg-white rounded-lg flex items-center gap-4">
                   <div className="text-[10px] text-gray-500 uppercase font-bold">Preview:</div>
                   <div className="flex items-center gap-2">
                     <span className="text-xs text-gray-600">Grade:</span>
@@ -1934,7 +1934,7 @@ const AdminResults = () => {
             <button
               type="button"
               onClick={() => { setShowEditModal(false); setSelectedResult(null); resetForm(); }}
-              className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+              className="px-4 py-2 border border-black rounded-lg text-gray-700 hover:bg-white"
             >
               Cancel
             </button>
@@ -1957,7 +1957,7 @@ const AdminResults = () => {
               type="file"
               accept=".csv"
               onChange={e => setBulkFile(e.target.files[0])}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
             />
             <p className="text-xs text-gray-500 mt-1">Upload CSV with columns: StudentID, SubjectCode, Year, Semester, ExamType, Marks</p>
             <p className="text-xs text-gray-500">Year options: 1st Year, 2nd Year, 3rd Year, 4th Year | Semester: 1 or 2</p>
@@ -1969,7 +1969,7 @@ const AdminResults = () => {
             <button
               type="button"
               onClick={handleDownloadTemplate}
-              className="px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 flex items-center"
+              className="px-4 py-2 bg-white border border-black rounded-lg hover:bg-gray-200 flex items-center"
             >
               <FiDownload className="mr-2" /> Download Template
             </button>
@@ -1977,7 +1977,7 @@ const AdminResults = () => {
               <button
                 type="button"
                 onClick={() => { setShowBulkUploadModal(false); setBulkFile(null); }}
-                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                className="px-4 py-2 border border-black rounded-lg text-gray-700 hover:bg-white"
               >
                 Cancel
               </button>
@@ -2002,7 +2002,7 @@ const AdminResults = () => {
           </div>
 
           {/* Student Info */}
-          <div className="border rounded-lg p-4 mb-6 bg-gray-50">
+          <div className="border rounded-lg p-4 mb-6 bg-white">
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <p className="text-sm text-gray-500">Student Name</p>
@@ -2053,7 +2053,7 @@ const AdminResults = () => {
             <h3 className="text-lg font-semibold mb-3">Detailed Results</h3>
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+                <thead className="bg-white">
                   <tr>
                     <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">Subject</th>
                     <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">Year</th>
@@ -2111,7 +2111,7 @@ const AdminResults = () => {
           </button>
           <button
             onClick={() => { setShowTranscriptModal(false); setSelectedStudent(null); }}
-            className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+            className="px-4 py-2 border border-black rounded-lg text-gray-700 hover:bg-white"
           >
             Close
           </button>
@@ -2166,7 +2166,7 @@ const AdminResults = () => {
         <div className="flex justify-end border-t pt-4 mt-4">
           <button
             onClick={() => { setShowSemesterGPAModal(false); setSelectedStudent(null); }}
-            className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
+            className="px-4 py-2 bg-white border border-black text-gray-700 rounded-lg hover:bg-gray-200"
           >
             Close
           </button>
@@ -2190,17 +2190,17 @@ const AdminResults = () => {
 
             {/* Overview Cards */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-              <div className="bg-purple-50 rounded-lg p-4">
+              <div className="bg-white border border-black rounded-lg p-4">
                 <p className="text-sm text-purple-600 font-medium">CGPA</p>
-                <p className="text-2xl font-bold text-purple-700">{studentAnalysis.overall.cgpa}</p>
+                <p className="text-2xl font-bold text-slate-700">{studentAnalysis.overall.cgpa}</p>
               </div>
               <div className="bg-green-50 rounded-lg p-4">
                 <p className="text-sm text-green-600 font-medium">Pass Percentage</p>
-                <p className="text-2xl font-bold text-green-700">{studentAnalysis.overall.passPercentage}%</p>
+                <p className="text-2xl font-bold text-slate-700">{studentAnalysis.overall.passPercentage}%</p>
               </div>
               <div className="bg-blue-50 rounded-lg p-4">
                 <p className="text-sm text-blue-600 font-medium">Total Subjects</p>
-                <p className="text-2xl font-bold text-blue-700">{studentAnalysis.overall.totalSubjects}</p>
+                <p className="text-2xl font-bold text-slate-700">{studentAnalysis.overall.totalSubjects}</p>
               </div>
               <div className={`rounded-lg p-4 ${studentAnalysis.overall.improvementTrend === 'improving' ? 'bg-green-50' :
                   studentAnalysis.overall.improvementTrend === 'declining' ? 'bg-red-50' : 'bg-yellow-50'
@@ -2226,7 +2226,7 @@ const AdminResults = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
               {studentAnalysis.bestSubject && (
                 <div className="bg-green-50 rounded-lg p-4">
-                  <h4 className="font-semibold text-green-700 mb-2 flex items-center">
+                  <h4 className="font-semibold text-slate-700 mb-2 flex items-center">
                     <FiStar className="mr-2" /> Best Performing Subject
                   </h4>
                   <p className="text-lg font-medium">{studentAnalysis.bestSubject.name}</p>
@@ -2238,7 +2238,7 @@ const AdminResults = () => {
               )}
               {studentAnalysis.worstSubject && (
                 <div className="bg-orange-50 rounded-lg p-4">
-                  <h4 className="font-semibold text-orange-700 mb-2 flex items-center">
+                  <h4 className="font-semibold text-slate-700 mb-2 flex items-center">
                     <FiClock className="mr-2" /> Needs Improvement
                   </h4>
                   <p className="text-lg font-medium">{studentAnalysis.worstSubject.name}</p>
@@ -2277,7 +2277,7 @@ const AdminResults = () => {
               <h4 className="text-lg font-semibold mb-3">Performance by Exam Type</h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {Object.entries(studentAnalysis.examTypePerformance).map(([type, data]) => (
-                  <div key={type} className="bg-gray-50 rounded-lg p-3">
+                  <div key={type} className="bg-white rounded-lg p-3">
                     <p className="font-medium capitalize">{type}</p>
                     <p className="text-sm">Average: <span className="font-semibold">{data.average}%</span></p>
                     <p className="text-sm">Count: {data.count}</p>
@@ -2291,7 +2291,7 @@ const AdminResults = () => {
         <div className="flex justify-end border-t pt-4 mt-4">
           <button
             onClick={() => { setShowStudentAnalysisModal(false); setSelectedStudent(null); }}
-            className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
+            className="px-4 py-2 bg-white border border-black text-gray-700 rounded-lg hover:bg-gray-200"
           >
             Close
           </button>
@@ -2310,19 +2310,19 @@ const AdminResults = () => {
                 <div className="p-4">
                   {/* Overview Stats */}
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-                    <div className="bg-gray-50 rounded-lg p-3">
+                    <div className="bg-white rounded-lg p-3">
                       <p className="text-xs text-gray-500">Students</p>
                       <p className="text-xl font-bold text-gray-800">{stats.studentCount}</p>
                     </div>
-                    <div className="bg-gray-50 rounded-lg p-3">
+                    <div className="bg-white rounded-lg p-3">
                       <p className="text-xs text-gray-500">Results</p>
                       <p className="text-xl font-bold text-gray-800">{stats.resultCount}</p>
                     </div>
-                    <div className="bg-gray-50 rounded-lg p-3">
+                    <div className="bg-white rounded-lg p-3">
                       <p className="text-xs text-gray-500">Avg CGPA</p>
                       <p className="text-xl font-bold text-purple-600">{stats.avgCGPA}</p>
                     </div>
-                    <div className="bg-gray-50 rounded-lg p-3">
+                    <div className="bg-white rounded-lg p-3">
                       <p className="text-xs text-gray-500">Pass Rate</p>
                       <p className="text-xl font-bold text-green-600">{stats.passRate}%</p>
                     </div>
@@ -2346,7 +2346,7 @@ const AdminResults = () => {
                       <h4 className="font-semibold mb-2">Top Performers</h4>
                       <div className="space-y-2">
                         {stats.topPerformers.map((student, idx) => (
-                          <div key={idx} className="flex items-center justify-between bg-gray-50 p-2 rounded">
+                          <div key={idx} className="flex items-center justify-between bg-white p-2 rounded">
                             <div>
                               <p className="font-medium">{student.name}</p>
                               <p className="text-xs text-gray-500">{student.studentId}</p>
@@ -2389,7 +2389,7 @@ const AdminResults = () => {
         <div className="flex justify-end border-t pt-4 mt-4">
           <button
             onClick={() => setShowDepartmentStatsModal(false)}
-            className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
+            className="px-4 py-2 bg-white border border-black text-gray-700 rounded-lg hover:bg-gray-200"
           >
             Close
           </button>
@@ -2402,25 +2402,25 @@ const AdminResults = () => {
           <div className="grid grid-cols-1 gap-6">
             {yearlyStats && Object.entries(yearlyStats).map(([year, stats]) => (
               <div key={year} className="border rounded-lg overflow-hidden">
-                <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-4 text-white">
+                <div className="bg-white border border-black p-4 text-slate-900">
                   <h3 className="text-lg font-semibold">{year}</h3>
                 </div>
                 <div className="p-4">
                   {/* Overview Stats */}
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-                    <div className="bg-gray-50 rounded-lg p-3">
+                    <div className="bg-white rounded-lg p-3">
                       <p className="text-xs text-gray-500">Total Results</p>
                       <p className="text-xl font-bold text-gray-800">{stats.totalResults}</p>
                     </div>
-                    <div className="bg-gray-50 rounded-lg p-3">
+                    <div className="bg-white rounded-lg p-3">
                       <p className="text-xs text-gray-500">Students</p>
                       <p className="text-xl font-bold text-gray-800">{stats.totalStudents}</p>
                     </div>
-                    <div className="bg-gray-50 rounded-lg p-3">
+                    <div className="bg-white rounded-lg p-3">
                       <p className="text-xs text-gray-500">Average Marks</p>
                       <p className="text-xl font-bold text-purple-600">{stats.overallAvgMarks}%</p>
                     </div>
-                    <div className="bg-gray-50 rounded-lg p-3">
+                    <div className="bg-white rounded-lg p-3">
                       <p className="text-xs text-gray-500">Pass Rate</p>
                       <p className="text-xl font-bold text-green-600">{stats.passRate}%</p>
                     </div>
@@ -2433,7 +2433,7 @@ const AdminResults = () => {
                       {[1, 2].map(sem => {
                         const semStats = stats.semesterStats[sem];
                         return semStats ? (
-                          <div key={sem} className="bg-gray-50 rounded-lg p-3">
+                          <div key={sem} className="bg-white rounded-lg p-3">
                             <p className="font-medium mb-2">Semester {sem}</p>
                             <div className="space-y-1 text-sm">
                               <p>Results: <span className="font-semibold">{semStats.resultCount}</span></p>
@@ -2458,7 +2458,7 @@ const AdminResults = () => {
                       <h4 className="font-semibold mb-2">Department Performance</h4>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         {Object.entries(stats.deptPerformance).map(([dept, avg]) => (
-                          <div key={dept} className="bg-gray-50 rounded-lg p-3">
+                          <div key={dept} className="bg-white rounded-lg p-3">
                             <div className="flex justify-between items-center">
                               <span className={`px-2 py-1 text-xs font-semibold rounded-full ${getDepartmentColor(dept)}`}>
                                 {dept}
@@ -2485,7 +2485,7 @@ const AdminResults = () => {
         <div className="flex justify-end border-t pt-4 mt-4">
           <button
             onClick={() => setShowYearlyStatsModal(false)}
-            className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
+            className="px-4 py-2 bg-white border border-black text-gray-700 rounded-lg hover:bg-gray-200"
           >
             Close
           </button>
@@ -2504,7 +2504,7 @@ const AdminResults = () => {
                 value={bulkSemesterData.student}
                 onChange={handleBulkSemesterStudentChange}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
               >
                 <option value="">Choose a student</option>
                 {students.map(s => (
@@ -2520,7 +2520,7 @@ const AdminResults = () => {
                 type="text"
                 value={bulkSemesterData.year}
                 readOnly
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 cursor-not-allowed"
+                className="w-full px-4 py-2 border border-black rounded-lg bg-white cursor-not-allowed"
                 placeholder="Auto-filled from student"
               />
             </div>
@@ -2530,7 +2530,7 @@ const AdminResults = () => {
                 type="text"
                 value={bulkSemesterData.semester}
                 readOnly
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 cursor-not-allowed"
+                className="w-full px-4 py-2 border border-black rounded-lg bg-white cursor-not-allowed"
                 placeholder="Auto-filled from student"
               />
             </div>
@@ -2544,7 +2544,7 @@ const AdminResults = () => {
               value={bulkSemesterData.examType}
               onChange={(e) => setBulkSemesterData(prev => ({ ...prev, examType: e.target.value }))}
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
               {examTypes.map(e => <option key={e} value={e}>{e.charAt(0).toUpperCase() + e.slice(1)}</option>)}
             </select>
@@ -2558,7 +2558,7 @@ const AdminResults = () => {
                 {bulkSemesterData.subjects.map((subjectData, index) => {
                   const subject = subjects.find(s => s._id === subjectData.subjectId);
                   return (
-                    <div key={subjectData.subjectId} className="flex items-center space-x-4 p-3 bg-gray-50 rounded-lg">
+                    <div key={subjectData.subjectId} className="flex items-center space-x-4 p-3 bg-white rounded-lg">
                       <div className="flex-1">
                         <span className="font-medium">{subject?.name || 'Unknown Subject'}</span>
                         <span className="text-sm text-gray-500 ml-2">({subject?.code || 'N/A'})</span>
@@ -2572,7 +2572,7 @@ const AdminResults = () => {
                           value={subjectData.marks}
                           onChange={(e) => handleBulkSemesterSubjectMarksChange(subjectData.subjectId, e.target.value)}
                           placeholder="Marks"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                          className="w-full px-3 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                         />
                       </div>
                     </div>
@@ -2592,7 +2592,7 @@ const AdminResults = () => {
             <button
               type="button"
               onClick={() => { setShowBulkSemesterModal(false); resetBulkSemesterForm(); }}
-              className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+              className="px-4 py-2 border border-black rounded-lg text-gray-700 hover:bg-white"
             >
               Cancel
             </button>

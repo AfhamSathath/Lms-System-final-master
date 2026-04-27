@@ -61,20 +61,20 @@ const StudentRepeatExam = () => {
     switch (status) {
       case 'SUBMITTED': return 'bg-amber-100 text-amber-700 border-amber-200';
       case 'LECTURER_APPROVED': return 'bg-emerald-100 text-emerald-700 border-emerald-200';
-      case 'HOD_APPROVED': return 'bg-blue-100 text-blue-700 border-blue-200';
-      case 'EXAM_OFFICER_APPROVED': return 'bg-indigo-100 text-indigo-700 border-indigo-200';
-      case 'FEE_ALLOCATED': return 'bg-purple-100 text-purple-700 border-purple-200';
-      case 'PAYMENT_SUBMITTED': return 'bg-cyan-100 text-cyan-700 border-cyan-200';
+      case 'HOD_APPROVED': return 'bg-white border border-black text-slate-700 border-blue-200';
+      case 'EXAM_OFFICER_APPROVED': return 'bg-white border border-black text-slate-700 border-indigo-200';
+      case 'FEE_ALLOCATED': return 'bg-white border border-black text-slate-700 border-purple-200';
+      case 'PAYMENT_SUBMITTED': return 'bg-white border border-black text-slate-700 border-cyan-200';
       case 'COMPLETED': return 'bg-slate-900 text-white border-slate-900 shadow-xl';
       case 'REJECTED': return 'bg-rose-100 text-rose-700 border-rose-200';
-      default: return 'bg-slate-100 text-slate-500 border-slate-200';
+      default: return 'bg-slate-100 text-slate-500 border-black';
     }
   };
 
   if (loading) return <Loader fullScreen />;
 
   return (
-    <div className="p-8 max-w-[1500px] mx-auto min-h-screen bg-slate-50/30">
+    <div className="p-8 max-w-[1500px] mx-auto min-h-screen bg-white/30">
       <header className="mb-14 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
           <h1 className="text-5xl font-black text-slate-800 tracking-tighter uppercase leading-none mb-3 italic scale-x-110 origin-left">
@@ -83,7 +83,7 @@ const StudentRepeatExam = () => {
           <p className="text-slate-400 font-bold uppercase tracking-[0.4em] text-[10px] ml-1">Resit Application Workflow • EUSL</p>
         </div>
         
-        <div className="bg-white px-8 py-5 rounded-[2rem] shadow-2xl border border-slate-100 flex items-center gap-6">
+        <div className="bg-white px-8 py-5 rounded-[2rem] shadow-2xl border border-black flex items-center gap-6">
            <div className="text-right">
               <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 italic">Eligibility</p>
               <p className="text-2xl font-black text-slate-800 tracking-tighter">{eligibleSubjects.length} Units</p>
@@ -115,7 +115,7 @@ const StudentRepeatExam = () => {
                     key={sub.subjectId}
                     className="bg-white p-10 rounded-[3.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.03)] border-2 border-slate-50 hover:border-indigo-100 transition-all group relative overflow-hidden"
                   >
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-slate-50/50 -mr-16 -mt-16 rounded-full group-hover:scale-150 transition-transform duration-1000"></div>
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-white/50 -mr-16 -mt-16 rounded-full group-hover:scale-150 transition-transform duration-1000"></div>
                     
                     <div className="relative z-10 h-full flex flex-col">
                       <div className="flex justify-between items-start mb-8">
@@ -147,7 +147,7 @@ const StudentRepeatExam = () => {
               </AnimatePresence>
 
               {eligibleSubjects.length === 0 && (
-                <div className="col-span-full py-32 text-center bg-white rounded-[4rem] border-4 border-dashed border-slate-100">
+                <div className="col-span-full py-32 text-center bg-white rounded-[4rem] border-4 border-dashed border-black">
                    <div className="h-24 w-24 bg-emerald-50 text-emerald-300 rounded-full flex items-center justify-center mx-auto mb-8 shadow-inner border border-emerald-100">
                       <FiCheckCircle size={48} strokeWidth={3} />
                    </div>
@@ -160,7 +160,7 @@ const StudentRepeatExam = () => {
 
         <div className="xl:col-span-4">
            <div className="flex items-center gap-4 mb-10 group cursor-default">
-              <div className="h-12 w-12 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center transform group-hover:-rotate-12 transition-transform duration-500">
+              <div className="h-12 w-12 bg-white border border-black text-indigo-600 rounded-2xl flex items-center justify-center transform group-hover:-rotate-12 transition-transform duration-500">
                 <FiClock size={24} />
               </div>
               <h2 className="text-2xl font-black text-slate-800 tracking-tight uppercase italic underline decoration-indigo-200 decoration-8 underline-offset-[10px]">Submission Tracking</h2>
@@ -186,13 +186,13 @@ const StudentRepeatExam = () => {
                    <h4 className="font-black text-slate-800 italic scale-x-105 origin-left mb-1 truncate">{reg.subjectName}</h4>
                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-6">{reg.subjectCode}</p>
 
-                   <div className="p-5 bg-slate-50 rounded-2xl border border-slate-100 space-y-3">
+                   <div className="p-5 bg-white rounded-2xl border border-black space-y-3">
                       <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest">
                          <span className="text-slate-400 italic">Fee Status</span>
                          <span className={reg.feeStatus === 'PAID' ? 'text-emerald-500' : 'text-amber-500'}>{reg.feeStatus}</span>
                       </div>
                       {reg.registrationStatus === 'FEE_ALLOCATED' && (
-                        <div className="flex justify-between items-center border-t border-slate-200 pt-3">
+                        <div className="flex justify-between items-center border-t border-black pt-3">
                            <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 italic">Amount Due</span>
                            <span className="text-lg font-black text-indigo-600 tracking-tighter italic">LKR {reg.repeatFeeAmount}</span>
                         </div>
@@ -218,7 +218,7 @@ const StudentRepeatExam = () => {
               ))}
 
               {registrations.length === 0 && (
-                <div className="bg-slate-50 rounded-[3rem] p-16 text-center border-2 border-dashed border-slate-200 flex flex-col items-center">
+                <div className="bg-white rounded-[3rem] p-16 text-center border-2 border-dashed border-black flex flex-col items-center">
                    <FiLayers size={40} className="text-slate-200 mb-6" />
                    <p className="text-slate-300 font-black italic uppercase tracking-widest text-[10px]">Your application timeline will appear here</p>
                 </div>
@@ -257,7 +257,7 @@ const StudentRepeatExam = () => {
                   <select
                     value={registerModal.reason}
                     onChange={(e) => setRegisterModal({ ...registerModal, reason: e.target.value })}
-                    className="w-full bg-slate-50 border-4 border-slate-100 rounded-[2.5rem] py-6 px-8 text-sm font-black text-indigo-600 focus:border-indigo-500 outline-none transition-all shadow-inner uppercase tracking-widest"
+                    className="w-full bg-white border-4 border-black rounded-[2.5rem] py-6 px-8 text-sm font-black text-indigo-600 focus:border-indigo-500 outline-none transition-all shadow-inner uppercase tracking-widest"
                   >
                     <option value="">Select a reason...</option>
                     <option value="FAIL">Academic Failure (F/E/D/C-)</option>
@@ -273,7 +273,7 @@ const StudentRepeatExam = () => {
                     value={registerModal.comments}
                     onChange={(e) => setRegisterModal({ ...registerModal, comments: e.target.value })}
                     placeholder="Provide any additional details for the subject lecturer..."
-                    className="w-full h-32 bg-slate-50 border-4 border-slate-100 rounded-[2.5rem] p-8 focus:border-indigo-500 outline-none transition-all resize-none text-slate-700 font-bold italic"
+                    className="w-full h-32 bg-white border-4 border-black rounded-[2.5rem] p-8 focus:border-indigo-500 outline-none transition-all resize-none text-slate-700 font-bold italic"
                   />
                </div>
 

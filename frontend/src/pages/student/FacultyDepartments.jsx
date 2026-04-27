@@ -26,7 +26,7 @@ const FacultyDepartments = () => {
   if (loading) return <Loader fullScreen />;
 
   return (
-    <div className="p-6 bg-slate-50 min-h-screen">
+    <div className="p-6 bg-white min-h-screen">
       <div className="max-w-7xl mx-auto">
         <div className="mb-12">
            <h1 className="text-4xl font-black text-slate-800 tracking-tighter uppercase leading-none mb-2">Faculty Departments</h1>
@@ -35,7 +35,7 @@ const FacultyDepartments = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
            {departments.length === 0 ? (
-             <div className="col-span-full py-20 text-center bg-white rounded-[3rem] border-2 border-dashed border-slate-200">
+             <div className="col-span-full py-20 text-center bg-white rounded-[3rem] border-2 border-dashed border-black">
                 <p className="text-slate-400 font-black uppercase tracking-widest text-sm text-center">No departmental information available at this time</p>
              </div>
            ) : (
@@ -45,7 +45,7 @@ const FacultyDepartments = () => {
                  initial={{ opacity: 0, x: idx % 2 === 0 ? -20 : 20 }}
                  animate={{ opacity: 1, x: 0 }}
                  transition={{ delay: idx * 0.1 }}
-                 className="bg-white rounded-[2.5rem] shadow-sm border border-slate-200 overflow-hidden hover:shadow-2xl hover:shadow-indigo-50 transition-all group"
+                 className="bg-white rounded-[2.5rem] shadow-sm border border-black overflow-hidden hover:shadow-2xl hover:shadow-indigo-50 transition-all group"
                >
                  <div className="p-10">
                    <div className="flex justify-between items-start mb-8">

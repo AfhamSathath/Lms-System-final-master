@@ -24,7 +24,7 @@ const ChangeMedium = () => {
         <motion.div 
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          className="bg-white p-12 rounded-[3rem] shadow-xl text-center max-w-lg border border-slate-100"
+          className="bg-white p-12 rounded-[3rem] shadow-xl text-center max-w-lg border border-black"
         >
           <div className="w-20 h-20 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center text-4xl mx-auto mb-6 shadow-inner">
             <FiCheckCircle />
@@ -39,9 +39,9 @@ const ChangeMedium = () => {
   }
 
   return (
-    <div className="p-6 bg-slate-50 min-h-screen">
+    <div className="p-6 bg-white min-h-screen">
       <div className="max-w-4xl mx-auto">
-        <div className="bg-white rounded-[3.5rem] shadow-sm border border-slate-200 overflow-hidden">
+        <div className="bg-white rounded-[3.5rem] shadow-sm border border-black overflow-hidden">
           <div className="bg-slate-900 p-12 text-white relative">
              <div className="absolute top-0 right-0 p-12 opacity-10">
                 <FiLayers className="text-9xl" />
@@ -53,7 +53,7 @@ const ChangeMedium = () => {
           </div>
 
           <div className="p-12">
-            <div className="flex items-center gap-4 p-6 bg-indigo-50 border border-indigo-100 rounded-3xl mb-10 text-indigo-700">
+            <div className="flex items-center gap-4 p-6 bg-indigo-50 border border-indigo-100 rounded-3xl mb-10 text-slate-700">
                <FiAlertCircle className="text-2xl shrink-0" />
                <p className="text-sm font-bold leading-tight">
                  Medium changes are typically only permitted within the first two weeks of the semester. Approval is subject to departmental review.
@@ -70,7 +70,7 @@ const ChangeMedium = () => {
                   </div>
                   <div className="space-y-2">
                     <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Target Medium</label>
-                    <select className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl font-black uppercase text-xs focus:ring-2 focus:ring-indigo-500 transition-all appearance-none cursor-pointer">
+                    <select className="w-full px-6 py-4 bg-white border-none rounded-2xl font-black uppercase text-xs focus:ring-2 focus:ring-indigo-500 transition-all appearance-none cursor-pointer">
                        <option value="english">English (Default)</option>
                        <option value="sinhala">Sinhala Instruction</option>
                        <option value="tamil">Tamil Instruction</option>
@@ -82,7 +82,7 @@ const ChangeMedium = () => {
                   <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Statement of Justification</label>
                   <textarea 
                     required
-                    className="w-full px-6 py-5 bg-slate-50 border-none rounded-2xl font-bold transition-all focus:ring-2 focus:ring-indigo-500 min-h-[150px]"
+                    className="w-full px-6 py-5 bg-white border-none rounded-2xl font-bold transition-all focus:ring-2 focus:ring-indigo-500 min-h-[150px]"
                     placeholder="Briefly explain the reason for your request..."
                   ></textarea>
                </div>

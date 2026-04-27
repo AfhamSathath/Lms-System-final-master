@@ -133,7 +133,7 @@ const ProfilePictureUpload = ({ currentPicture, userName, onUpdate }) => {
     <>
       {/* Profile Picture Display */}
       <div className="relative group">
-        <div className="h-24 w-24 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 p-1">
+        <div className="h-24 w-24 rounded-full bg-white border border-black p-1">
           {imageUrl && !imageError ? (
             <img
               src={imageUrl}
@@ -189,7 +189,7 @@ const ProfilePictureUpload = ({ currentPicture, userName, onUpdate }) => {
 
               {/* Preview */}
               <div className="flex justify-center mb-6">
-                <div className="h-32 w-32 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 p-1">
+                <div className="h-32 w-32 rounded-full bg-white border border-black p-1">
                   {preview ? (
                     <img
                       src={preview}
@@ -215,7 +215,7 @@ const ProfilePictureUpload = ({ currentPicture, userName, onUpdate }) => {
               {/* Upload Controls */}
               <div className="space-y-4">
                 <div className="flex items-center justify-center">
-                  <label className="cursor-pointer bg-purple-50 hover:bg-purple-100 text-purple-600 px-4 py-2 rounded-lg transition-colors">
+                  <label className="cursor-pointer bg-white border border-black hover:bg-white border border-black text-purple-600 px-4 py-2 rounded-lg transition-colors">
                     <input
                       ref={fileInputRef}
                       type="file"
@@ -249,7 +249,7 @@ const ProfilePictureUpload = ({ currentPicture, userName, onUpdate }) => {
                     </button>
                     <button
                       onClick={handleCancel}
-                      className="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition-colors"
+                      className="bg-white0 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition-colors"
                     >
                       Cancel
                     </button>
@@ -261,7 +261,7 @@ const ProfilePictureUpload = ({ currentPicture, userName, onUpdate }) => {
                     <button
                       onClick={handleRemove}
                       disabled={uploading}
-                      className="text-red-600 hover:text-red-700 text-sm font-medium disabled:opacity-50"
+                      className="text-red-600 hover:text-slate-700 text-sm font-medium disabled:opacity-50"
                     >
                       Remove current picture
                     </button>

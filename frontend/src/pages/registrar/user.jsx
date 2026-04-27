@@ -95,15 +95,15 @@ const RegistrarUsers = () => {
   const academicYears = ['1', '2', '3', '4', '5'];
   const semesters = [1, 2, 3, 4, 5, 6, 7, 8];
   const roles = [
-    { value: 'student', label: 'Student', icon: '👨‍🎓', color: 'bg-blue-100 text-blue-800' },
-    { value: 'lecturer', label: 'Lecturer', icon: '👨‍🏫', color: 'bg-green-100 text-green-800' },
-    { value: 'hod', label: 'Head of Department', icon: '👔', color: 'bg-purple-100 text-purple-800' },
-    { value: 'dean', label: 'Dean', icon: '👨‍💼', color: 'bg-yellow-100 text-yellow-800' },
-    { value: 'registrar', label: 'Registrar', icon: '📋', color: 'bg-indigo-100 text-indigo-800' },
-    { value: 'bursar', label: 'Bursar', icon: '💰', color: 'bg-orange-100 text-orange-800' },
-    { value: 'exam_officer', label: 'Exam Officer', icon: '🧾', color: 'bg-teal-100 text-teal-800' },
-    { value: 'librarian', label: 'Librarian', icon: '📚', color: 'bg-pink-100 text-pink-800' },
-    { value: 'admin', label: 'Registrar', icon: '👨‍💻', color: 'bg-red-100 text-red-800' }
+    { value: 'student', label: 'Student', icon: '👨‍🎓', color: 'bg-white border border-black text-slate-800' },
+    { value: 'lecturer', label: 'Lecturer', icon: '👨‍🏫', color: 'bg-white border border-black text-slate-800' },
+    { value: 'hod', label: 'Head of Department', icon: '👔', color: 'bg-white border border-black text-slate-800' },
+    { value: 'dean', label: 'Dean', icon: '👨‍💼', color: 'bg-white border border-black text-slate-800' },
+    { value: 'registrar', label: 'Registrar', icon: '📋', color: 'bg-white border border-black text-slate-800' },
+    { value: 'bursar', label: 'Bursar', icon: '💰', color: 'bg-white border border-black text-slate-800' },
+    { value: 'exam_officer', label: 'Exam Officer', icon: '🧾', color: 'bg-white border border-black text-slate-800' },
+    { value: 'librarian', label: 'Librarian', icon: '📚', color: 'bg-white border border-black text-slate-800' },
+    { value: 'admin', label: 'Registrar', icon: '👨‍💻', color: 'bg-white border border-black text-slate-800' }
   ];
   const genders = ['male', 'female', 'other'];
 
@@ -340,7 +340,10 @@ const RegistrarUsers = () => {
       fetchUsers();
     } catch (error) {
       console.error('Add user error:', error);
-      toast.error(error.response?.data?.message || 'Failed to add user');
+      const errorMessage = error.response?.data?.message || 
+                          (error.response?.data?.errors && error.response.data.errors[0]?.msg) || 
+                          'Failed to add user';
+      toast.error(errorMessage);
     }
   };
 
@@ -394,7 +397,10 @@ const RegistrarUsers = () => {
       fetchUsers();
     } catch (error) {
       console.error('Edit user error:', error);
-      toast.error(error.response?.data?.message || 'Update failed');
+      const errorMessage = error.response?.data?.message || 
+                          (error.response?.data?.errors && error.response.data.errors[0]?.msg) || 
+                          'Update failed';
+      toast.error(errorMessage);
     }
   };
 
@@ -547,7 +553,7 @@ const RegistrarUsers = () => {
 
   const getRoleBadge = (role) => {
     const roleInfo = roles.find(r => r.value === role);
-    return roleInfo?.color || 'bg-gray-100 text-gray-800';
+    return roleInfo?.color || 'bg-white border border-black text-gray-800';
   };
 
   const getRoleIcon = (role) => {
@@ -557,19 +563,19 @@ const RegistrarUsers = () => {
 
   const getYearBadge = (year) => {
     const colors = {
-      1: 'bg-blue-100 text-blue-800',
-      2: 'bg-green-100 text-green-800',
-      3: 'bg-yellow-100 text-yellow-800',
-      4: 'bg-orange-100 text-orange-800',
-      5: 'bg-purple-100 text-purple-800'
+      1: 'bg-white border border-black text-slate-800',
+      2: 'bg-white border border-black text-slate-800',
+      3: 'bg-white border border-black text-slate-800',
+      4: 'bg-white border border-black text-slate-800',
+      5: 'bg-white border border-black text-slate-800'
     };
-    return colors[year] || 'bg-gray-100 text-gray-800';
+    return colors[year] || 'bg-white border border-black text-gray-800';
   };
 
   const getStatusBadge = (isActive) => {
     return isActive
-      ? 'bg-green-100 text-green-800 flex items-center'
-      : 'bg-red-100 text-red-800 flex items-center';
+      ? 'bg-white border border-black text-slate-800 flex items-center'
+      : 'bg-white border border-black text-slate-800 flex items-center';
   };
 
   const getInitials = (name) => {
@@ -593,11 +599,11 @@ const RegistrarUsers = () => {
   return (
     <div className="container mx-auto px-4 py-8 transition-all duration-300">
       {/* Header */}
-      <div className="bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl shadow-xl p-6 mb-8 text-white">
+      <div className="bg-white border border-black rounded-2xl shadow-sm p-6 mb-8 text-slate-900">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div className="flex-1">
             <h1 className="text-2xl md:text-3xl font-bold">Registrar Management</h1>
-            <p className="text-purple-100 mt-1">
+            <p className="text-slate-500 mt-1">
               Manage students, lecturers, HODs, deans, and university personnel
             </p>
           </div>
@@ -607,7 +613,7 @@ const RegistrarUsers = () => {
                 fetchUsers();
                 toast.success('Refreshing user list...');
               }}
-              className="bg-white bg-opacity-20 text-white px-4 py-2 rounded-lg hover:bg-opacity-30 transition-colors flex items-center"
+              className="bg-white text-slate-700 border border-black px-4 py-2 rounded-lg hover:bg-white transition-colors flex items-center shadow-sm"
               title="Refresh"
             >
               <FiRefreshCw className={`mr-2 ${loading ? 'animate-spin' : ''}`} />
@@ -624,7 +630,7 @@ const RegistrarUsers = () => {
                 resetForm();
                 setShowAddModal(true);
               }}
-              className="bg-white text-purple-600 px-6 py-2 rounded-lg hover:bg-purple-50 transition-colors flex items-center shadow-lg"
+              className="bg-red-900 text-white px-6 py-2 rounded-lg hover:bg-red-800 transition-colors flex items-center shadow-sm"
             >
               <FiUserPlus className="mr-2" />
               Add User
@@ -649,25 +655,25 @@ const RegistrarUsers = () => {
             title="Total Users"
             value={stats.total || 0}
             icon={<FiUsers className="h-6 w-6 text-blue-600" />}
-            bgColor="bg-blue-100"
+            bgColor="bg-white border border-black"
           />
           <StatCard
             title="Active Users"
             value={stats.active || 0}
             icon={<FiCheckCircle className="h-6 w-6 text-green-600" />}
-            bgColor="bg-green-100"
+            bgColor="bg-white border border-black"
           />
           <StatCard
             title="New This Month"
             value={stats.newThisMonth || 0}
             icon={<FiClock className="h-6 w-6 text-purple-600" />}
-            bgColor="bg-purple-100"
+            bgColor="bg-white border border-black"
           />
           <StatCard
             title="Inactive"
             value={stats.inactive || 0}
             icon={<FiXCircle className="h-6 w-6 text-red-600" />}
-            bgColor="bg-red-100"
+            bgColor="bg-white border border-black"
           />
         </div>
       )}
@@ -699,7 +705,7 @@ const RegistrarUsers = () => {
             <input
               type="text"
               placeholder="Search by name, email, ID, or department..."
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full pl-10 pr-4 py-3 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -711,7 +717,7 @@ const RegistrarUsers = () => {
             <select
               value={selectedRole}
               onChange={(e) => setSelectedRole(e.target.value)}
-              className="w-full pl-10 pr-8 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 appearance-none"
+              className="w-full pl-10 pr-8 py-3 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 appearance-none"
             >
               <option value="all">All Roles</option>
               {roles.map(role => (
@@ -729,7 +735,7 @@ const RegistrarUsers = () => {
             <select
               value={selectedDepartment}
               onChange={(e) => setSelectedDepartment(e.target.value)}
-              className="w-full pl-10 pr-8 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 appearance-none"
+              className="w-full pl-10 pr-8 py-3 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 appearance-none"
             >
               <option value="all">All Departments</option>
               {departments.map(dept => (
@@ -745,7 +751,7 @@ const RegistrarUsers = () => {
             <select
               value={selectedYear}
               onChange={(e) => setSelectedYear(e.target.value)}
-              className="w-full pl-10 pr-8 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 appearance-none"
+              className="w-full pl-10 pr-8 py-3 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 appearance-none"
             >
               <option value="all">All Years</option>
               {academicYears.map(year => (
@@ -761,7 +767,7 @@ const RegistrarUsers = () => {
             <select
               value={selectedSemester}
               onChange={(e) => setSelectedSemester(e.target.value)}
-              className="w-full pl-10 pr-8 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 appearance-none"
+              className="w-full pl-10 pr-8 py-3 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 appearance-none"
             >
               <option value="all">All Semesters</option>
               {semesters.map(sem => (
@@ -777,7 +783,7 @@ const RegistrarUsers = () => {
             <select
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
-              className="w-full pl-10 pr-8 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 appearance-none"
+              className="w-full pl-10 pr-8 py-3 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 appearance-none"
             >
               <option value="all">All Status</option>
               <option value="active">Active</option>
@@ -792,7 +798,7 @@ const RegistrarUsers = () => {
             <select
               value={selectedBatch}
               onChange={(e) => setSelectedBatch(e.target.value)}
-              className="w-full pl-10 pr-8 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 appearance-none"
+              className="w-full pl-10 pr-8 py-3 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 appearance-none"
             >
               <option value="all">All Batches</option>
               {batches.map(b => (
@@ -853,7 +859,7 @@ const RegistrarUsers = () => {
                   setSelectedDepartment('all');
                   setSelectedStatus('all');
                 }}
-                className="text-xs text-purple-600 hover:text-purple-800 font-medium ml-2"
+                className="text-xs text-purple-600 hover:text-slate-800 font-medium ml-2"
               >
                 Clear all
               </button>
@@ -865,12 +871,12 @@ const RegistrarUsers = () => {
       <div className="bg-white rounded-xl shadow-lg overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+            <thead className="bg-white">
               <tr>
                 <th className="px-6 py-3 text-left">
                   <input
                     type="checkbox"
-                    className="rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                    className="rounded border-black text-purple-600 focus:ring-purple-500"
                     onChange={handleSelectAll}
                     checked={selectedUserIds.length === filteredUsers.length && filteredUsers.length > 0}
                   />
@@ -915,7 +921,7 @@ const RegistrarUsers = () => {
                     <td className="px-6 py-4 whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
                       <input
                         type="checkbox"
-                        className="rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                        className="rounded border-black text-purple-600 focus:ring-purple-500"
                         checked={selectedUserIds.includes(u._id)}
                         onChange={() => handleSelectUser(u._id)}
                         disabled={u._id === user?.id}
@@ -923,7 +929,7 @@ const RegistrarUsers = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
-                        <div className="h-10 w-10 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                        <div className="h-10 w-10 rounded-full bg-white border border-black flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
                           {getInitials(u.name)}
                         </div>
                         <div className="ml-4">
@@ -984,7 +990,7 @@ const RegistrarUsers = () => {
                         </button>
                         <button
                           onClick={() => handleResetPassword(u._id)}
-                          className="text-purple-600 hover:text-purple-900 p-1 rounded hover:bg-purple-50"
+                          className="text-purple-600 hover:text-purple-900 p-1 rounded hover:bg-white border border-black"
                           title="Reset Password"
                         >
                           <FiEyeOff className="h-5 w-5" />
@@ -1119,7 +1125,7 @@ const RegistrarUsers = () => {
               type="file"
               accept=".csv"
               onChange={(e) => setBulkFile(e.target.files[0])}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
               required
             />
             <p className="mt-2 text-xs text-gray-500">
@@ -1146,7 +1152,7 @@ const RegistrarUsers = () => {
             <button
               type="button"
               onClick={handleDownloadTemplate}
-              className="px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors flex items-center"
+              className="px-4 py-2 bg-white border border-black rounded-lg hover:bg-gray-200 transition-colors flex items-center"
             >
               <FiDownload className="mr-2" /> Download Template
             </button>
@@ -1154,7 +1160,7 @@ const RegistrarUsers = () => {
               <button
                 type="button"
                 onClick={() => { setShowBulkUploadModal(false); setBulkFile(null); setUploadProgress(0); }}
-                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                className="px-4 py-2 border border-black rounded-lg text-gray-700 hover:bg-white"
               >
                 Cancel
               </button>
@@ -1190,7 +1196,7 @@ const StatCard = ({ title, value, icon, bgColor }) => (
 );
 
 const FilterBadge = ({ label, onRemove }) => (
-  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-white border border-black text-slate-800">
     {label}
     <button onClick={onRemove} className="ml-2 hover:text-purple-900">
       ×
@@ -1244,7 +1250,7 @@ const UserForm = ({
               value={formData.name}
               onChange={handleInputChange}
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
               placeholder="John Doe"
             />
           </div>
@@ -1258,7 +1264,7 @@ const UserForm = ({
               value={formData.email}
               onChange={handleInputChange}
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
               placeholder="john@example.com"
             />
           </div>
@@ -1274,7 +1280,7 @@ const UserForm = ({
                   value={formData.password}
                   onChange={handleInputChange}
                   required={!isEdit}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 pr-10"
+                  className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 pr-10"
                   placeholder="Enter password"
                 />
                 <button
@@ -1296,7 +1302,7 @@ const UserForm = ({
               value={formData.role}
               onChange={handleRoleChange}
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
             >
               {roles.map(role => (
                 <option key={role.value} value={role.value}>
@@ -1327,7 +1333,7 @@ const UserForm = ({
                     value={formData.studentId}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 uppercase"
+                    className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 uppercase"
                     placeholder="STU001"
                   />
                 </div>
@@ -1340,7 +1346,7 @@ const UserForm = ({
                     value={formData.batch}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                   >
                     <option value="">Select Batch</option>
                     <option value="2024/2025">2024/2025</option>
@@ -1365,7 +1371,7 @@ const UserForm = ({
                     value={formData.lecturerId}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 uppercase"
+                    className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 uppercase"
                     placeholder="EMP001"
                   />
                 </div>
@@ -1378,7 +1384,7 @@ const UserForm = ({
                     name="qualifications"
                     value={formData.qualifications}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                     placeholder="PhD, MSc, BSc"
                   />
                 </div>
@@ -1391,7 +1397,7 @@ const UserForm = ({
                     name="specialization"
                     value={formData.specialization}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                     placeholder="Computer Science, Mathematics"
                   />
                 </div>
@@ -1409,7 +1415,7 @@ const UserForm = ({
                 value={formData.faculty}
                 onChange={handleInputChange}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
               >
                 <option value="">Select Faculty</option>
                 {faculties.map(f => (
@@ -1427,7 +1433,7 @@ const UserForm = ({
                 onChange={handleInputChange}
                 required
                 disabled={!formData.faculty}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:bg-gray-100"
+                className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:bg-white border border-black"
               >
                 <option value="">{formData.faculty ? 'Select Department' : 'Select Faculty First'}</option>
                 {availableDepartments.map(dept => (
@@ -1454,7 +1460,7 @@ const UserForm = ({
               name="phone"
               value={formData.phone}
               onChange={handleInputChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
               placeholder="+94 77 123 4567"
             />
           </div>
@@ -1466,7 +1472,7 @@ const UserForm = ({
               name="gender"
               value={formData.gender}
               onChange={handleInputChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
             >
               <option value="">Select Gender</option>
               {genders.map(gender => (
@@ -1485,7 +1491,7 @@ const UserForm = ({
               name="dateOfBirth"
               value={formData.dateOfBirth}
               onChange={handleInputChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
             />
           </div>
           <div>
@@ -1497,7 +1503,7 @@ const UserForm = ({
               name="emergencyContact"
               value={formData.emergencyContact}
               onChange={handleInputChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
               placeholder="Name: Phone"
             />
           </div>
@@ -1510,7 +1516,7 @@ const UserForm = ({
               value={formData.address}
               onChange={handleInputChange}
               rows="2"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
               placeholder="Enter address"
             />
           </div>
@@ -1526,7 +1532,7 @@ const UserForm = ({
               name="isActive"
               checked={formData.isActive}
               onChange={handleInputChange}
-              className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
+              className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-black rounded"
             />
             <label className="ml-2 block text-sm text-gray-900">
               Account is active
@@ -1540,7 +1546,7 @@ const UserForm = ({
         <button
           type="button"
           onClick={onCancel}
-          className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+          className="px-6 py-2 border border-black text-gray-700 rounded-lg hover:bg-white transition-colors"
         >
           Cancel
         </button>
@@ -1562,7 +1568,7 @@ const UserProfile = ({ user, roles, onEdit, onToggleStatus, onClose, getRoleBadg
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center space-x-4">
-        <div className="h-20 w-20 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 flex items-center justify-center text-white font-bold text-3xl">
+        <div className="h-20 w-20 rounded-full bg-white border border-black flex items-center justify-center text-white font-bold text-3xl">
           {user.name?.charAt(0).toUpperCase()}
         </div>
         <div className="flex-1">
@@ -1586,7 +1592,7 @@ const UserProfile = ({ user, roles, onEdit, onToggleStatus, onClose, getRoleBadg
       {/* Details Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Identification */}
-        <div className="bg-gray-50 rounded-lg p-4">
+        <div className="bg-white rounded-lg p-4">
           <h3 className="text-sm font-medium text-gray-500 mb-3">Identification</h3>
           <div className="space-y-2">
             <div className="flex justify-between">
@@ -1612,7 +1618,7 @@ const UserProfile = ({ user, roles, onEdit, onToggleStatus, onClose, getRoleBadg
 
         {/* Academic Info */}
         {user.role === 'student' && (
-          <div className="bg-gray-50 rounded-lg p-4">
+          <div className="bg-white rounded-lg p-4">
             <h3 className="text-sm font-medium text-gray-500 mb-3">Academic Information</h3>
             <div className="space-y-2">
               <div className="flex justify-between">
@@ -1633,7 +1639,7 @@ const UserProfile = ({ user, roles, onEdit, onToggleStatus, onClose, getRoleBadg
 
         {/* Professional Info */}
         {['lecturer', 'hod', 'dean'].includes(user.role) && (
-          <div className="bg-gray-50 rounded-lg p-4">
+          <div className="bg-white rounded-lg p-4">
             <h3 className="text-sm font-medium text-gray-500 mb-3">Professional Information</h3>
             <div className="space-y-2">
               {user.qualifications && (
@@ -1653,7 +1659,7 @@ const UserProfile = ({ user, roles, onEdit, onToggleStatus, onClose, getRoleBadg
         )}
 
         {/* Contact Info */}
-        <div className="bg-gray-50 rounded-lg p-4">
+        <div className="bg-white rounded-lg p-4">
           <h3 className="text-sm font-medium text-gray-500 mb-3">Contact Information</h3>
           <div className="space-y-2">
             {user.phone && (
@@ -1684,7 +1690,7 @@ const UserProfile = ({ user, roles, onEdit, onToggleStatus, onClose, getRoleBadg
         </div>
 
         {/* Personal Info */}
-        <div className="bg-gray-50 rounded-lg p-4">
+        <div className="bg-white rounded-lg p-4">
           <h3 className="text-sm font-medium text-gray-500 mb-3">Personal Information</h3>
           <div className="space-y-2">
             {user.gender && (
@@ -1711,7 +1717,7 @@ const UserProfile = ({ user, roles, onEdit, onToggleStatus, onClose, getRoleBadg
         </div>
 
         {/* Account Info */}
-        <div className="md:col-span-2 bg-gray-50 rounded-lg p-4">
+        <div className="md:col-span-2 bg-white rounded-lg p-4">
           <h3 className="text-sm font-medium text-gray-500 mb-3">Account Information</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
@@ -1749,7 +1755,7 @@ const UserProfile = ({ user, roles, onEdit, onToggleStatus, onClose, getRoleBadg
         </button>
         <button
           onClick={onClose}
-          className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+          className="px-6 py-2 border border-black text-gray-700 rounded-lg hover:bg-white transition-colors"
         >
           Close
         </button>

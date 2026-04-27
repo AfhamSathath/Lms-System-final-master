@@ -36,13 +36,13 @@ const StudentResults = () => {
       'A+': 'bg-emerald-100 text-emerald-700',
       'A': 'bg-emerald-100 text-emerald-700',
       'A-': 'bg-emerald-100 text-emerald-700',
-      'B+': 'bg-blue-100 text-blue-700',
-      'B': 'bg-blue-100 text-blue-700',
-      'B-': 'bg-blue-100 text-blue-700',
+      'B+': 'bg-white border border-black text-slate-700',
+      'B': 'bg-white border border-black text-slate-700',
+      'B-': 'bg-white border border-black text-slate-700',
       'C+': 'bg-amber-100 text-amber-700',
       'C': 'bg-amber-100 text-amber-700',
-      'C-': 'bg-orange-100 text-orange-700',
-      'D+': 'bg-orange-100 text-orange-700',
+      'C-': 'bg-white border border-black text-slate-700',
+      'D+': 'bg-white border border-black text-slate-700',
       'D': 'bg-rose-100 text-rose-700',
       'F': 'bg-rose-100 text-rose-700',
     };
@@ -141,7 +141,7 @@ const StudentResults = () => {
   const semesterKeys = Object.keys(results).sort((a, b) => b.localeCompare(a));
 
   return (
-    <div className="container mx-auto px-4 py-8 bg-slate-50 min-h-screen">
+    <div className="container mx-auto px-4 py-8 bg-white min-h-screen">
       <div className="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
           <h1 className="text-4xl font-extrabold text-slate-800 tracking-tight font-outfit uppercase">Academic Portfolio</h1>
@@ -166,7 +166,7 @@ const StudentResults = () => {
            </div>
         </div>
 
-        <div className="lg:col-span-2 bg-white rounded-[3rem] shadow-xl p-10 border border-slate-100 flex flex-col justify-center">
+        <div className="lg:col-span-2 bg-white rounded-[3rem] shadow-xl p-10 border border-black flex flex-col justify-center">
            <div className="flex justify-between items-center mb-8">
               <h3 className="text-xl font-black text-slate-800 uppercase tracking-widest flex items-center gap-2">
                  <FiFilter className="text-indigo-600" />
@@ -193,7 +193,7 @@ const StudentResults = () => {
                </button>
              ))}
            </div>
-           <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest italic flex items-center gap-2 bg-slate-50 p-4 rounded-2xl self-start">
+           <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest italic flex items-center gap-2 bg-white p-4 rounded-2xl self-start">
               <FiInfo className="text-indigo-400" /> Multi-select semesters to calculate custom academic performance.
            </p>
         </div>
@@ -218,9 +218,9 @@ const StudentResults = () => {
 
       <div className="space-y-8">
         {semesterKeys.map(key => (
-          <div key={key} className="bg-white rounded-[4rem] shadow-2xl overflow-hidden border border-slate-100 group">
+          <div key={key} className="bg-white rounded-[4rem] shadow-2xl overflow-hidden border border-black group">
              <div 
-               className="px-12 py-10 cursor-pointer hover:bg-slate-50 transition-all flex flex-col md:flex-row justify-between md:items-center gap-6"
+               className="px-12 py-10 cursor-pointer hover:bg-white transition-all flex flex-col md:flex-row justify-between md:items-center gap-6"
                onClick={() => setExpandedSemesters({...expandedSemesters, [key]: !expandedSemesters[key]})}
              >
                 <div className="flex items-center gap-6">
@@ -248,7 +248,7 @@ const StudentResults = () => {
                <div className="px-12 pb-12 overflow-x-auto">
                   <table className="w-full text-left">
                      <thead>
-                        <tr className="border-b border-slate-100">
+                        <tr className="border-b border-black">
                            <th className="py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Descriptor</th>
                            <th className="py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Weight</th>
                            <th className="py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Marks</th>
@@ -269,7 +269,7 @@ const StudentResults = () => {
                           const status = item.status || info.status;
 
                           return (
-                            <tr key={i} className="group-hover:bg-slate-50/50 transition-colors">
+                            <tr key={i} className="group-hover:bg-white/50 transition-colors">
                                <td className="py-6">
                                   <p className="font-extrabold text-slate-700 text-md">{item.subject?.name}</p>
                                   <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">{item.subject?.code}</p>
@@ -298,7 +298,7 @@ const StudentResults = () => {
         ))}
 
         {semesterKeys.length === 0 && (
-          <div className="py-32 text-center bg-white rounded-[4rem] border border-slate-100 shadow-xl">
+          <div className="py-32 text-center bg-white rounded-[4rem] border border-black shadow-xl">
              <FiAward className="h-16 w-16 text-slate-200 mx-auto mb-6" />
              <h3 className="text-2xl font-black text-slate-700">No Academic Records Published.</h3>
              <p className="text-slate-400 font-medium italic">Contact the examination department for official transcript sync.</p>

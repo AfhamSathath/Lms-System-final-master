@@ -67,7 +67,7 @@ const LecturerAssignments = () => {
   if (loading) return <Loader fullScreen />;
 
   return (
-    <div className="container mx-auto px-4 py-8 bg-slate-50 min-h-screen">
+    <div className="container mx-auto px-4 py-8 bg-white min-h-screen">
       <div className="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
           <button 
@@ -80,7 +80,7 @@ const LecturerAssignments = () => {
           <p className="text-slate-500 mt-2 font-black uppercase tracking-widest text-[10px]">{subjectName}</p>
         </div>
         
-        <div className="bg-white p-6 rounded-[2.5rem] shadow-xl border border-slate-100 flex items-center gap-6">
+        <div className="bg-white p-6 rounded-[2.5rem] shadow-xl border border-black flex items-center gap-6">
            <div className="p-4 bg-amber-50 rounded-2xl text-amber-600 shadow-sm">
               <FiAward className="h-8 w-8" />
            </div>
@@ -95,10 +95,10 @@ const LecturerAssignments = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         <div className="lg:col-span-8">
-          <div className="bg-white rounded-[4rem] shadow-2xl overflow-hidden border border-slate-100 mb-10">
+          <div className="bg-white rounded-[4rem] shadow-2xl overflow-hidden border border-black mb-10">
             <div className="overflow-x-auto">
               <table className="w-full text-left">
-                <thead className="bg-slate-50">
+                <thead className="bg-white">
                   <tr>
                     <th className="px-10 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Student</th>
                     <th className="px-10 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">CA (40%)</th>
@@ -112,7 +112,7 @@ const LecturerAssignments = () => {
                     <tr key={student._id} className={`hover:bg-slate-50/50 transition-colors ${selectedEnrollment?._id === student._id ? 'bg-indigo-50/30' : ''}`}>
                       <td className="px-10 py-6">
                         <div className="flex items-center gap-4">
-                          <div className="h-12 w-12 rounded-2xl bg-indigo-100 flex items-center justify-center text-indigo-600 font-black">
+                          <div className="h-12 w-12 rounded-2xl bg-white border border-black flex items-center justify-center text-indigo-600 font-black">
                             {student.student?.name?.charAt(0)}
                           </div>
                           <div>
@@ -148,7 +148,7 @@ const LecturerAssignments = () => {
 
         <div className="lg:col-span-4">
            {selectedEnrollment ? (
-             <div className="bg-white rounded-[4rem] shadow-2xl p-12 border border-slate-100 sticky top-10">
+             <div className="bg-white rounded-[4rem] shadow-2xl p-12 border border-black sticky top-10">
                 <div className="flex items-center gap-4 mb-10">
                    <div className="h-16 w-16 bg-slate-900 rounded-[1.5rem] flex items-center justify-center text-white">
                       <FiAward className="h-8 w-8" />
@@ -169,7 +169,7 @@ const LecturerAssignments = () => {
                            min="0"
                            value={marks.continuousAssessment}
                            onChange={(e) => setMarks({ ...marks, continuousAssessment: e.target.value })}
-                           className="w-full bg-slate-50 border-0 rounded-3xl p-6 text-slate-800 font-black text-xl focus:ring-4 focus:ring-indigo-100 transition-all"
+                           className="w-full bg-white border-0 rounded-3xl p-6 text-slate-800 font-black text-xl focus:ring-4 focus:ring-indigo-100 transition-all"
                          />
                       </div>
                       <div className="group">
@@ -180,7 +180,7 @@ const LecturerAssignments = () => {
                            min="0"
                            value={marks.finalExam}
                            onChange={(e) => setMarks({ ...marks, finalExam: e.target.value })}
-                           className="w-full bg-slate-50 border-0 rounded-3xl p-6 text-slate-800 font-black text-xl focus:ring-4 focus:ring-indigo-100 transition-all"
+                           className="w-full bg-white border-0 rounded-3xl p-6 text-slate-800 font-black text-xl focus:ring-4 focus:ring-indigo-100 transition-all"
                          />
                       </div>
                       <div className="group">
@@ -188,7 +188,7 @@ const LecturerAssignments = () => {
                          <textarea 
                            value={marks.remarks}
                            onChange={(e) => setMarks({ ...marks, remarks: e.target.value })}
-                           className="w-full bg-slate-50 border-0 rounded-3xl p-6 text-slate-800 font-medium text-sm focus:ring-4 focus:ring-indigo-100 transition-all min-h-[120px]"
+                           className="w-full bg-white border-0 rounded-3xl p-6 text-slate-800 font-medium text-sm focus:ring-4 focus:ring-indigo-100 transition-all min-h-[120px]"
                            placeholder="Feedback for the student..."
                          />
                       </div>

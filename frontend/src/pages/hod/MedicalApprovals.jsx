@@ -60,7 +60,7 @@ const HodMedicalApprovals = () => {
         </div>
       ) : medicals.length === 0 ? (
         <div className="bg-white p-12 text-center rounded-xl shadow-sm">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-100 text-blue-500 mb-4">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white border border-black text-blue-500 mb-4">
             <FiCheck className="w-8 h-8" />
           </div>
           <h3 className="text-lg font-medium text-gray-900">All Caught Up!</h3>
@@ -69,7 +69,7 @@ const HodMedicalApprovals = () => {
       ) : (
         <div className="grid gap-6">
           {medicals.map(medical => (
-            <div key={medical._id} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden relative">
+            <div key={medical._id} className="bg-white rounded-xl shadow-sm border border-black overflow-hidden relative">
               <div className="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
               <div className="p-6">
                 <div className="flex justify-between items-start">
@@ -77,10 +77,10 @@ const HodMedicalApprovals = () => {
                     <h3 className="text-lg font-bold text-gray-900">{medical.fullName} ({medical.registrationNumber})</h3>
                     <p className="text-sm text-gray-500 mt-1">{medical.faculty} • {medical.semester}</p>
                   </div>
-                  <span className="px-3 py-1 bg-yellow-100 text-yellow-800 text-xs font-semibold rounded-full">PENDING REVIEW</span>
+                  <span className="px-3 py-1 bg-white border border-black text-slate-800 text-xs font-semibold rounded-full">PENDING REVIEW</span>
                 </div>
 
-                <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-50 p-4 rounded-lg">
+                <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-4 rounded-lg">
                   <div>
                     <p className="text-xs text-gray-500 uppercase tracking-wider font-semibold">Diagnosis / Illness</p>
                     <p className="font-medium text-gray-800 mt-1">{medical.illness}</p>
@@ -98,7 +98,7 @@ const HodMedicalApprovals = () => {
                   </div>
                   <div>
                      <p className="text-xs text-gray-500 uppercase tracking-wider font-semibold mb-2">Medical Document</p>
-                     <a href={`http://localhost:5001${medical.documentUrl}`} target="_blank" rel="noreferrer" className="inline-flex items-center text-sm text-blue-600 hover:text-blue-800 font-medium">
+                     <a href={`http://localhost:5001${medical.documentUrl}`} target="_blank" rel="noreferrer" className="inline-flex items-center text-sm text-blue-600 hover:text-slate-800 font-medium">
                        <FiFileText className="mr-2" /> View Certificate
                      </a>
                   </div>
@@ -111,7 +111,7 @@ const HodMedicalApprovals = () => {
                     value={remarks[medical._id] || ''}
                     onChange={(e) => setRemarks({...remarks, [medical._id]: e.target.value})}
                     placeholder="Add optional remarks..."
-                    className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm mb-4"
+                    className="w-full p-2 border border-black rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm mb-4"
                   />
                   
                   <div className="flex gap-3">

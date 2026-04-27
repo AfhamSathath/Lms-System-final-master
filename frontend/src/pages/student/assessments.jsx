@@ -51,7 +51,7 @@ const StudentAssessments = () => {
   const currentEnrollment = filteredEnrollments.find(e => e._id === activeSubject);
 
   return (
-    <div className="container mx-auto px-4 py-8 bg-slate-50 min-h-screen">
+    <div className="container mx-auto px-4 py-8 bg-white min-h-screen">
       <div className="mb-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
            <h1 className="text-4xl font-black text-slate-800 tracking-tight uppercase font-outfit">Continuous Evaluation</h1>
@@ -60,7 +60,7 @@ const StudentAssessments = () => {
         
         {/* Quick Stats Summary */}
         <div className="flex gap-4">
-           <div className="bg-white px-6 py-4 rounded-3xl shadow-xl border border-slate-100 hidden sm:block">
+           <div className="bg-white px-6 py-4 rounded-3xl shadow-xl border border-black hidden sm:block">
               <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Modules</p>
               <p className="text-xl font-black text-slate-800">{filteredEnrollments.length}</p>
            </div>
@@ -69,7 +69,7 @@ const StudentAssessments = () => {
 
       {/* Modern Filter Toggles */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12 animate-in fade-in slide-in-from-top-4 duration-1000">
-         <div className="bg-white rounded-[2rem] shadow-xl p-8 border border-slate-100 relative overflow-hidden group">
+         <div className="bg-white rounded-[2rem] shadow-xl p-8 border border-black relative overflow-hidden group">
             <div className="absolute top-0 right-0 p-8 opacity-[0.02] group-hover:scale-125 transition-transform duration-1000">
                <FiBook className="h-32 w-32" />
             </div>
@@ -117,7 +117,7 @@ const StudentAssessments = () => {
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* Sidebar: Subject List */}
         <div className="lg:col-span-1 space-y-4">
-          <div className="bg-white rounded-[2rem] shadow-xl p-6 border border-slate-100 sticky top-24">
+          <div className="bg-white rounded-[2rem] shadow-xl p-6 border border-black sticky top-24">
             <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-6 px-2">Registered Modules</h3>
             <div className="space-y-3">
               {filteredEnrollments.map((e) => (
@@ -143,7 +143,7 @@ const StudentAssessments = () => {
             </div>
             
             {filteredEnrollments.length === 0 && (
-              <div className="p-12 text-center bg-slate-50 rounded-3xl border border-dashed border-slate-200">
+              <div className="p-12 text-center bg-white rounded-3xl border border-dashed border-black">
                 <FiInfo className="mx-auto h-8 w-8 text-slate-200 mb-3" />
                 <p className="text-[9px] text-slate-400 font-black uppercase tracking-[0.2em]">No Modules Found</p>
               </div>
@@ -156,7 +156,7 @@ const StudentAssessments = () => {
           {currentEnrollment ? (
             <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
               {/* Subject Header Card */}
-              <div className="bg-white rounded-[3rem] shadow-2xl p-10 border border-slate-100 relative overflow-hidden group">
+              <div className="bg-white rounded-[3rem] shadow-2xl p-10 border border-black relative overflow-hidden group">
                  <div className="absolute top-0 right-0 p-10 opacity-[0.03] group-hover:scale-110 transition-transform">
                     <FiAward className="h-64 w-64 -mr-16 -mt-16" />
                  </div>
@@ -192,7 +192,7 @@ const StudentAssessments = () => {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                       <div className="p-6 bg-slate-50 rounded-[2.5rem] border border-slate-100">
+                       <div className="p-6 bg-white rounded-[2.5rem] border border-black">
                           <div className="flex items-center gap-3 mb-4">
                              <FiBarChart2 className="text-indigo-600" />
                              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Components</span>
@@ -201,7 +201,7 @@ const StudentAssessments = () => {
                           <p className="text-xs text-slate-400 font-medium">Evaluations published</p>
                        </div>
 
-                       <div className="p-6 bg-slate-50 rounded-[2.5rem] border border-slate-100">
+                       <div className="p-6 bg-white rounded-[2.5rem] border border-black">
                           <div className="flex items-center gap-3 mb-4">
                              <FiPieChart className="text-emerald-600" />
                              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Pass Status</span>
@@ -210,7 +210,7 @@ const StudentAssessments = () => {
                           <p className="text-xs text-slate-400 font-medium italic">Based on CA weightage</p>
                        </div>
 
-                       <div className="p-6 bg-slate-50 rounded-[2.5rem] border border-slate-100">
+                       <div className="p-6 bg-white rounded-[2.5rem] border border-black">
                           <div className="flex items-center gap-3 mb-4">
                              <FiCheckCircle className="text-blue-600" />
                              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Attendance</span>
@@ -232,7 +232,7 @@ const StudentAssessments = () => {
                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {currentEnrollment.assessments && currentEnrollment.assessments.length > 0 ? (
                       currentEnrollment.assessments.map((assess, idx) => (
-                        <div key={idx} className="bg-white p-8 rounded-[2.5rem] shadow-xl border border-slate-100 group hover:scale-[1.02] transition-transform">
+                        <div key={idx} className="bg-white p-8 rounded-[2.5rem] shadow-xl border border-black group hover:scale-[1.02] transition-transform">
                            <div className="flex justify-between items-start mb-6">
                               <div>
                                  <span className="px-3 py-1 bg-slate-100 text-slate-600 text-[10px] font-black rounded-full uppercase tracking-widest inline-block mb-3">
@@ -265,7 +265,7 @@ const StudentAssessments = () => {
                         </div>
                       ))
                     ) : (
-                      <div className="col-span-full py-20 bg-white rounded-[3rem] border border-dashed border-slate-200 flex flex-col items-center justify-center">
+                      <div className="col-span-full py-20 bg-white rounded-[3rem] border border-dashed border-black flex flex-col items-center justify-center">
                          <FiBook className="h-12 w-12 text-slate-100 mb-4" />
                          <p className="text-slate-400 font-bold uppercase tracking-[0.2em] text-xs">No marks recorded yet</p>
                          <p className="text-slate-300 text-[10px] uppercase font-medium mt-2">Check back after HOD approval</p>

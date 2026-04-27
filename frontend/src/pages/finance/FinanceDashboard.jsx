@@ -251,12 +251,12 @@ const FinanceDashboard = () => {
             placeholder="Search by student name, index, or subject code..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+            className="flex-1 px-4 py-2 border border-black rounded-lg focus:ring-2 focus:ring-blue-500"
           />
           <select
             value={filterMonth}
             onChange={(e) => setFilterMonth(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+            className="px-4 py-2 border border-black rounded-lg focus:ring-2 focus:ring-blue-500"
           >
             <option value="">All Months</option>
             <option value="2026-05">May 2026</option>
@@ -268,7 +268,7 @@ const FinanceDashboard = () => {
         {/* Pending Payments Table */}
         <div className="bg-white rounded-lg shadow overflow-hidden">
           <table className="w-full">
-            <thead className="bg-gray-100 border-b border-gray-200">
+            <thead className="bg-white border border-black border-b border-black">
               <tr>
                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Student</th>
                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Subject</th>
@@ -347,7 +347,7 @@ const FinanceDashboard = () => {
       <div className="space-y-4">
         <div className="bg-white rounded-lg shadow overflow-hidden">
           <table className="w-full">
-            <thead className="bg-gray-100 border-b border-gray-200">
+            <thead className="bg-white border border-black border-b border-black">
               <tr>
                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Student</th>
                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Subject</th>
@@ -359,7 +359,7 @@ const FinanceDashboard = () => {
             </thead>
             <tbody className="divide-y divide-gray-200">
               {confirmedPayments.map((payment) => (
-                <tr key={payment._id} className="hover:bg-gray-50">
+                <tr key={payment._id} className="hover:bg-white">
                   <td className="px-6 py-4 text-sm text-gray-900">
                     <div className="font-medium">{payment.studentName}</div>
                     <div className="text-gray-600">{payment.studentIndex}</div>
@@ -371,7 +371,7 @@ const FinanceDashboard = () => {
                     LKR {payment.amount.toLocaleString()}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-900">
-                    <code className="bg-gray-100 px-2 py-1 rounded text-xs">
+                    <code className="bg-white border border-black px-2 py-1 rounded text-xs">
                       {payment.paymentReference}
                     </code>
                   </td>
@@ -415,7 +415,7 @@ const FinanceDashboard = () => {
                   reference: e.target.value
                 })}
                 placeholder="e.g., BANK_TRX_123456"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                className="w-full px-4 py-2 border border-black rounded-lg focus:ring-2 focus:ring-green-500"
               />
             </div>
 
@@ -431,7 +431,7 @@ const FinanceDashboard = () => {
                   proof: e.target.value
                 })}
                 placeholder="/uploads/receipt.pdf"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                className="w-full px-4 py-2 border border-black rounded-lg focus:ring-2 focus:ring-green-500"
               />
             </div>
           </div>
@@ -439,7 +439,7 @@ const FinanceDashboard = () => {
           <div className="flex gap-4 mt-6">
             <button
               onClick={() => setPaymentProofModal(null)}
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 font-semibold hover:bg-gray-50"
+              className="flex-1 px-4 py-2 border border-black rounded-lg text-gray-700 font-semibold hover:bg-white"
             >
               Cancel
             </button>
@@ -467,7 +467,7 @@ const FinanceDashboard = () => {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 border-b border-gray-200">
+      <div className="flex gap-2 border-b border-black">
         {[
           { id: 'overview', label: 'Overview' },
           { id: 'pending', label: 'Pending Payments' },

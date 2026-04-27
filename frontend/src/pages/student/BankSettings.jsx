@@ -49,9 +49,9 @@ const BankSettings = () => {
   if (loading) return <Loader fullScreen />;
 
   return (
-    <div className="p-6 bg-slate-50 min-h-screen">
+    <div className="p-6 bg-white min-h-screen">
       <div className="max-w-4xl mx-auto">
-        <div className="bg-white rounded-[3rem] shadow-sm border border-slate-200 overflow-hidden">
+        <div className="bg-white rounded-[3rem] shadow-sm border border-black overflow-hidden">
           <div className="bg-indigo-600 p-12 text-white relative">
             <div className="absolute top-0 right-0 p-12 opacity-15">
               <FiCreditCard className="text-9xl rotate-12" />
@@ -102,7 +102,7 @@ const BankSettings = () => {
                 />
               </div>
 
-              <div className="pt-6 border-t border-slate-100 flex justify-end">
+              <div className="pt-6 border-t border-black flex justify-end">
                 <button
                   type="submit"
                   disabled={saving}
@@ -130,7 +130,7 @@ const InputGroup = ({ label, name, placeholder, value, onChange }) => (
       type="text"
       name={name}
       placeholder={placeholder}
-      className="w-full px-6 py-4 bg-slate-50 border-2 border-transparent focus:border-indigo-500 focus:bg-white rounded-2xl font-bold transition-all outline-none"
+      className="w-full px-6 py-4 bg-white border-2 border-transparent focus:border-indigo-500 focus:bg-white rounded-2xl font-bold transition-all outline-none"
       value={value}
       onChange={onChange}
       required

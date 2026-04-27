@@ -124,9 +124,9 @@ const HodStaff = () => {
   if (loading) return <Loader fullScreen />;
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
+    <div className="p-6 bg-white min-h-screen">
       {/* Header */}
-      <div className="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8 mb-8">
+      <div className="bg-white rounded-[2rem] shadow-sm border border-black p-8 mb-8">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
             <h1 className="text-3xl font-black text-gray-800 tracking-tight uppercase leading-none mb-2">Staff Directory</h1>
@@ -140,7 +140,7 @@ const HodStaff = () => {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search staff..."
-                className="pl-10 pr-4 py-3 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-indigo-500 w-full md:w-64 font-medium transition-all"
+                className="pl-10 pr-4 py-3 bg-white border-none rounded-2xl focus:ring-2 focus:ring-indigo-500 w-full md:w-64 font-medium transition-all"
               />
             </div>
             <button
@@ -151,7 +151,7 @@ const HodStaff = () => {
             </button>
             <button
               onClick={fetchStaff}
-              className="p-3 bg-indigo-50 text-indigo-600 rounded-2xl hover:bg-indigo-100 transition-all"
+              className="p-3 bg-indigo-50 text-indigo-600 rounded-2xl hover:bg-white border border-black transition-all"
               title="Refresh"
             >
               <FiRefreshCw />
@@ -161,10 +161,10 @@ const HodStaff = () => {
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden">
+      <div className="bg-white rounded-[2rem] shadow-sm border border-black overflow-hidden">
         <table className="min-w-full text-left">
           <thead>
-            <tr className="bg-gray-50/50">
+            <tr className="bg-white/50">
               <th className="px-8 py-6 text-xs font-black uppercase tracking-widest text-gray-400">Staff Member</th>
               <th className="px-8 py-6 text-xs font-black uppercase tracking-widest text-gray-400">Staff ID</th>
               <th className="px-8 py-6 text-xs font-black uppercase tracking-widest text-gray-400">Role</th>
@@ -184,7 +184,7 @@ const HodStaff = () => {
               </tr>
             ) : (
               filteredStaff.map((staffer) => (
-                <tr key={staffer._id} className="hover:bg-gray-50/50 transition-colors group">
+                <tr key={staffer._id} className="hover:bg-white/50 transition-colors group">
                   <td className="px-8 py-6">
                     <div className="flex items-center gap-4">
                       <div className="w-12 h-12 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600 font-black text-lg shadow-sm">
@@ -242,7 +242,7 @@ const HodStaff = () => {
         title="Appoint New Department Staff"
       >
         <div className="space-y-6">
-          <div className="p-4 bg-indigo-50 rounded-2xl flex items-center gap-4 text-indigo-700">
+          <div className="p-4 bg-indigo-50 rounded-2xl flex items-center gap-4 text-slate-700">
             <FiInfo className="text-xl shrink-0" />
             <p className="text-xs font-bold leading-tight uppercase tracking-wider">Select unassigned lecturers to bring them into your department.</p>
           </div>
@@ -252,7 +252,7 @@ const HodStaff = () => {
             <input
               type="text"
               placeholder="Filter unassigned staff..."
-              className="w-full pl-10 pr-4 py-3 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-indigo-500 font-medium"
+              className="w-full pl-10 pr-4 py-3 bg-white border-none rounded-2xl focus:ring-2 focus:ring-indigo-500 font-medium"
               value={assignSearch}
               onChange={(e) => setAssignSearch(e.target.value)}
             />
@@ -269,7 +269,7 @@ const HodStaff = () => {
                 l.name?.toLowerCase().includes(assignSearch.toLowerCase()) || 
                 l.email?.toLowerCase().includes(assignSearch.toLowerCase())
               ).map(l => (
-                <div key={l._id} className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl hover:bg-indigo-50 transition-colors group">
+                <div key={l._id} className="flex items-center justify-between p-4 bg-white rounded-2xl hover:bg-indigo-50 transition-colors group">
                   <div>
                     <p className="font-bold text-gray-800">{l.name}</p>
                     <p className="text-xs text-gray-400">{l.email}</p>
@@ -302,7 +302,7 @@ const HodStaff = () => {
               value={editFormData.lecturerId}
               onChange={(e) => setEditFormData({ ...editFormData, lecturerId: e.target.value })}
               placeholder="e.g. L001"
-              className="w-full px-5 py-4 bg-gray-50 border-none rounded-2xl font-bold focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-5 py-4 bg-white border-none rounded-2xl font-bold focus:ring-2 focus:ring-indigo-500"
             />
           </div>
 
@@ -311,7 +311,7 @@ const HodStaff = () => {
             <select
               value={editFormData.isActive}
               onChange={(e) => setEditFormData({ ...editFormData, isActive: e.target.value === 'true' })}
-              className="w-full px-5 py-4 bg-gray-50 border-none rounded-2xl font-bold focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-5 py-4 bg-white border-none rounded-2xl font-bold focus:ring-2 focus:ring-indigo-500"
             >
               <option value="true">Active Access</option>
               <option value="false">Inactive / Suspended</option>

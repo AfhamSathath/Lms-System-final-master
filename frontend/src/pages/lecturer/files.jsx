@@ -64,18 +64,18 @@ const getFileIcon = (mimeType, fileType) => {
 
 const getFileTypeColor = (fileType) => {
   const colors = {
-    'lecture_notes': 'bg-blue-100 text-blue-800',
-    'tutorial': 'bg-green-100 text-green-800',
-    'assignment': 'bg-yellow-100 text-yellow-800',
-    'past_paper': 'bg-purple-100 text-purple-800',
-    'syllabus': 'bg-indigo-100 text-indigo-800',
-    'reading_material': 'bg-pink-100 text-pink-800',
-    'lab_manual': 'bg-orange-100 text-orange-800',
-    'project_guideline': 'bg-red-100 text-red-800',
-    'announcement': 'bg-teal-100 text-teal-800',
-    'supplementary_material': 'bg-gray-100 text-gray-800'
+    'lecture_notes': 'bg-white border border-black text-slate-800',
+    'tutorial': 'bg-white border border-black text-slate-800',
+    'assignment': 'bg-white border border-black text-slate-800',
+    'past_paper': 'bg-white border border-black text-slate-800',
+    'syllabus': 'bg-white border border-black text-slate-800',
+    'reading_material': 'bg-white border border-black text-slate-800',
+    'lab_manual': 'bg-white border border-black text-slate-800',
+    'project_guideline': 'bg-white border border-black text-slate-800',
+    'announcement': 'bg-white border border-black text-slate-800',
+    'supplementary_material': 'bg-white border border-black text-gray-800'
   };
-  return colors[fileType] || 'bg-gray-100 text-gray-800';
+  return colors[fileType] || 'bg-white border border-black text-gray-800';
 };
 
 const getOrdinal = (n) => {
@@ -544,7 +544,7 @@ const LecturerFiles = () => {
         <div className="bg-red-50 border-l-4 border-red-500 p-6 rounded-lg shadow-lg">
           <div className="flex items-center mb-4">
             <FiInfo className="h-8 w-8 text-red-500 mr-3" />
-            <h2 className="text-xl font-bold text-red-700">Connection Error</h2>
+            <h2 className="text-xl font-bold text-slate-700">Connection Error</h2>
           </div>
           <p className="text-red-600 mb-4">Cannot connect to the backend server.</p>
           <button
@@ -698,11 +698,11 @@ const LecturerFiles = () => {
 // ==================== SUB-COMPONENTS ====================
 
 const Header = ({ stats, selectedCount, onUpload, onStats, onBulkDelete, formatFileSize }) => (
-  <div className="bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl shadow-xl p-6 mb-8 text-white">
+  <div className="bg-white border border-black rounded-2xl shadow-xl p-6 mb-8 text-slate-900">
     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
       <div>
         <h1 className="text-3xl font-bold">File Management</h1>
-        <p className="text-purple-100 mt-1">Upload, manage, and share educational materials</p>
+        <p className="text-slate-500 mt-1">Upload, manage, and share educational materials</p>
       </div>
 
       <div className="flex gap-3">
@@ -732,7 +732,7 @@ const Header = ({ stats, selectedCount, onUpload, onStats, onBulkDelete, formatF
 
         <button
           onClick={onUpload}
-          className="px-4 py-2 bg-white text-purple-600 rounded-lg hover:bg-purple-50 transition-colors flex items-center"
+          className="px-4 py-2 bg-white text-purple-600 rounded-lg hover:bg-white border border-black transition-colors flex items-center"
         >
           <FiUpload className="mr-2" /> Upload
         </button>
@@ -862,7 +862,7 @@ const Filters = ({ filters, subjects, departments, uploaders, onFilterChange, on
 
         <button
           onClick={onClear}
-          className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+          className="px-4 py-2 bg-white border border-black text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
         >
           Clear Filters
         </button>
@@ -895,7 +895,7 @@ const SearchInput = ({ value, onChange }) => (
       placeholder="Search files by name, description, tags..."
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+      className="w-full pl-10 pr-10 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
     />
     {value && (
       <button
@@ -914,7 +914,7 @@ const Select = ({ icon, value, onChange, options }) => (
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="w-full pl-10 pr-8 py-2 border border-gray-300 rounded-lg appearance-none focus:outline-none focus:ring-2 focus:ring-purple-500"
+      className="w-full pl-10 pr-8 py-2 border border-black rounded-lg appearance-none focus:outline-none focus:ring-2 focus:ring-purple-500"
     >
       {options.map(opt => (
         <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -982,12 +982,12 @@ const FileCard = ({ file, isSelected, onSelect, onView, onEdit, onDelete, onDown
         {file.tags?.length > 0 && (
           <div className="flex flex-wrap gap-1 mb-3">
             {file.tags.slice(0, 3).map(tag => (
-              <span key={tag} className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
+              <span key={tag} className="px-2 py-1 bg-white border border-black text-gray-600 text-xs rounded-full">
                 #{tag}
               </span>
             ))}
             {file.tags.length > 3 && (
-              <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
+              <span className="px-2 py-1 bg-white border border-black text-gray-600 text-xs rounded-full">
                 +{file.tags.length - 3}
               </span>
             )}
@@ -1058,7 +1058,7 @@ const UploadModal = ({ isOpen, onClose, formData, onInputChange, onSubjectChange
               value={formData.subjects || ''}
               onChange={onSubjectChange}
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+              className="w-full px-4 py-2 border border-black rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
             >
               <option value="">-- Select a Subject --</option>
               {validSubjects.length > 0 ? (
@@ -1099,7 +1099,7 @@ const UploadModal = ({ isOpen, onClose, formData, onInputChange, onSubjectChange
               onChange={onInputChange}
               required
               disabled={!!formData.subjects && validSubjects.length > 0}
-              className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none ${formData.subjects && validSubjects.length > 0 ? 'bg-gray-100 cursor-not-allowed' : ''
+              className={`w-full px-4 py-2 border border-black rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none ${formData.subjects && validSubjects.length > 0 ? 'bg-white border border-black cursor-not-allowed' : ''
                 }`}
             >
               <option value="">-- Select Year --</option>
@@ -1126,7 +1126,7 @@ const UploadModal = ({ isOpen, onClose, formData, onInputChange, onSubjectChange
               onChange={onInputChange}
               required
               disabled={!!formData.subjects && validSubjects.length > 0}
-              className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none ${formData.subjects && validSubjects.length > 0 ? 'bg-gray-100 cursor-not-allowed' : ''
+              className={`w-full px-4 py-2 border border-black rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none ${formData.subjects && validSubjects.length > 0 ? 'bg-white border border-black cursor-not-allowed' : ''
                 }`}
             >
               <option value="">-- Select Semester --</option>
@@ -1152,7 +1152,7 @@ const UploadModal = ({ isOpen, onClose, formData, onInputChange, onSubjectChange
               value={formData.fileType || 'lecture_notes'}
               onChange={onInputChange}
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+              className="w-full px-4 py-2 border border-black rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
             >
               {FILE_TYPES.map(type => (
                 <option key={type.value} value={type.value}>
@@ -1172,7 +1172,7 @@ const UploadModal = ({ isOpen, onClose, formData, onInputChange, onSubjectChange
               value={formData.tags || ''}
               onChange={onInputChange}
               placeholder="e.g., important, exam, revision"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+              className="w-full px-4 py-2 border border-black rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
             />
           </div>
 
@@ -1186,7 +1186,7 @@ const UploadModal = ({ isOpen, onClose, formData, onInputChange, onSubjectChange
               onChange={onInputChange}
               rows="3"
               placeholder="Enter file description"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+              className="w-full px-4 py-2 border border-black rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
             />
           </div>
 
@@ -1211,7 +1211,7 @@ const UploadModal = ({ isOpen, onClose, formData, onInputChange, onSubjectChange
               type="file"
               onChange={onFileSelect}
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none file:mr-4 file:px-4 file:py-2 file:rounded-lg file:border-0 file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100 cursor-pointer"
+              className="w-full px-4 py-2 border border-black rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none file:mr-4 file:px-4 file:py-2 file:rounded-lg file:border-0 file:bg-white border border-black file:text-slate-700 hover:file:bg-white border border-black cursor-pointer"
             />
             <p className="mt-1 text-xs text-gray-500">
               Max file size: 50MB. All formats accepted.
@@ -1236,10 +1236,10 @@ const UploadModal = ({ isOpen, onClose, formData, onInputChange, onSubjectChange
 
         {formData.subjects && formData.year && formData.semester && (
           <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-            <p className="text-sm text-green-800 font-medium flex items-center gap-1">
+            <p className="text-sm text-slate-800 font-medium flex items-center gap-1">
               <span>✓</span> Auto-filled from selected subject:
             </p>
-            <p className="text-xs text-green-700 mt-1">
+            <p className="text-xs text-slate-700 mt-1">
               Year: {getYearDisplay(formData.year)} • Semester: {formData.semester} • Department: {formData.department}
             </p>
           </div>
@@ -1249,7 +1249,7 @@ const UploadModal = ({ isOpen, onClose, formData, onInputChange, onSubjectChange
           <button
             type="button"
             onClick={onClose}
-            className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+            className="px-6 py-2 border border-black text-gray-700 rounded-lg hover:bg-white transition-colors"
           >
             Cancel
           </button>
@@ -1281,7 +1281,7 @@ const EditModal = ({ isOpen, onClose, formData, onInputChange, onSubjectChange, 
               name="subjects"
               value={formData.subjects || ''}
               onChange={onSubjectChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+              className="w-full px-4 py-2 border border-black rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
             >
               <option value="">-- Select a Subject --</option>
               {validSubjects.length > 0 ? (
@@ -1312,7 +1312,7 @@ const EditModal = ({ isOpen, onClose, formData, onInputChange, onSubjectChange, 
               value={formData.year || ''}
               onChange={onInputChange}
               disabled={!!formData.subjects && validSubjects.length > 0}
-              className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none ${formData.subjects && validSubjects.length > 0 ? 'bg-gray-100 cursor-not-allowed' : ''
+              className={`w-full px-4 py-2 border border-black rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none ${formData.subjects && validSubjects.length > 0 ? 'bg-white border border-black cursor-not-allowed' : ''
                 }`}
             >
               <option value="">-- Select Year --</option>
@@ -1329,7 +1329,7 @@ const EditModal = ({ isOpen, onClose, formData, onInputChange, onSubjectChange, 
               value={formData.semester || ''}
               onChange={onInputChange}
               disabled={!!formData.subjects && validSubjects.length > 0}
-              className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none ${formData.subjects && validSubjects.length > 0 ? 'bg-gray-100 cursor-not-allowed' : ''
+              className={`w-full px-4 py-2 border border-black rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none ${formData.subjects && validSubjects.length > 0 ? 'bg-white border border-black cursor-not-allowed' : ''
                 }`}
             >
               <option value="">-- Select Semester --</option>
@@ -1345,7 +1345,7 @@ const EditModal = ({ isOpen, onClose, formData, onInputChange, onSubjectChange, 
               name="fileType"
               value={formData.fileType || 'lecture_notes'}
               onChange={onInputChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+              className="w-full px-4 py-2 border border-black rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
             >
               {FILE_TYPES.map(type => (
                 <option key={type.value} value={type.value}>
@@ -1362,7 +1362,7 @@ const EditModal = ({ isOpen, onClose, formData, onInputChange, onSubjectChange, 
               name="tags"
               value={formData.tags || ''}
               onChange={onInputChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+              className="w-full px-4 py-2 border border-black rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
             />
           </div>
 
@@ -1373,7 +1373,7 @@ const EditModal = ({ isOpen, onClose, formData, onInputChange, onSubjectChange, 
               value={formData.description || ''}
               onChange={onInputChange}
               rows="3"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+              className="w-full px-4 py-2 border border-black rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
             />
           </div>
 
@@ -1395,7 +1395,7 @@ const EditModal = ({ isOpen, onClose, formData, onInputChange, onSubjectChange, 
           <button
             type="button"
             onClick={onClose}
-            className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+            className="px-6 py-2 border border-black text-gray-700 rounded-lg hover:bg-white transition-colors"
           >
             Cancel
           </button>
@@ -1434,7 +1434,7 @@ const ViewModal = ({ isOpen, onClose, file, onDownload, onEdit, onDelete, getFil
         </div>
 
         {/* Details Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 p-4 rounded-lg">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-4 rounded-lg">
           <DetailItem label="Subject" value={file.subject ? `${file.subject.code || ''} - ${file.subject.name || 'Unknown'}` : 'N/A'} />
           <DetailItem label="Department" value={file.subject?.department || file.department?.name || 'N/A'} />
           <DetailItem label="Year of Study" value={file.subject?.year || file.academicYear || (file.yearOfStudy ? `${file.yearOfStudy}${getOrdinal(file.yearOfStudy)} Year` : 'N/A')} />
@@ -1451,7 +1451,7 @@ const ViewModal = ({ isOpen, onClose, file, onDownload, onEdit, onDelete, getFil
             <h3 className="text-sm font-medium text-gray-700 mb-2">Tags</h3>
             <div className="flex flex-wrap gap-2">
               {file.tags.map(tag => (
-                <span key={tag} className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-xs font-medium">
+                <span key={tag} className="px-3 py-1 bg-white border border-black text-slate-800 rounded-full text-xs font-medium">
                   #{tag}
                 </span>
               ))}
@@ -1463,7 +1463,7 @@ const ViewModal = ({ isOpen, onClose, file, onDownload, onEdit, onDelete, getFil
         {file.description && (
           <div>
             <h3 className="text-sm font-medium text-gray-700 mb-2">Description</h3>
-            <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">{file.description}</p>
+            <p className="text-sm text-gray-600 bg-white p-3 rounded-lg">{file.description}</p>
           </div>
         )}
 
@@ -1473,7 +1473,7 @@ const ViewModal = ({ isOpen, onClose, file, onDownload, onEdit, onDelete, getFil
             <h3 className="text-sm font-medium text-gray-700 mb-2">Recent Downloads</h3>
             <div className="space-y-2 max-h-40 overflow-y-auto">
               {file.downloadHistory.slice(0, 5).map((history, idx) => (
-                <div key={idx} className="flex items-center justify-between text-sm bg-gray-50 p-2 rounded">
+                <div key={idx} className="flex items-center justify-between text-sm bg-white p-2 rounded">
                   <span>User: {history.user?.name || 'Unknown'}</span>
                   <span className="text-gray-500">{history.downloadedAt ? new Date(history.downloadedAt).toLocaleString() : 'Unknown'}</span>
                 </div>
@@ -1504,7 +1504,7 @@ const ViewModal = ({ isOpen, onClose, file, onDownload, onEdit, onDelete, getFil
           </button>
           <button
             onClick={onClose}
-            className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+            className="px-4 py-2 border border-black text-gray-700 rounded-lg hover:bg-white transition-colors"
           >
             Close
           </button>
@@ -1540,7 +1540,7 @@ const StatsModal = ({ isOpen, onClose, stats, formatFileSize }) => (
               {Object.entries(stats.byType).map(([type, count]) => {
                 const fileType = FILE_TYPES.find(t => t.value === type);
                 return (
-                  <div key={type} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                  <div key={type} className="flex justify-between items-center p-3 bg-white rounded-lg">
                     <span className="flex items-center gap-2">
                       <span>{fileType?.icon || '📁'}</span>
                       <span className="font-medium">{fileType?.label || type}</span>
@@ -1562,7 +1562,7 @@ const StatsModal = ({ isOpen, onClose, stats, formatFileSize }) => (
                 .sort((a, b) => b[1] - a[1])
                 .slice(0, 5)
                 .map(([uploader, count], idx) => (
-                  <div key={uploader} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                  <div key={uploader} className="flex justify-between items-center p-3 bg-white rounded-lg">
                     <span className="flex items-center gap-2">
                       <span className="w-6 text-gray-500">{idx + 1}.</span>
                       <span className="font-medium">{uploader}</span>
@@ -1583,7 +1583,7 @@ const StatsModal = ({ isOpen, onClose, stats, formatFileSize }) => (
                 .sort((a, b) => b[0].localeCompare(a[0]))
                 .slice(0, 6)
                 .map(([month, data]) => (
-                  <div key={month} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                  <div key={month} className="flex justify-between items-center p-3 bg-white rounded-lg">
                     <span className="font-medium">{month}</span>
                     <div className="flex items-center gap-4">
                       <span>{data.count || 0} files</span>
@@ -1600,7 +1600,7 @@ const StatsModal = ({ isOpen, onClose, stats, formatFileSize }) => (
 );
 
 const StatBox = ({ label, value }) => (
-  <div className="bg-gray-50 p-4 rounded-lg text-center">
+  <div className="bg-white p-4 rounded-lg text-center">
     <p className="text-sm text-gray-500">{label}</p>
     <p className="text-xl font-bold text-purple-600">{value}</p>
   </div>
@@ -1618,7 +1618,7 @@ const BulkDeleteModal = ({ isOpen, onClose, onConfirm, count }) => (
             <FiInfo className="h-5 w-5 text-yellow-400" />
           </div>
           <div className="ml-3">
-            <p className="text-sm text-yellow-700">
+            <p className="text-sm text-slate-700">
               Warning: This will permanently delete these files from the server.
             </p>
           </div>
@@ -1627,7 +1627,7 @@ const BulkDeleteModal = ({ isOpen, onClose, onConfirm, count }) => (
       <div className="flex justify-end gap-3">
         <button
           onClick={onClose}
-          className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+          className="px-4 py-2 border border-black text-gray-700 rounded-lg hover:bg-white transition-colors"
         >
           Cancel
         </button>

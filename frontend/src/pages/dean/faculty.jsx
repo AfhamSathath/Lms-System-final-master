@@ -26,7 +26,7 @@ const FacultyOversight = () => {
   };
 
   return (
-    <div className="p-10 bg-gray-50 min-h-screen">
+    <div className="p-10 bg-white min-h-screen">
        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-10 mb-12">
           <div className="max-w-2xl">
              <h1 className="text-5xl font-black text-gray-900 leading-tight uppercase tracking-tight mb-2">Faculty Human Capital</h1>
@@ -38,7 +38,7 @@ const FacultyOversight = () => {
              <button className="px-10 py-5 bg-rose-600 text-white font-black rounded-[40px] shadow-2xl shadow-rose-200 hover:bg-rose-700 transition-all flex items-center justify-center gap-3 tracking-widest uppercase text-xs">
                 <FiBarChart2 /> Generate KPI Report
              </button>
-             <button className="px-10 py-5 bg-white text-gray-800 font-black rounded-[40px] shadow-sm border border-gray-100 hover:shadow-xl transition-all flex items-center justify-center gap-3 tracking-widest uppercase text-xs">
+             <button className="px-10 py-5 bg-white text-gray-800 font-black rounded-[40px] shadow-sm border border-black hover:shadow-xl transition-all flex items-center justify-center gap-3 tracking-widest uppercase text-xs">
                 <FiSettings /> Faculty Policies
              </button>
           </div>
@@ -53,7 +53,7 @@ const FacultyOversight = () => {
                initial={{ opacity: 0, scale: 0.9 }}
                animate={{ opacity: 1, scale: 1 }}
                transition={{ delay: i * 0.05 }}
-               className="bg-white p-10 rounded-[50px] shadow-sm border border-gray-100 relative group overflow-hidden"
+               className="bg-white p-10 rounded-[50px] shadow-sm border border-black relative group overflow-hidden"
              >
                 <div className="absolute top-0 right-0 p-10 opacity-5 group-hover:opacity-10 transition-opacity transform rotate-12 scale-150 text-rose-600">
                    <FiAward size={100} />
@@ -80,12 +80,12 @@ const FacultyOversight = () => {
                    </div>
                 </div>
 
-                <div className="flex justify-between items-center relative z-10 pt-6 border-t border-gray-100">
+                <div className="flex justify-between items-center relative z-10 pt-6 border-t border-black">
                    <div className="text-center">
                       <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Status</p>
                       <span className="text-xs font-black text-emerald-600 bg-emerald-50 px-4 py-1 rounded-full uppercase tracking-tighter">Active</span>
                    </div>
-                   <button className="p-4 bg-gray-50 text-rose-600 rounded-2xl hover:bg-rose-600 hover:text-white transition-all shadow-sm">
+                   <button className="p-4 bg-white text-rose-600 rounded-2xl hover:bg-rose-600 hover:text-white transition-all shadow-sm">
                       <FiInfo size={20} />
                    </button>
                 </div>

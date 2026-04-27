@@ -84,11 +84,11 @@ const BursarMahapolaManagement = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+      <div className="bg-white rounded-xl shadow-sm border border-black overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-slate-50 border-b border-slate-200">
+              <tr className="bg-white border-b border-black">
                 <th className="p-4 font-semibold text-sm text-slate-600">Student Info</th>
                 <th className="p-4 font-semibold text-sm text-slate-600">Type & Month</th>
                 <th className="p-4 font-semibold text-sm text-slate-600">Bank Details</th>
@@ -98,7 +98,7 @@ const BursarMahapolaManagement = () => {
             </thead>
             <tbody className="divide-y divide-slate-100">
               {applications.map((app) => (
-                <tr key={app._id} className="hover:bg-slate-50 transition-colors">
+                <tr key={app._id} className="hover:bg-white transition-colors">
                   <td className="p-4">
                     <div className="font-medium text-slate-800">{app.fullName}</div>
                     <div className="text-sm text-slate-500">{app.registrationNumber}</div>

@@ -61,7 +61,7 @@ const StudentClaims = () => {
   if (loading) return <Loader fullScreen />;
 
   return (
-    <div className="p-6 bg-slate-50 min-h-screen">
+    <div className="p-6 bg-white min-h-screen">
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
           <div>
@@ -79,8 +79,8 @@ const StudentClaims = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <AnimatePresence>
             {claims.length === 0 ? (
-               <div className="col-span-full py-20 bg-white rounded-[3rem] border-2 border-dashed border-slate-200 flex flex-col items-center text-center p-10">
-                 <div className="w-20 h-20 bg-slate-50 rounded-3xl flex items-center justify-center text-3xl text-slate-300 mb-6 shadow-inner">
+               <div className="col-span-full py-20 bg-white rounded-[3rem] border-2 border-dashed border-black flex flex-col items-center text-center p-10">
+                 <div className="w-20 h-20 bg-white rounded-3xl flex items-center justify-center text-3xl text-slate-300 mb-6 shadow-inner">
                    <FiFileText />
                  </div>
                  <h3 className="font-black text-slate-800 uppercase tracking-tight text-lg">No Active Claims</h3>
@@ -94,7 +94,7 @@ const StudentClaims = () => {
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.95 }}
-                  className="bg-white rounded-[2.5rem] p-8 border border-slate-200 shadow-sm hover:shadow-xl transition-all group overflow-hidden relative"
+                  className="bg-white rounded-[2.5rem] p-8 border border-black shadow-sm hover:shadow-xl transition-all group overflow-hidden relative"
                 >
                   <div className={`absolute top-0 right-0 p-8 opacity-[0.03] transition-transform duration-700 group-hover:scale-150 group-hover:rotate-12`}>
                     <FiDollarSign className="text-9xl" />
@@ -118,7 +118,7 @@ const StudentClaims = () => {
                        "{claim.description}"
                      </p>
                      
-                     <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl">
+                     <div className="flex items-center justify-between p-4 bg-white rounded-2xl">
                         <div>
                           <p className="text-[10px] font-black uppercase text-slate-300 tracking-[0.2em] mb-1">Total Requested</p>
                           <p className="text-2xl font-black text-slate-800 tracking-tighter">LKR {claim.amount.toLocaleString()}</p>
@@ -157,7 +157,7 @@ const StudentClaims = () => {
                <div className="space-y-1">
                  <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Claim Category</label>
                  <select 
-                   className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl font-bold uppercase transition-all focus:ring-2 focus:ring-indigo-500 appearance-none"
+                   className="w-full px-5 py-4 bg-white border-none rounded-2xl font-bold uppercase transition-all focus:ring-2 focus:ring-indigo-500 appearance-none"
                    value={formData.claimType}
                    onChange={(e) => setFormData({...formData, claimType: e.target.value})}
                  >
@@ -172,7 +172,7 @@ const StudentClaims = () => {
                  <input 
                    type="number"
                    required
-                   className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl font-bold focus:ring-2 focus:ring-indigo-500 transition-all placeholder:opacity-30"
+                   className="w-full px-5 py-4 bg-white border-none rounded-2xl font-bold focus:ring-2 focus:ring-indigo-500 transition-all placeholder:opacity-30"
                    placeholder="0.00"
                    value={formData.amount}
                    onChange={(e) => setFormData({...formData, amount: e.target.value})}
@@ -183,7 +183,7 @@ const StudentClaims = () => {
                <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Reason / Description</label>
                <textarea 
                  required
-                 className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl font-bold focus:ring-2 focus:ring-indigo-500 transition-all placeholder:opacity-30 min-h-[120px]"
+                 className="w-full px-5 py-4 bg-white border-none rounded-2xl font-bold focus:ring-2 focus:ring-indigo-500 transition-all placeholder:opacity-30 min-h-[120px]"
                  placeholder="Provide a detailed explanation for your claim..."
                  value={formData.description}
                  onChange={(e) => setFormData({...formData, description: e.target.value})}

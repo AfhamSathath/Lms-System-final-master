@@ -32,9 +32,9 @@ const StaffDirectory = () => {
   if (loading) return <Loader fullScreen />;
 
   return (
-    <div className="p-6 bg-slate-50 min-h-screen">
+    <div className="p-6 bg-white min-h-screen">
       <div className="max-w-7xl mx-auto">
-        <div className="bg-white rounded-[2.5rem] shadow-sm border border-slate-200 p-10 mb-8 overflow-hidden relative">
+        <div className="bg-white rounded-[2.5rem] shadow-sm border border-black p-10 mb-8 overflow-hidden relative">
           <div className="absolute top-0 right-0 p-10 opacity-5">
             <FiUsers className="text-9xl text-indigo-600" />
           </div>
@@ -67,7 +67,7 @@ const StaffDirectory = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.05 }}
-                className="bg-white rounded-[2rem] p-6 border border-slate-200 hover:shadow-xl hover:shadow-indigo-50 transition-all group"
+                className="bg-white rounded-[2rem] p-6 border border-black hover:shadow-xl hover:shadow-indigo-50 transition-all group"
               >
                 <div className="flex items-center gap-4 mb-6">
                   <div className="w-16 h-16 rounded-2xl bg-indigo-50 flex items-center justify-center text-2xl text-indigo-600 font-black shadow-inner group-hover:bg-indigo-600 group-hover:text-white transition-colors duration-500">

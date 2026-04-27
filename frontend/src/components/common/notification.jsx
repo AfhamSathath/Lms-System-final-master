@@ -165,7 +165,7 @@ const Notification = () => {
   return (
     <div className="bg-white rounded-xl shadow-lg overflow-hidden">
       {/* HEADER */}
-      <div className="bg-gradient-to-r from-purple-600 to-pink-600 px-6 py-4 flex justify-between items-center">
+      <div className="bg-white border border-black px-6 py-4 flex justify-between items-center">
         <div className="flex items-center text-white">
           <FiBell className="mr-2" />
           <h2 className="font-semibold text-lg">Notifications</h2>
@@ -205,7 +205,7 @@ const Notification = () => {
         {unreadCount > 0 && (
           <button
             onClick={markAllAsRead}
-            className="bg-purple-100 text-purple-700 px-3 py-1 rounded text-sm"
+            className="bg-white border border-black text-slate-700 px-3 py-1 rounded text-sm"
           >
             Mark all read
           </button>
@@ -214,7 +214,7 @@ const Notification = () => {
         {notifications.length > 0 && (
           <button
             onClick={clearAll}
-            className="bg-red-100 text-red-700 px-3 py-1 rounded text-sm"
+            className="bg-white border border-black text-slate-700 px-3 py-1 rounded text-sm"
           >
             Clear all
           </button>

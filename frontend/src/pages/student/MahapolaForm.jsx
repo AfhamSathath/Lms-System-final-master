@@ -65,8 +65,8 @@ const StudentMahapolaForm = () => {
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-        <div className="bg-gradient-to-r from-emerald-600 to-teal-700 p-6 text-white flex items-center gap-4">
+      <div className="bg-white rounded-xl shadow-sm border border-black overflow-hidden">
+        <div className="bg-white border border-black p-6 text-slate-900 flex items-center gap-4">
           <FiDollarSign className="w-8 h-8 opacity-80" />
           <div>
             <h2 className="text-2xl font-bold">Mahapola / Bursary Application Form</h2>
@@ -90,7 +90,7 @@ const StudentMahapolaForm = () => {
                 value={formData.registrationNumber}
                 onChange={handleChange}
                 placeholder="e.g. IT20123456"
-                className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                className="w-full p-3 border border-black rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                 required
               />
             </div>
@@ -102,7 +102,7 @@ const StudentMahapolaForm = () => {
                 name="fullName"
                 value={formData.fullName}
                 onChange={handleChange}
-                className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                className="w-full p-3 border border-black rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                 required
               />
             </div>
@@ -115,7 +115,7 @@ const StudentMahapolaForm = () => {
                 value={formData.nic}
                 onChange={handleChange}
                 placeholder="e.g. 199912345678 or 991234567V"
-                className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                className="w-full p-3 border border-black rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                 required
               />
             </div>
@@ -128,7 +128,7 @@ const StudentMahapolaForm = () => {
                 value={formData.degreeProgram}
                 onChange={handleChange}
                 placeholder="e.g. BSc (Hons) in IT"
-                className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                className="w-full p-3 border border-black rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                 required
               />
             </div>
@@ -144,7 +144,7 @@ const StudentMahapolaForm = () => {
                 name="academicYear"
                 value={formData.academicYear}
                 onChange={handleChange}
-                className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white"
+                className="w-full p-3 border border-black rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white"
                 required
               >
                 <option value="">Select Year</option>
@@ -201,7 +201,7 @@ const StudentMahapolaForm = () => {
                 name="installmentMonth"
                 value={formData.installmentMonth}
                 onChange={handleChange}
-                className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                className="w-full p-3 border border-black rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                 required
               />
             </div>
@@ -219,7 +219,7 @@ const StudentMahapolaForm = () => {
                 value={formData.bankAccountNumber}
                 onChange={handleChange}
                 placeholder="Account No."
-                className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                className="w-full p-3 border border-black rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                 required
               />
             </div>
@@ -232,7 +232,7 @@ const StudentMahapolaForm = () => {
                 value={formData.bankName}
                 onChange={handleChange}
                 placeholder="e.g. Bank of Ceylon (BOC) / People's Bank"
-                className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                className="w-full p-3 border border-black rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                 required
               />
             </div>
@@ -245,7 +245,7 @@ const StudentMahapolaForm = () => {
                 value={formData.branchName}
                 onChange={handleChange}
                 placeholder="e.g. Campus Branch / City"
-                className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                className="w-full p-3 border border-black rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                 required
               />
             </div>

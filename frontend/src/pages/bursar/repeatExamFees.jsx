@@ -48,7 +48,7 @@ const BursarRepeatFees = () => {
   if (loading) return <Loader fullScreen />;
 
   return (
-    <div className="p-8 max-w-[1440px] mx-auto min-h-screen bg-slate-50/50">
+    <div className="p-8 max-w-[1440px] mx-auto min-h-screen bg-white/50">
       <header className="mb-14 text-center">
         <h1 className="text-5xl font-black text-slate-900 tracking-tighter uppercase mb-2 italic underline decoration-indigo-600 decoration-8 underline-offset-[10px]">Repeat Fee Allocation</h1>
         <p className="text-slate-400 font-bold uppercase tracking-[0.4em] text-[10px]">Financial Control & Bursary Division</p>
@@ -63,7 +63,7 @@ const BursarRepeatFees = () => {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.8 }}
               key={app._id}
-              className="bg-white rounded-[3.5rem] p-10 shadow-2xl border border-slate-100 relative group overflow-hidden"
+              className="bg-white rounded-[3.5rem] p-10 shadow-2xl border border-black relative group overflow-hidden"
             >
               <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-50 -mr-12 -mt-12 rounded-full group-hover:scale-150 transition-transform duration-700"></div>
               
@@ -78,13 +78,13 @@ const BursarRepeatFees = () => {
                   </div>
                 </div>
 
-                <div className="bg-slate-50 border border-slate-100 rounded-[2.5rem] p-8 mb-8 space-y-4">
+                <div className="bg-white border border-black rounded-[2.5rem] p-8 mb-8 space-y-4">
                   <div>
                     <p className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em] mb-1 italic">Subject Unit</p>
                     <p className="text-lg font-extrabold text-slate-700 leading-tight">{app.subjectCode} - {app.subjectName}</p>
                   </div>
                   
-                  <div className="flex gap-4 pt-4 border-t border-slate-200/50">
+                  <div className="flex gap-4 pt-4 border-t border-black/50">
                     <div>
                       <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Academic Year</p>
                       <p className="text-sm font-bold text-slate-600">{app.academicYear}</p>
@@ -95,8 +95,8 @@ const BursarRepeatFees = () => {
                 {/* Workflow Progress Tracker */}
                 <div className="mb-8 grid grid-cols-1 gap-5">
                    {/* Combined Review History for Bursar */}
-                   <div className="p-8 bg-slate-900/5 rounded-[4rem] border border-slate-200/50 backdrop-blur-sm group-hover:bg-white transition-all shadow-inner">
-                      <div className="flex items-center justify-between mb-8 pb-4 border-b border-slate-200/50">
+                   <div className="p-8 bg-slate-900/5 rounded-[4rem] border border-black/50 backdrop-blur-sm group-hover:bg-white transition-all shadow-inner">
+                      <div className="flex items-center justify-between mb-8 pb-4 border-b border-black/50">
                         <p className="text-[10px] font-black text-slate-800 uppercase tracking-[0.3em] italic">Review Chain</p>
                         <div className="flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-600 rounded-full">
                            <FiCheck size={10} strokeWidth={4} />
@@ -151,7 +151,7 @@ const BursarRepeatFees = () => {
         </AnimatePresence>
 
         {applications.length === 0 && (
-          <div className="col-span-full py-40 text-center bg-white rounded-[5rem] border-4 border-dashed border-slate-200">
+          <div className="col-span-full py-40 text-center bg-white rounded-[5rem] border-4 border-dashed border-black">
              <div className="h-32 w-32 bg-emerald-50 text-emerald-300 rounded-full flex items-center justify-center mx-auto mb-10 shadow-inner">
                 <FiCheck size={64} />
              </div>
@@ -189,7 +189,7 @@ const BursarRepeatFees = () => {
                         type="number"
                         value={feeModal.amount}
                         onChange={(e) => setFeeModal({ ...feeModal, amount: e.target.value })}
-                        className="w-full bg-slate-50 border-4 border-slate-100 rounded-[2rem] py-8 pl-24 pr-8 text-4xl font-black text-indigo-600 focus:border-indigo-500 outline-none transition-all shadow-inner"
+                        className="w-full bg-white border-4 border-black rounded-[2rem] py-8 pl-24 pr-8 text-4xl font-black text-indigo-600 focus:border-indigo-500 outline-none transition-all shadow-inner"
                      />
                   </div>
                </div>
@@ -200,7 +200,7 @@ const BursarRepeatFees = () => {
                     value={feeModal.comments}
                     onChange={(e) => setFeeModal({ ...feeModal, comments: e.target.value })}
                     placeholder="Enter any internal notes for this allocation..."
-                    className="w-full h-32 bg-slate-50 border-4 border-slate-100 rounded-[2rem] p-8 focus:border-indigo-500 outline-none transition-all resize-none text-slate-700 font-bold"
+                    className="w-full h-32 bg-white border-4 border-black rounded-[2rem] p-8 focus:border-indigo-500 outline-none transition-all resize-none text-slate-700 font-bold"
                   />
                </div>
 

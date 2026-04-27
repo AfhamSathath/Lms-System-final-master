@@ -48,7 +48,7 @@ const LecturerRepeatApprovals = () => {
   if (loading) return <Loader fullScreen />;
 
   return (
-    <div className="p-8 max-w-7xl mx-auto min-h-screen bg-slate-50/50">
+    <div className="p-8 max-w-7xl mx-auto min-h-screen bg-white/50">
       <header className="mb-12">
         <h1 className="text-4xl font-black text-slate-800 tracking-tight uppercase">Repeat Exam Approvals</h1>
         <p className="text-slate-500 font-medium italic mt-2">Assess student repeat requests based on attendance and performance.</p>
@@ -63,7 +63,7 @@ const LecturerRepeatApprovals = () => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9 }}
               key={app._id}
-              className="bg-white rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-slate-100 overflow-hidden group"
+              className="bg-white rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-black overflow-hidden group"
             >
               <div className="p-8">
                 <div className="flex justify-between items-center mb-6">
@@ -84,7 +84,7 @@ const LecturerRepeatApprovals = () => {
                 <p className="text-sm font-medium text-slate-500 mb-6">{app.student?.studentId} • {app.student?.department}</p>
 
                 <div className="space-y-4 mb-8">
-                  <div className="flex items-center gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                  <div className="flex items-center gap-3 p-4 bg-white rounded-2xl border border-black">
                     <FiBookOpen className="text-indigo-500" />
                     <div className="w-full">
                       <div className="flex justify-between items-start">
@@ -138,7 +138,7 @@ const LecturerRepeatApprovals = () => {
                   </button>
                   <button
                     onClick={() => setReviewModal({ open: true, app, action: 'REJECT', comments: '' })}
-                    className="flex-1 bg-white border border-slate-200 text-slate-400 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:border-rose-300 hover:text-rose-500 transition-all active:scale-95"
+                    className="flex-1 bg-white border border-black text-slate-400 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:border-rose-300 hover:text-rose-500 transition-all active:scale-95"
                   >
                     Reject
                   </button>
@@ -182,7 +182,7 @@ const LecturerRepeatApprovals = () => {
                 value={reviewModal.comments}
                 onChange={(e) => setReviewModal({ ...reviewModal, comments: e.target.value })}
                 placeholder={`Why are you ${reviewModal.action.toLowerCase()}ing this student?`}
-                className="w-full h-40 bg-slate-50 border border-slate-200 rounded-3xl p-6 focus:ring-2 focus:ring-indigo-500 outline-none transition-all resize-none text-slate-700"
+                className="w-full h-40 bg-white border border-black rounded-3xl p-6 focus:ring-2 focus:ring-indigo-500 outline-none transition-all resize-none text-slate-700"
               />
               
               <div className="mt-8 flex gap-4">

@@ -160,15 +160,15 @@ const HodDashboard = () => {
   return (
     <div className="p-6">
       <div className="container mx-auto">
-        <div className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl shadow-xl p-8 mb-8 text-white">
+        <div className="bg-white border border-black rounded-2xl shadow-xl p-8 mb-8 text-slate-900">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between">
             <div>
               <h1 className="text-3xl md:text-4xl font-bold mb-2">Welcome, Dr. {user?.name?.split(' ')[0] || user?.name}</h1>
-              <p className="text-purple-200">Department: {department?.name || user?.department || 'Unassigned'}</p>
+              <p className="text-slate-400">Department: {department?.name || user?.department || 'Unassigned'}</p>
             </div>
             <Link
               to="/hod/notifications"
-              className="bg-white text-purple-700 px-5 py-3 rounded-lg hover:bg-purple-50 transition-colors font-semibold inline-flex items-center"
+              className="bg-white text-slate-700 px-5 py-3 rounded-lg hover:bg-white border border-black transition-colors font-semibold inline-flex items-center"
             >
               <FiBell className="mr-2" /> Manage Notifications
             </Link>
@@ -193,7 +193,7 @@ const HodDashboard = () => {
           }].map((item, idx) => (
             <div key={`${item.label}-${idx}`} className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
               <div className="flex items-center">
-                <div className="p-3 bg-purple-100 rounded-lg">
+                <div className="p-3 bg-white border border-black rounded-lg">
                   <item.icon className="h-8 w-8 text-purple-600" />
                 </div>
                 <div className="ml-4">
@@ -217,7 +217,7 @@ const HodDashboard = () => {
           }].map((item, idx) => (
             <div key={`${item.label}-${idx}`} className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
               <div className="flex items-center">
-                <div className="p-3 bg-yellow-100 rounded-lg">
+                <div className="p-3 bg-white border border-black rounded-lg">
                   <item.icon className="h-8 w-8 text-yellow-600" />
                 </div>
                 <div className="ml-4">
@@ -231,7 +231,7 @@ const HodDashboard = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           {/* Assessment Review Workflow */}
-          <div className="rounded-[2.5rem] border border-slate-200 bg-white p-8 shadow-xl relative overflow-hidden group">
+          <div className="rounded-[2.5rem] border border-black bg-white p-8 shadow-xl relative overflow-hidden group">
             <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-50 rounded-bl-[5rem] -mr-8 -mt-8 transition-all group-hover:scale-110"></div>
             <div className="relative z-10">
               <div className="flex items-start justify-between mb-6">
@@ -248,7 +248,7 @@ const HodDashboard = () => {
               {dashboardData.pendingAssessments.length > 0 ? (
                 <div className="space-y-4">
                   {dashboardData.pendingAssessments.slice(0, 3).map((assess) => (
-                    <div key={assess._id} className="p-4 bg-slate-50 rounded-2xl border border-slate-100 flex items-center justify-between hover:bg-emerald-50/30 transition-colors">
+                    <div key={assess._id} className="p-4 bg-white rounded-2xl border border-black flex items-center justify-between hover:bg-emerald-50/30 transition-colors">
                       <div className="flex items-center gap-4">
                         <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-emerald-600 shadow-sm">
                           <FiFileText />
@@ -271,7 +271,7 @@ const HodDashboard = () => {
                   )}
                 </div>
               ) : (
-                <div className="py-10 text-center bg-slate-50/50 rounded-3xl border border-dashed border-slate-200">
+                <div className="py-10 text-center bg-white/50 rounded-3xl border border-dashed border-black">
                   <FiCheckCircle className="mx-auto h-10 w-10 text-slate-300 mb-3" />
                   <p className="text-slate-400 font-bold text-sm">All assessments reviewed!</p>
                 </div>
@@ -280,7 +280,7 @@ const HodDashboard = () => {
           </div>
 
           {/* Attendance Approval Workflow */}
-          <div className="rounded-[2.5rem] border border-slate-200 bg-white p-8 shadow-xl relative overflow-hidden group">
+          <div className="rounded-[2.5rem] border border-black bg-white p-8 shadow-xl relative overflow-hidden group">
             <div className="absolute top-0 right-0 w-32 h-32 bg-amber-50 rounded-bl-[5rem] -mr-8 -mt-8 transition-all group-hover:scale-110"></div>
             <div className="relative z-10">
               <div className="flex items-start justify-between mb-6">
@@ -297,7 +297,7 @@ const HodDashboard = () => {
               {dashboardData.pendingAttendanceSessions?.length > 0 ? (
                 <div className="space-y-4">
                   {dashboardData.pendingAttendanceSessions.slice(0, 3).map((session) => (
-                    <div key={session._id} className="p-4 bg-slate-50 rounded-2xl border border-slate-100 flex items-center justify-between hover:bg-amber-50/30 transition-colors">
+                    <div key={session._id} className="p-4 bg-white rounded-2xl border border-black flex items-center justify-between hover:bg-amber-50/30 transition-colors">
                       <div className="flex items-center gap-4">
                         <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-amber-600 shadow-sm">
                           <FiCheckCircle />
@@ -317,7 +317,7 @@ const HodDashboard = () => {
                   ))}
                 </div>
               ) : (
-                <div className="py-10 text-center bg-slate-50/50 rounded-3xl border border-dashed border-slate-200">
+                <div className="py-10 text-center bg-white/50 rounded-3xl border border-dashed border-black">
                   <FiCheckCircle className="mx-auto h-10 w-10 text-slate-300 mb-3" />
                   <p className="text-slate-400 font-bold text-sm">No attendance pending approval!</p>
                 </div>
@@ -326,7 +326,7 @@ const HodDashboard = () => {
           </div>
 
           {/* Repeat Registration Workflow */}
-          <div className="rounded-[2.5rem] border border-slate-200 bg-white p-8 shadow-xl relative overflow-hidden group">
+          <div className="rounded-[2.5rem] border border-black bg-white p-8 shadow-xl relative overflow-hidden group">
             <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-50 rounded-bl-[5rem] -mr-8 -mt-8 transition-all group-hover:scale-110"></div>
             <div className="relative z-10">
               <div className="flex items-start justify-between mb-6">
@@ -340,7 +340,7 @@ const HodDashboard = () => {
                 </div>
               </div>
 
-              <div className="flex items-center justify-between p-6 bg-slate-50 rounded-3xl border border-slate-100">
+              <div className="flex items-center justify-between p-6 bg-white rounded-3xl border border-black">
                 <div>
                   <p className="text-3xl font-black text-slate-800">{pendingRepeats}</p>
                   <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Pending Approvals</p>
@@ -355,7 +355,7 @@ const HodDashboard = () => {
             </div>
 
             {/* Published Attendance Log */}
-            <div className="rounded-[2.5rem] border border-slate-200 bg-white p-8 shadow-xl relative overflow-hidden group">
+            <div className="rounded-[2.5rem] border border-black bg-white p-8 shadow-xl relative overflow-hidden group">
               <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50 rounded-bl-[5rem] -mr-8 -mt-8 transition-all group-hover:scale-110"></div>
               <div className="relative z-10">
                 <div className="flex items-start justify-between mb-6">
@@ -372,7 +372,7 @@ const HodDashboard = () => {
                 {dashboardData.recentAttendance?.length > 0 ? (
                   <div className="space-y-4">
                     {dashboardData.recentAttendance.map((record, i) => (
-                      <div key={i} className="p-4 bg-slate-50 rounded-2xl border border-slate-100 flex items-center justify-between hover:bg-blue-50/30 transition-colors">
+                      <div key={i} className="p-4 bg-white rounded-2xl border border-black flex items-center justify-between hover:bg-blue-50/30 transition-colors">
                         <div className="flex items-center gap-4 truncate">
                           <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-blue-600 shadow-sm flex-shrink-0">
                             <FiUsers />
@@ -393,7 +393,7 @@ const HodDashboard = () => {
                     <Link to="/hod/attendance-review" className="block text-center text-[10px] font-black uppercase text-blue-600 tracking-widest hover:underline pt-2">View Detailed Analytics</Link>
                   </div>
                 ) : (
-                  <div className="py-10 text-center bg-slate-50/50 rounded-3xl border border-dashed border-slate-200">
+                  <div className="py-10 text-center bg-white/50 rounded-3xl border border-dashed border-black">
                     <FiCalendar className="mx-auto h-10 w-10 text-slate-300 mb-3" />
                     <p className="text-slate-400 font-bold text-sm">No recent attendance marked.</p>
                   </div>
@@ -411,12 +411,12 @@ const HodDashboard = () => {
               {dashboardData.courses.length > 0 ? (
                 <div className="space-y-4">
                   {dashboardData.courses.map(course => (
-                    <div key={course._id} className="flex justify-between items-center border-b border-gray-100 pb-3 last:border-0 last:pb-0">
+                    <div key={course._id} className="flex justify-between items-center border-b border-black pb-3 last:border-0 last:pb-0">
                       <div>
                         <p className="font-semibold text-gray-800">{course.name || course.courseName}</p>
                         <p className="text-sm text-gray-500">{course.code || course.courseCode}</p>
                       </div>
-                      <span className="text-xs bg-purple-100 text-purple-600 px-2 py-1 rounded-full">
+                      <span className="text-xs bg-white border border-black text-purple-600 px-2 py-1 rounded-full">
                         Credits: {course.credits}
                       </span>
                     </div>
@@ -435,12 +435,12 @@ const HodDashboard = () => {
               {dashboardData.staff.length > 0 ? (
                 <div className="space-y-4">
                   {dashboardData.staff.map(member => (
-                    <div key={member._id} className="flex justify-between items-center border-b border-gray-100 pb-3 last:border-0 last:pb-0">
+                    <div key={member._id} className="flex justify-between items-center border-b border-black pb-3 last:border-0 last:pb-0">
                       <div>
                         <p className="font-semibold text-gray-800">{member.name}</p>
                         <p className="text-sm text-gray-500">{member.email}</p>
                       </div>
-                      <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">
+                      <span className="text-xs bg-white border border-black text-slate-800 px-2 py-1 rounded-full">
                         {member.role || 'Staff'}
                       </span>
                     </div>
@@ -460,7 +460,7 @@ const HodDashboard = () => {
                 </div>
                 <Link
                   to="/hod/students"
-                  className="text-indigo-600 hover:text-indigo-800 text-sm font-semibold"
+                  className="text-indigo-600 hover:text-slate-800 text-sm font-semibold"
                 >
                   View all
                 </Link>
@@ -468,7 +468,7 @@ const HodDashboard = () => {
               {dashboardData.students.length > 0 ? (
                 <div className="space-y-4">
                   {dashboardData.students.map((student) => (
-                    <div key={student._id} className="flex justify-between items-center border-b border-gray-100 pb-3 last:border-0 last:pb-0">
+                    <div key={student._id} className="flex justify-between items-center border-b border-black pb-3 last:border-0 last:pb-0">
                       <div>
                         <p className="font-semibold text-gray-800">{student.name}</p>
                         <p className="text-sm text-gray-500">{student.studentId || student.email}</p>

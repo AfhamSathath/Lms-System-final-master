@@ -12,7 +12,7 @@ const ComingSoon = ({ title }) => {
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.5 }}
-        className="bg-white rounded-[3rem] shadow-2xl p-12 max-w-2xl w-full border border-gray-100"
+        className="bg-white rounded-[3rem] shadow-2xl p-12 max-w-2xl w-full border border-black"
       >
         <div className="w-24 h-24 bg-indigo-50 rounded-[2rem] flex items-center justify-center text-5xl text-indigo-600 mb-8 mx-auto shadow-inner">
           <FiClock className="animate-pulse" />

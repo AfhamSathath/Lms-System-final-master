@@ -122,11 +122,11 @@ const Register = () => {
         {/* Header */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center h-20 w-20 rounded-full bg-white bg-opacity-20 backdrop-blur-lg mb-4">
-            <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-4 rounded-full">
+            <div className="bg-white border border-black p-4 rounded-full">
               <FiUser className="h-8 w-8 text-white" />
             </div>
           </div>
-          <h2 className="text-4xl font-extrabold text-white mb-2">
+          <h2 className="text-4xl font-extrabold text-slate-900 mb-2">
             Create Account
           </h2>
           <p className="text-lg text-white text-opacity-90">
@@ -503,7 +503,7 @@ const Register = () => {
                 <button
                   type="button"
                   onClick={handleNext}
-                  className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-4 rounded-lg hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transform hover:scale-105 transition-all duration-200 font-medium"
+                  className="flex-1 bg-white border border-black text-white py-3 px-4 rounded-lg hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transform hover:scale-105 transition-all duration-200 font-medium"
                 >
                   Next
                 </button>

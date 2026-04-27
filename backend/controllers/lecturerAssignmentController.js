@@ -88,6 +88,9 @@ exports.assignLecturerToSubject = async (req, res) => {
 
     await newAssignment.save();
 
+    const emailService = require('../utils/emailService');
+    emailService.sendLecturerCourseAssignmentEmail(lecturer, subject).catch(err => console.error('Lecturer Assignment Email Failed:', err));
+
     console.log('Assignment created successfully:', newAssignment._id);
     res.status(201).json({
       success: true,

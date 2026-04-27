@@ -180,7 +180,7 @@ const RepeatSubjectRegistrationForm = () => {
             <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded">
               <div className="flex items-start">
                 <AlertCircle className="text-red-500 mt-0.5 mr-3" size={20} />
-                <p className="text-red-700">{error}</p>
+                <p className="text-slate-700">{error}</p>
               </div>
             </div>
           )}
@@ -189,7 +189,7 @@ const RepeatSubjectRegistrationForm = () => {
             <div className="bg-green-50 border-l-4 border-green-500 p-4 mb-6 rounded">
               <div className="flex items-start">
                 <CheckCircle className="text-green-500 mt-0.5 mr-3" size={20} />
-                <p className="text-green-700">{success}</p>
+                <p className="text-slate-700">{success}</p>
               </div>
             </div>
           )}
@@ -197,11 +197,11 @@ const RepeatSubjectRegistrationForm = () => {
           {/* Info Box */}
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
             <h3 className="font-bold text-lg text-blue-900 mb-2">📋 Information</h3>
-            <p className="text-blue-800 mb-3">
+            <p className="text-slate-800 mb-3">
               You can repeat a subject only if you have received a failing or low grade (F, E, D, D+, C-).
               Select the subject you wish to repeat below.
             </p>
-            <div className="bg-white bg-opacity-60 p-3 rounded text-sm text-blue-700">
+            <div className="bg-white bg-opacity-60 p-3 rounded text-sm text-slate-700">
               <strong>Workflow:</strong> Submit → HOD Approval → Registrar Approval → Fee Payment → Exam Schedule
             </div>
           </div>
@@ -302,7 +302,7 @@ const RepeatSubjectRegistrationForm = () => {
           {error && (
             <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded">
               <AlertCircle className="inline text-red-500 mr-2" size={16} />
-              <span className="text-red-700">{error}</span>
+              <span className="text-slate-700">{error}</span>
             </div>
           )}
 
@@ -341,7 +341,7 @@ const RepeatSubjectRegistrationForm = () => {
                 Reason for Repetition <span className="text-red-500">*</span>
               </label>
               <div className="space-y-2">
-                <label className="flex items-center p-3 border-2 border-gray-200 rounded cursor-pointer hover:border-blue-500 transition-all" style={{borderColor: repeatReason === 'FAILED' ? '#3b82f6' : ''}}>
+                <label className="flex items-center p-3 border-2 border-black rounded cursor-pointer hover:border-blue-500 transition-all" style={{borderColor: repeatReason === 'FAILED' ? '#3b82f6' : ''}}>
                   <input
                     type="radio"
                     value="FAILED"
@@ -351,7 +351,7 @@ const RepeatSubjectRegistrationForm = () => {
                   />
                   <span className="font-medium text-gray-900">Failed Subject (Grade F)</span>
                 </label>
-                <label className="flex items-center p-3 border-2 border-gray-200 rounded cursor-pointer hover:border-blue-500 transition-all" style={{borderColor: repeatReason === 'GRADE_IMPROVEMENT' ? '#3b82f6' : ''}}>
+                <label className="flex items-center p-3 border-2 border-black rounded cursor-pointer hover:border-blue-500 transition-all" style={{borderColor: repeatReason === 'GRADE_IMPROVEMENT' ? '#3b82f6' : ''}}>
                   <input
                     type="radio"
                     value="GRADE_IMPROVEMENT"
@@ -373,14 +373,14 @@ const RepeatSubjectRegistrationForm = () => {
                 value={comments}
                 onChange={(e) => setComments(e.target.value)}
                 placeholder="Optional: Explain your reasons for repeating this subject..."
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-black rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 rows="4"
               />
             </div>
 
             {/* Important Notice */}
             <div className="bg-yellow-50 border border-yellow-200 rounded p-4 mb-6">
-              <p className="text-sm text-yellow-800">
+              <p className="text-sm text-slate-800">
                 <strong>⚠️ Important:</strong> The repeat fee of LKR 2,500 is mandatory if your application is approved.
               </p>
             </div>
@@ -389,7 +389,7 @@ const RepeatSubjectRegistrationForm = () => {
             <div className="flex gap-4 justify-between">
               <button
                 onClick={handleBackToSelection}
-                className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 font-semibold hover:bg-gray-50 transition-all"
+                className="px-6 py-2 border border-black rounded-lg text-gray-700 font-semibold hover:bg-white transition-all"
                 disabled={submitting}
               >
                 ← Back
@@ -398,7 +398,7 @@ const RepeatSubjectRegistrationForm = () => {
               <div className="flex gap-3">
                 <button
                   onClick={handleSaveDraft}
-                  className="px-6 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg font-semibold transition-all disabled:opacity-50"
+                  className="px-6 py-2 bg-white0 hover:bg-gray-600 text-white rounded-lg font-semibold transition-all disabled:opacity-50"
                   disabled={submitting}
                 >
                   {submitting ? 'Saving...' : 'Save Draft'}
@@ -458,14 +458,14 @@ const RepeatSubjectRegistrationForm = () => {
           {error && (
             <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded">
               <AlertCircle className="inline text-red-500 mr-2" size={16} />
-              <span className="text-red-700">{error}</span>
+              <span className="text-slate-700">{error}</span>
             </div>
           )}
 
           {success && (
             <div className="bg-green-50 border-l-4 border-green-500 p-4 mb-6 rounded">
               <CheckCircle className="inline text-green-500 mr-2" size={16} />
-              <span className="text-green-700">{success}</span>
+              <span className="text-slate-700">{success}</span>
             </div>
           )}
 
@@ -475,7 +475,7 @@ const RepeatSubjectRegistrationForm = () => {
               <h3 className="font-bold text-lg text-gray-900">Application Summary</h3>
               <button
                 onClick={() => setShowPreview(!showPreview)}
-                className="text-blue-500 hover:text-blue-700 font-semibold text-sm flex items-center gap-2"
+                className="text-blue-500 hover:text-slate-700 font-semibold text-sm flex items-center gap-2"
               >
                 {showPreview ? <EyeOff size={16} /> : <Eye size={16} />}
                 {showPreview ? 'Hide' : 'Preview'}
@@ -490,13 +490,13 @@ const RepeatSubjectRegistrationForm = () => {
               </div>
 
               <div className="grid grid-cols-2 gap-4">
-                <div className="bg-gray-50 p-4 rounded">
+                <div className="bg-white p-4 rounded">
                   <p className="text-sm text-gray-600">Reason</p>
                   <p className="font-semibold text-gray-900">
                     {repeatReason === 'FAILED' ? 'Failed Subject' : 'Grade Improvement'}
                   </p>
                 </div>
-                <div className="bg-gray-50 p-4 rounded">
+                <div className="bg-white p-4 rounded">
                   <p className="text-sm text-gray-600">Previous Grade</p>
                   <p className="font-bold text-red-600 text-lg">{selectedSubject.previousGrade}</p>
                 </div>
@@ -568,7 +568,7 @@ const RepeatSubjectRegistrationForm = () => {
           </div>
 
           {/* Terms & Conditions */}
-          <div className="bg-gray-50 border border-gray-200 rounded p-6 mb-6">
+          <div className="bg-white border border-black rounded p-6 mb-6">
             <label className="flex items-start gap-3 cursor-pointer">
               <input type="checkbox" className="mt-1 w-4 h-4 text-blue-500" required />
               <span className="text-sm text-gray-700">
@@ -582,7 +582,7 @@ const RepeatSubjectRegistrationForm = () => {
           <div className="flex gap-4 justify-between">
             <button
               onClick={() => setStep(2)}
-              className="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 font-semibold hover:bg-gray-50 transition-all disabled:opacity-50"
+              className="px-6 py-3 border border-black rounded-lg text-gray-700 font-semibold hover:bg-white transition-all disabled:opacity-50"
               disabled={submitting}
             >
               ← Back

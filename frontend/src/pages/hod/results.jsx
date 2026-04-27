@@ -127,7 +127,7 @@ const HodResults = () => {
   if (loading) return <Loader fullScreen />;
 
   return (
-    <div className="container mx-auto px-4 py-8 bg-slate-50 min-h-screen">
+    <div className="container mx-auto px-4 py-8 bg-white min-h-screen">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-8">
         <div>
           <button
@@ -141,15 +141,15 @@ const HodResults = () => {
         </div>
 
         <div className="grid grid-cols-1 gap-4 w-full sm:w-auto">
-          <div className="bg-white rounded-3xl p-4 shadow-lg border border-slate-100">
+          <div className="bg-white rounded-3xl p-4 shadow-lg border border-black">
             <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Published results</p>
             <p className="text-3xl font-black text-slate-900">{filteredResults.length}</p>
           </div>
-          <div className="bg-white rounded-3xl p-4 shadow-lg border border-slate-100">
+          <div className="bg-white rounded-3xl p-4 shadow-lg border border-black">
             <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Subjects in dept.</p>
             <p className="text-3xl font-black text-slate-900">{subjects.length}</p>
           </div>
-          <div className="bg-white rounded-3xl p-4 shadow-lg border border-slate-100">
+          <div className="bg-white rounded-3xl p-4 shadow-lg border border-black">
             <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Students with results</p>
             <p className="text-3xl font-black text-slate-900">{studentCards.length}</p>
           </div>
@@ -157,7 +157,7 @@ const HodResults = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-        <div className="lg:col-span-2 bg-white rounded-[3rem] shadow-2xl border border-slate-100 p-6">
+        <div className="lg:col-span-2 bg-white rounded-[3rem] shadow-2xl border border-black p-6">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
             <div>
               <h2 className="text-xl font-bold text-slate-900">Results Ledger</h2>
@@ -170,14 +170,14 @@ const HodResults = () => {
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder="Search student, subject, or code"
-                  className="w-full md:w-[320px] pl-12 pr-4 py-3 rounded-3xl border border-slate-200 focus:ring-2 focus:ring-indigo-100 focus:border-indigo-300"
+                  className="w-full md:w-[320px] pl-12 pr-4 py-3 rounded-3xl border border-black focus:ring-2 focus:ring-indigo-100 focus:border-indigo-300"
                 />
               </div>
               <div>
                 <select
                   value={selectedSubjectId}
                   onChange={(e) => setSelectedSubjectId(e.target.value)}
-                  className="w-full md:w-[320px] rounded-3xl border border-slate-200 px-4 py-3 bg-white focus:ring-2 focus:ring-indigo-100 focus:border-indigo-300"
+                  className="w-full md:w-[320px] rounded-3xl border border-black px-4 py-3 bg-white focus:ring-2 focus:ring-indigo-100 focus:border-indigo-300"
                 >
                   <option value="">All subjects</option>
                   {subjects.map((subject) => (
@@ -191,7 +191,7 @@ const HodResults = () => {
                 <select
                   value={selectedBatch}
                   onChange={(e) => setSelectedBatch(e.target.value)}
-                  className="w-full md:w-[320px] rounded-3xl border border-slate-200 px-4 py-3 bg-white focus:ring-2 focus:ring-indigo-100 focus:border-indigo-300"
+                  className="w-full md:w-[320px] rounded-3xl border border-black px-4 py-3 bg-white focus:ring-2 focus:ring-indigo-100 focus:border-indigo-300"
                 >
                   <option value="">All Batches</option>
                   {getBatches().map((batch) => (
@@ -204,7 +204,7 @@ const HodResults = () => {
 
           <div className="overflow-x-auto">
             <table className="min-w-full border-separate border-spacing-0">
-              <thead className="bg-slate-50 text-left text-[10px] uppercase tracking-[0.28em] text-slate-400">
+              <thead className="bg-white text-left text-[10px] uppercase tracking-[0.28em] text-slate-400">
                 <tr>
                   <th className="px-6 py-5">Student</th>
                   <th className="px-6 py-5">Subject</th>
@@ -223,7 +223,7 @@ const HodResults = () => {
                   </tr>
                 ) : (
                   filteredResults.map((result) => (
-                    <tr key={result._id} className="hover:bg-slate-50 transition-colors">
+                    <tr key={result._id} className="hover:bg-white transition-colors">
                       <td className="px-6 py-5">
                         <p className="font-semibold text-slate-900">{result.student?.name || 'Unknown'}</p>
                         <p className="text-xs text-slate-400">{result.student?.studentId}</p>
@@ -245,7 +245,7 @@ const HodResults = () => {
         </div>
 
         <div className="lg:col-span-1 space-y-6">
-          <div className="bg-white rounded-[3rem] shadow-2xl border border-slate-100 p-6">
+          <div className="bg-white rounded-[3rem] shadow-2xl border border-black p-6">
             <h3 className="text-lg font-bold text-slate-900 mb-3">Quick actions</h3>
             <button
               onClick={() => navigate('/hod/subjects')}
@@ -255,7 +255,7 @@ const HodResults = () => {
               <FiChevronRight />
             </button>
           </div>
-          <div className="bg-white rounded-[3rem] shadow-2xl border border-slate-100 p-6">
+          <div className="bg-white rounded-[3rem] shadow-2xl border border-black p-6">
             <h3 className="text-lg font-bold text-slate-900 mb-3">Student roster</h3>
             <p className="text-sm text-slate-500 mb-4">Click a student to load year and semester GPA details.</p>
             <div className="space-y-3">
@@ -266,7 +266,7 @@ const HodResults = () => {
                   <button
                     key={student._id}
                     onClick={() => fetchStudentResults(student)}
-                    className={`w-full text-left border rounded-3xl px-4 py-3 transition-colors ${selectedStudent?._id === student._id ? 'border-indigo-500 bg-indigo-50' : 'border-slate-200 bg-white hover:bg-slate-50'}`}
+                    className={`w-full text-left border rounded-3xl px-4 py-3 transition-colors ${selectedStudent?._id === student._id ? 'border-indigo-500 bg-indigo-50' : 'border-black bg-white hover:bg-slate-50'}`}
                   >
                     <p className="font-semibold text-slate-900">{student.name}</p>
                     <p className="text-sm text-slate-500">{student.studentId || 'No ID available'}</p>
@@ -292,7 +292,7 @@ const HodResults = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-[3rem] shadow-2xl border border-slate-100 p-6 mb-8">
+      <div className="bg-white rounded-[3rem] shadow-2xl border border-black p-6 mb-8">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
           <div>
             <h2 className="text-lg font-bold text-slate-900">{selectedStudent ? `${selectedStudent.name} - Result Details` : 'Select a Student'}</h2>
@@ -302,15 +302,15 @@ const HodResults = () => {
           </div>
           {selectedStudent && (
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 w-full sm:w-auto">
-              <div className="rounded-3xl bg-slate-50 p-4 text-center">
+              <div className="rounded-3xl bg-white p-4 text-center">
                 <p className="text-[10px] uppercase tracking-[0.28em] text-slate-400">Semesters</p>
                 <p className="text-3xl font-black text-slate-900">{getSemesterRows().length}</p>
               </div>
-              <div className="rounded-3xl bg-slate-50 p-4 text-center">
+              <div className="rounded-3xl bg-white p-4 text-center">
                 <p className="text-[10px] uppercase tracking-[0.28em] text-slate-400">Total credits</p>
                 <p className="text-3xl font-black text-slate-900">{getSemesterRows().reduce((sum, sem) => sum + (sem.totalCredits || 0), 0)}</p>
               </div>
-              <div className="rounded-3xl bg-slate-50 p-4 text-center">
+              <div className="rounded-3xl bg-white p-4 text-center">
                 <p className="text-[10px] uppercase tracking-[0.28em] text-slate-400">Overall GPA</p>
                 <p className="text-3xl font-black text-slate-900">{calculateOverallGPA(studentResults)}</p>
               </div>
@@ -324,7 +324,7 @@ const HodResults = () => {
             <div className="text-center py-10 text-red-500">{studentError}</div>
           ) : (
             getSemesterRows().map((sem) => (
-              <div key={`${sem.year}-${sem.semester}`} className="mb-6 rounded-3xl border border-slate-200 p-6 bg-slate-50">
+              <div key={`${sem.year}-${sem.semester}`} className="mb-6 rounded-3xl border border-black p-6 bg-white">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
                   <div>
                     <p className="text-sm uppercase tracking-[0.28em] text-slate-400">{sem.displayName}</p>
@@ -349,7 +349,7 @@ const HodResults = () => {
                     </thead>
                     <tbody className="bg-white divide-y divide-slate-100">
                       {sem.subjects.map((subjectResult) => (
-                        <tr key={subjectResult._id} className="hover:bg-slate-50">
+                        <tr key={subjectResult._id} className="hover:bg-white">
                           <td className="px-4 py-3 text-sm text-slate-700">{subjectResult.subject?.code || 'N/A'}</td>
                           <td className="px-4 py-3 text-sm text-slate-700">{subjectResult.subject?.name || 'N/A'}</td>
                           <td className="px-4 py-3 text-sm uppercase text-slate-500">{subjectResult.examType}</td>
@@ -369,18 +369,18 @@ const HodResults = () => {
         )}
       </div>
 
-      <div className="bg-white rounded-[3rem] shadow-2xl border border-slate-100 p-6">
+      <div className="bg-white rounded-[3rem] shadow-2xl border border-black p-6">
         <h2 className="text-lg font-bold text-slate-900 mb-4">Department overview</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="rounded-3xl border border-slate-200 p-5 bg-slate-50">
+          <div className="rounded-3xl border border-black p-5 bg-white">
             <label className="text-[10px] uppercase tracking-[0.28em] text-slate-400 font-black">Department</label>
             <div className="mt-3 text-slate-900 text-base font-semibold">{user.department || 'Not assigned'}</div>
           </div>
-          <div className="rounded-3xl border border-slate-200 p-5">
+          <div className="rounded-3xl border border-black p-5">
             <label className="text-[10px] uppercase tracking-[0.28em] text-slate-400 font-black">Subjects loaded</label>
             <div className="mt-3 text-slate-900 text-base font-semibold">{subjects.length}</div>
           </div>
-          <div className="rounded-3xl border border-slate-200 p-5 bg-slate-50">
+          <div className="rounded-3xl border border-black p-5 bg-white">
             <label className="text-[10px] uppercase tracking-[0.28em] text-slate-400 font-black">Search terms</label>
             <div className="mt-3 text-slate-900 text-base font-semibold">{searchTerm || 'None'}</div>
           </div>

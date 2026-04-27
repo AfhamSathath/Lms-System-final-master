@@ -43,6 +43,8 @@ const claimRoutes = require('./routes/claimRoutes');
 
 const app = express();
 
+// Disable ETags to fix 304 Not Modified "errors" showing up in logs and force 200 OK
+app.disable('etag');
 // Connect to database
 require('./config/database')();
 

@@ -5,14 +5,21 @@ import { FiCalendar, FiClock, FiMapPin } from 'react-icons/fi';
 import { format } from 'date-fns';
 
 const LecturerTimetable = () => {
+  const [allTimetables, setAllTimetables] = useState([]);
   const [timetables, setTimetables] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const [selectedYear, setSelectedYear] = useState('all');
+  const [selectedSemester, setSelectedSemester] = useState('all');
+
+  const academicYears = ['1st Year', '2nd Year', '3rd Year', '4th Year'];
+  const semesters = [1, 2];
 
   useEffect(() => {
     const fetch = async () => {
       try {
         const res = await api.get('api/timetables/upcoming');
-        setTimetables(res.data.timetables);
+        setAllTimetables(res.data.timetables || []);
       } catch (err) {
         console.error(err);
       } finally {
@@ -22,11 +29,31 @@ const LecturerTimetable = () => {
     fetch();
   }, []);
 
+  useEffect(() => {
+    let filtered = allTimetables;
+    if (selectedYear !== 'all') filtered = filtered.filter(t => t.year === selectedYear);
+    if (selectedSemester !== 'all') filtered = filtered.filter(t => t.semester === parseInt(selectedSemester));
+    setTimetables(filtered);
+  }, [allTimetables, selectedYear, selectedSemester]);
+
   if (loading) return <Loader fullScreen />;
 
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold text-gray-800 mb-6">Exam Schedule</h1>
+
+      {/* Filters */}
+      <div className="bg-white rounded-xl shadow p-4 mb-6 flex gap-4">
+        <select value={selectedYear} onChange={e => setSelectedYear(e.target.value)} className="border border-black rounded-lg px-4 py-2 focus:ring-2 focus:ring-purple-500">
+          <option value="all">All Years</option>
+          {academicYears.map(y => <option key={y} value={y}>{y}</option>)}
+        </select>
+        <select value={selectedSemester} onChange={e => setSelectedSemester(e.target.value)} className="border border-black rounded-lg px-4 py-2 focus:ring-2 focus:ring-purple-500">
+          <option value="all">All Semesters</option>
+          {semesters.map(s => <option key={s} value={s}>Semester {s}</option>)}
+        </select>
+      </div>
+
       {timetables.length === 0 ? (
         <p className="text-gray-600">No upcoming exams available.</p>
       ) : (

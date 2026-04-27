@@ -147,11 +147,11 @@ const RegistrarDashboard = () => {
   return (
     <div className="container mx-auto px-4 py-8 transition-all duration-300">
       {/* Welcome Section */}
-      <div className="bg-gradient-to-r from-purple-600 via-pink-600 to-red-600 rounded-2xl shadow-xl p-8 mb-8 text-white">
+      <div className="bg-white border border-black rounded-2xl shadow-xl p-8 mb-8 text-slate-900">
         <h1 className="text-3xl font-bold">
           Welcome back, Registrar {user?.name?.split(' ')[0] || ''} 👋
         </h1>
-        <p className="text-purple-100 mt-2">Overseeing the University Registry and Academic Operations</p>
+        <p className="text-slate-500 mt-2">Overseeing the University Registry and Academic Operations</p>
       </div>
 
       {/* Stat Cards */}
@@ -283,7 +283,7 @@ const RegistrarDashboard = () => {
             <tbody>
               {lastLogins.length > 0 ? (
                 lastLogins.map((u) => (
-                  <tr key={u._id} className="border-b hover:bg-gray-50">
+                  <tr key={u._id} className="border-b hover:bg-white">
                     <td className="py-3 px-4 font-medium">{u.name}</td>
                     <td className="py-3 px-4 text-gray-600">{u.email}</td>
                     <td className="py-3 px-4">
@@ -313,7 +313,7 @@ const RegistrarDashboard = () => {
           {recentActivities.length > 0 && (
             <button
               onClick={handleClearActivities}
-              className="text-red-600 hover:text-red-800 text-sm font-medium flex items-center transition-colors"
+              className="text-red-600 hover:text-slate-800 text-sm font-medium flex items-center transition-colors"
             >
               <FiTrash2 className="mr-1" /> Clear All
             </button>
@@ -354,19 +354,19 @@ const RegistrarDashboard = () => {
 
 const StatCard = ({ title, value, icon, trend, trendLabel, color }) => {
   const colors = {
-    blue: 'bg-blue-100 text-blue-600',
-    green: 'bg-green-100 text-green-600',
-    purple: 'bg-purple-100 text-purple-600',
-    orange: 'bg-orange-100 text-orange-600',
-    red: 'bg-red-100 text-red-600',
-    yellow: 'bg-yellow-100 text-yellow-600',
-    indigo: 'bg-indigo-100 text-indigo-600'
+    blue: 'bg-white border border-black text-blue-600',
+    green: 'bg-white border border-black text-green-600',
+    purple: 'bg-white border border-black text-purple-600',
+    orange: 'bg-white border border-black text-orange-600',
+    red: 'bg-white border border-black text-red-600',
+    yellow: 'bg-white border border-black text-yellow-600',
+    indigo: 'bg-white border border-black text-indigo-600'
   };
 
   return (
     <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
       <div className="flex justify-between items-start">
-        <div className={`p-3 rounded-lg ${colors[color] || 'bg-gray-100 text-gray-600'}`}>
+        <div className={`p-3 rounded-lg ${colors[color] || 'bg-white border border-black text-gray-600'}`}>
           {icon}
         </div>
         <span className="text-sm text-gray-600 flex items-center">
@@ -384,16 +384,16 @@ const StatCard = ({ title, value, icon, trend, trendLabel, color }) => {
 
 const QuickStat = ({ label, value, icon, color }) => {
   const colors = {
-    blue: 'bg-blue-100 text-blue-600',
-    green: 'bg-green-100 text-green-600',
-    yellow: 'bg-yellow-100 text-yellow-600',
-    red: 'bg-red-100 text-red-600',
-    purple: 'bg-purple-100 text-purple-600',
-    indigo: 'bg-indigo-100 text-indigo-600'
+    blue: 'bg-white border border-black text-blue-600',
+    green: 'bg-white border border-black text-green-600',
+    yellow: 'bg-white border border-black text-yellow-600',
+    red: 'bg-white border border-black text-red-600',
+    purple: 'bg-white border border-black text-purple-600',
+    indigo: 'bg-white border border-black text-indigo-600'
   };
 
   return (
-    <div className="bg-gray-50 rounded-lg p-4">
+    <div className="bg-white rounded-lg p-4">
       <div className="flex items-center justify-between">
         <span className="text-sm text-gray-600">{label}</span>
         <div className={`p-2 rounded-lg ${colors[color]}`}>
@@ -407,15 +407,15 @@ const QuickStat = ({ label, value, icon, color }) => {
 
 const RoleBadge = ({ role }) => {
   const colors = {
-    student: 'bg-blue-100 text-blue-800',
-    lecturer: 'bg-green-100 text-green-800',
-    admin: 'bg-purple-100 text-purple-800',
-    hod: 'bg-yellow-100 text-yellow-800',
-    dean: 'bg-red-100 text-red-800'
+    student: 'bg-white border border-black text-slate-800',
+    lecturer: 'bg-white border border-black text-slate-800',
+    admin: 'bg-white border border-black text-slate-800',
+    hod: 'bg-white border border-black text-slate-800',
+    dean: 'bg-white border border-black text-slate-800'
   };
 
   return (
-    <span className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${colors[role] || 'bg-gray-100 text-gray-800'}`}>
+    <span className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${colors[role] || 'bg-white border border-black text-gray-800'}`}>
       {role === 'admin' ? 'Registrar' : role}
     </span>
   );

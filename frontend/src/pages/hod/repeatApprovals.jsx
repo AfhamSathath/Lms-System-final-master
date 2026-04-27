@@ -54,7 +54,7 @@ const HodRepeatApprovals = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 p-6">
+    <div className="min-h-screen bg-white p-6">
       <div className="container mx-auto">
         <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
@@ -62,7 +62,7 @@ const HodRepeatApprovals = () => {
             <h1 className="text-4xl font-extrabold text-slate-900">Repeat Registration Approvals</h1>
             <p className="mt-2 text-slate-500 max-w-2xl">Review pending repeat subject applications from your department and advance them through the institutional workflow.</p>
           </div>
-          <div className="rounded-3xl border border-slate-200 bg-white px-6 py-4 shadow-sm">
+          <div className="rounded-3xl border border-black bg-white px-6 py-4 shadow-sm">
             <div className="text-slate-400 text-xs uppercase tracking-[0.3em]">Pending Requests</div>
             <div className="text-3xl font-extrabold text-slate-900 mt-2">{pendingRegistrations.length}</div>
           </div>
@@ -70,9 +70,9 @@ const HodRepeatApprovals = () => {
 
         <div className="grid gap-6 lg:grid-cols-12">
           <div className="lg:col-span-12">
-            <div className="overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-xl">
+            <div className="overflow-hidden rounded-[2rem] border border-black bg-white shadow-xl">
               <table className="w-full min-w-max overflow-hidden text-left text-sm">
-                <thead className="border-b border-slate-200 bg-slate-50 text-slate-500 tracking-[0.1em] uppercase text-[11px]">
+                <thead className="border-b border-black bg-white text-slate-500 tracking-[0.1em] uppercase text-[11px]">
                   <tr>
                     <th className="px-6 py-4">Student</th>
                     <th className="px-6 py-4">Subject</th>
@@ -94,7 +94,7 @@ const HodRepeatApprovals = () => {
                       const student = registration.student || {};
                       const subject = registration.subject || {};
                       return (
-                        <tr key={registration._id} className="hover:bg-slate-50 transition-colors">
+                        <tr key={registration._id} className="hover:bg-white transition-colors">
                           <td className="px-6 py-5 align-middle">
                             <div className="flex items-center gap-3">
                               <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600 font-bold">
@@ -116,7 +116,7 @@ const HodRepeatApprovals = () => {
                           </td>
                           <td className="px-6 py-5 max-w-[220px] text-slate-600 text-sm leading-relaxed">
                             <div className="font-bold text-slate-800 uppercase text-[10px] tracking-widest mb-1 italic opacity-60">Basis</div>
-                            <p className="font-semibold text-indigo-700 underline decoration-indigo-200 decoration-4 underline-offset-4 mb-2">{registration.repeatReason?.replace('_', ' ') || 'FAILED'}</p>
+                            <p className="font-semibold text-slate-700 underline decoration-indigo-200 decoration-4 underline-offset-4 mb-2">{registration.repeatReason?.replace('_', ' ') || 'FAILED'}</p>
                             {registration.additionalComments && (
                               <>
                                 <div className="font-bold text-slate-400 uppercase text-[9px] tracking-widest mt-3 mb-1 italic">Student Context</div>
@@ -126,7 +126,7 @@ const HodRepeatApprovals = () => {
 
                             {/* Previous Workflow Details (Lecturer) */}
                             {registration.lecturerReviewStatus && registration.lecturerReviewStatus !== 'PENDING' && (
-                              <div className="mt-4 pt-4 border-t border-slate-100 bg-slate-50/50 p-3 rounded-2xl">
+                              <div className="mt-4 pt-4 border-t border-black bg-white/50 p-3 rounded-2xl">
                                 <div className="flex items-center justify-between mb-2">
                                   <div className="font-bold text-slate-400 uppercase text-[8px] tracking-[0.2em] italic">Lecturer Decision</div>
                                   <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest ${registration.lecturerReviewStatus === 'APPROVED' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>

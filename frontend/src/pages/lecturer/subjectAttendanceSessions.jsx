@@ -13,6 +13,9 @@ const SubjectAttendanceSessions = () => {
   const [loading, setLoading] = useState(true);
   const [course, setCourse] = useState(null);
   const [filterBatch, setFilterBatch] = useState('All');
+  
+  // View mode
+  const [viewMode, setViewMode] = useState('sessions'); // 'sessions' | 'summary'
 
   // Create form state
   const [showCreate, setShowCreate] = useState(false);
@@ -178,22 +181,56 @@ const SubjectAttendanceSessions = () => {
 
   if (loading) return <Loader fullScreen />;
 
-  const batchFilteredStudents = students.filter(s => s && s.batch === activeSession?.batch);
+  const batchFilteredStudents = filterBatch === 'All' 
+    ? students 
+    : students.filter(s => s && s.batch === filterBatch);
+
+  const computeSummary = () => {
+    return batchFilteredStudents.map(student => {
+       let totalClasses = 0;
+       let attended = 0;
+
+       filteredSessions.forEach(session => {
+          // Only count sessions that have actually been marked (records exist)
+          if (session.attendanceRecords && session.attendanceRecords.length > 0) {
+             totalClasses++;
+             const record = session.attendanceRecords.find(r => 
+                (r.student?._id || r.student) === student._id
+             );
+             if (record && record.status === 'present') {
+                attended++;
+             }
+          }
+       });
+
+       return {
+          studentName: student.name,
+          studentId: student.studentId,
+          totalClasses,
+          attended,
+          percentage: totalClasses === 0 ? 0 : Math.round((attended / totalClasses) * 100)
+       };
+    });
+  };
 
   return (
-    <div className="container mx-auto px-4 py-8 bg-slate-50 min-h-screen">
+    <div className="container mx-auto px-4 py-8 bg-white min-h-screen">
       <div className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-3xl font-black text-slate-800 tracking-tight uppercase">Manage Attendance</h1>
           <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px] mt-1">{course?.courseName || 'Loading...'}</p>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex flex-wrap items-center gap-4">
+          <div className="flex bg-slate-200 p-1 rounded-xl">
+             <button onClick={() => setViewMode('sessions')} className={`px-4 py-2 rounded-lg text-xs font-bold uppercase transition-colors ${viewMode === 'sessions' ? 'bg-white shadow text-emerald-600' : 'text-slate-500 hover:text-slate-700'}`}>Sessions</button>
+             <button onClick={() => setViewMode('summary')} className={`px-4 py-2 rounded-lg text-xs font-bold uppercase transition-colors ${viewMode === 'summary' ? 'bg-white shadow text-emerald-600' : 'text-slate-500 hover:text-slate-700'}`}>Summary</button>
+          </div>
           <div className="flex items-center gap-2">
             <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Filter:</span>
             <select 
               value={filterBatch} 
               onChange={(e) => setFilterBatch(e.target.value)}
-              className="bg-white border-slate-200 rounded-lg text-xs font-bold text-slate-600 px-3 py-2 shadow-sm focus:ring-emerald-500 outline-none"
+              className="bg-white border-black rounded-lg text-xs font-bold text-slate-600 px-3 py-2 shadow-sm focus:ring-emerald-500 outline-none"
             >
               <option value="All">All Batches</option>
               <option value="2024/2025">2024/2025</option>
@@ -224,23 +261,23 @@ const SubjectAttendanceSessions = () => {
       </div>
 
       {showCreate && (
-        <div className="bg-white p-6 rounded-2xl shadow-xl border border-slate-100 mb-8 grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="bg-white p-6 rounded-2xl shadow-xl border border-black mb-8 grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
             <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Session Date</label>
-            <input type="date" className="w-full border-slate-200 rounded-lg p-2 bg-slate-50 font-semibold" value={newSession.date} onChange={e => setNewSession({...newSession, date: e.target.value})} />
+            <input type="date" className="w-full border-black rounded-lg p-2 bg-white font-semibold" value={newSession.date} onChange={e => setNewSession({...newSession, date: e.target.value})} />
           </div>
           <div>
             <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Start Time</label>
-            <input type="time" className="w-full border-slate-200 rounded-lg p-2 bg-slate-50 font-semibold" value={newSession.startTime} onChange={e => setNewSession({...newSession, startTime: e.target.value})} />
+            <input type="time" className="w-full border-black rounded-lg p-2 bg-white font-semibold" value={newSession.startTime} onChange={e => setNewSession({...newSession, startTime: e.target.value})} />
           </div>
           <div>
             <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Lecturer Hours</label>
-            <input type="number" min="1" className="w-full border-slate-200 rounded-lg p-2 bg-slate-50 font-semibold" value={newSession.lecturerHour} onChange={e => setNewSession({...newSession, lecturerHour: e.target.value})} />
+            <input type="number" min="1" className="w-full border-black rounded-lg p-2 bg-white font-semibold" value={newSession.lecturerHour} onChange={e => setNewSession({...newSession, lecturerHour: e.target.value})} />
           </div>
           <div>
             <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Batch Target</label>
             <select 
-              className="w-full border-slate-200 rounded-lg p-2 bg-slate-50 font-semibold focus:ring-indigo-500" 
+              className="w-full border-black rounded-lg p-2 bg-white font-semibold focus:ring-indigo-500" 
               value={newSession.batch} 
               onChange={e => setNewSession({...newSession, batch: e.target.value})}
             >
@@ -259,9 +296,41 @@ const SubjectAttendanceSessions = () => {
         </div>
       )}
 
-      {/* Marking Panel Array List Modal or View */}
-      {activeSession ? (
-        <div className="bg-white p-6 rounded-3xl shadow-xl border border-slate-100 mb-8">
+      // view mode summary rendering
+      {viewMode === 'summary' ? (
+        <div className="bg-white rounded-2xl shadow-xl border border-black overflow-hidden mb-8">
+           <table className="w-full text-left">
+              <thead className="bg-white border-b border-black">
+                <tr>
+                  <th className="p-4 text-xs font-black uppercase tracking-wider text-slate-500 rounded-tl-2xl">Student ID</th>
+                  <th className="p-4 text-xs font-black uppercase tracking-wider text-slate-500">Name</th>
+                  <th className="p-4 text-xs font-black uppercase tracking-wider text-slate-500">Classes Held</th>
+                  <th className="p-4 text-xs font-black uppercase tracking-wider text-slate-500">Attended</th>
+                  <th className="p-4 text-xs font-black uppercase tracking-wider text-slate-500 rounded-tr-2xl">Percentage</th>
+                </tr>
+              </thead>
+              <tbody>
+                {computeSummary().map((s, idx) => (
+                  <tr key={idx} className="border-b border-slate-50 hover:bg-white/50 transition-colors">
+                    <td className="p-4 font-mono text-xs font-bold text-slate-600">{s.studentId}</td>
+                    <td className="p-4 text-sm font-bold text-slate-800">{s.studentName}</td>
+                    <td className="p-4 text-sm font-bold text-slate-600 pl-8">{s.totalClasses}</td>
+                    <td className="p-4 text-sm font-bold text-emerald-600 pl-6">{s.attended}</td>
+                    <td className="p-4">
+                       <span className={`px-3 py-1.5 rounded-full text-xs font-black tracking-wide inline-flex items-center justify-center min-w-[3rem] ${s.percentage >= 80 ? 'bg-emerald-100 text-emerald-700' : s.percentage >= 50 ? 'bg-amber-100 text-amber-700' : 'bg-rose-100 text-rose-700'}`}>
+                         {s.percentage}%
+                       </span>
+                    </td>
+                  </tr>
+                ))}
+                {computeSummary().length === 0 && (
+                  <tr><td colSpan="5" className="p-8 text-center text-slate-400 font-bold uppercase tracking-wider">No students or attendance records found for this selection</td></tr>
+                )}
+              </tbody>
+           </table>
+        </div>
+      ) : activeSession ? (
+        <div className="bg-white p-6 rounded-3xl shadow-xl border border-black mb-8">
            <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
              <h2 className="text-xl font-black text-slate-700">Marking: {new Date(activeSession.date).toDateString()} - Batch: {activeSession.batch}</h2>
              
@@ -280,7 +349,7 @@ const SubjectAttendanceSessions = () => {
                    onClick={() => {
                      if (activeSession.status !== 'draft') return;
                      const updated = { ...attendanceData };
-                     batchFilteredStudents.forEach(s => { if (s && s._id) updated[s._id] = 'present'; });
+                     students.filter(s => s && s.batch === activeSession?.batch).forEach(s => { if (s && s._id) updated[s._id] = 'present'; });
                      setAttendanceData(updated);
                    }} 
                    className={`px-4 py-2 rounded-lg shadow-sm transition-colors ${activeSession.status === 'draft' ? 'bg-emerald-50 hover:bg-emerald-100 text-emerald-600' : 'bg-slate-50 text-slate-300 cursor-not-allowed'}`}
@@ -291,7 +360,7 @@ const SubjectAttendanceSessions = () => {
                    onClick={() => {
                      if (activeSession.status !== 'draft') return;
                      const updated = { ...attendanceData };
-                     batchFilteredStudents.forEach(s => { if (s && s._id) updated[s._id] = 'absent'; });
+                     students.filter(s => s && s.batch === activeSession?.batch).forEach(s => { if (s && s._id) updated[s._id] = 'absent'; });
                      setAttendanceData(updated);
                    }} 
                    className={`px-4 py-2 rounded-lg shadow-sm transition-colors ${activeSession.status === 'draft' ? 'bg-rose-50 hover:bg-rose-100 text-rose-600' : 'bg-slate-50 text-slate-300 cursor-not-allowed'}`}
@@ -301,14 +370,14 @@ const SubjectAttendanceSessions = () => {
              </div>
            </div>
            
-           <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-4 items-center bg-slate-50 p-4 rounded-2xl border border-slate-100">
+           <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-4 items-center bg-white p-4 rounded-2xl border border-black">
               {/* Left Box: Absent / Not Present */}
-              <div className="bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col h-96 overflow-hidden">
+              <div className="bg-white rounded-xl border border-black shadow-sm flex flex-col h-96 overflow-hidden">
                  <div className="bg-rose-50 p-3 border-b border-rose-100 flex justify-between items-center">
                     <h3 className="font-black text-rose-700 tracking-wide text-sm uppercase">Not Present ({batchFilteredStudents.filter(s => s && attendanceData[s._id] !== 'present').length})</h3>
                  </div>
                  <div className="overflow-y-auto p-2 flex-1 scrollbar-thin">
-                    {batchFilteredStudents
+                    {students.filter(s => s && s.batch === activeSession?.batch)
                        .filter(s => s && attendanceData[s._id] !== 'present' && (s.name.toLowerCase().includes(searchTerm.toLowerCase()) || s.studentId.toLowerCase().includes(searchTerm.toLowerCase())))
                        .map(s => (
                         <div 
@@ -325,19 +394,18 @@ const SubjectAttendanceSessions = () => {
                            {activeSession.status === 'draft' && <FiArrowRight className="text-slate-300 group-hover:text-rose-500 transition-colors" />}
                         </div>
                        ))}
-                    {batchFilteredStudents.filter(s => s && attendanceData[s._id] !== 'present').length === 0 && (
+                    {students.filter(s => s && s.batch === activeSession?.batch).filter(s => s && attendanceData[s._id] !== 'present').length === 0 && (
                        <p className="text-center text-slate-400 text-xs font-bold mt-10 uppercase">All students marked present.</p>
                     )}
                  </div>
               </div>
 
-              {/* Middle Action Buttons (Optional since we have click-to-move, but good for UX) */}
               <div className="flex flex-col gap-3 p-4">
                  <button 
                    onClick={() => {
                      if (activeSession.status !== 'draft') return;
                      const updated = { ...attendanceData };
-                     batchFilteredStudents.filter(s => s && attendanceData[s._id] !== 'present').forEach(s => updated[s._id] = 'present');
+                     students.filter(s => s && s.batch === activeSession?.batch).filter(s => s && attendanceData[s._id] !== 'present').forEach(s => updated[s._id] = 'present');
                      setAttendanceData(updated);
                    }} 
                    className={`p-3 rounded-full transition-colors shadow-sm ${activeSession.status === 'draft' ? 'bg-emerald-100 text-emerald-600 hover:bg-emerald-200' : 'bg-slate-100 text-slate-300 cursor-not-allowed'}`}
@@ -350,7 +418,7 @@ const SubjectAttendanceSessions = () => {
                    onClick={() => {
                      if (activeSession.status !== 'draft') return;
                      const updated = { ...attendanceData };
-                     batchFilteredStudents.filter(s => s && attendanceData[s._id] === 'present').forEach(s => updated[s._id] = 'absent');
+                     students.filter(s => s && s.batch === activeSession?.batch).filter(s => s && attendanceData[s._id] === 'present').forEach(s => updated[s._id] = 'absent');
                      setAttendanceData(updated);
                    }} 
                    className={`p-3 rounded-full transition-colors shadow-sm ${activeSession.status === 'draft' ? 'bg-rose-100 text-rose-600 hover:bg-rose-200' : 'bg-slate-100 text-slate-300 cursor-not-allowed'}`}
@@ -361,13 +429,12 @@ const SubjectAttendanceSessions = () => {
                  </button>
               </div>
 
-              {/* Right Box: Present */}
-              <div className="bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col h-96 overflow-hidden">
+              <div className="bg-white rounded-xl border border-black shadow-sm flex flex-col h-96 overflow-hidden">
                  <div className="bg-emerald-50 p-3 border-b border-emerald-100 flex justify-between items-center">
                     <h3 className="font-black text-emerald-700 tracking-wide text-sm uppercase">Present ({batchFilteredStudents.filter(s => s && attendanceData[s._id] === 'present').length})</h3>
                  </div>
                  <div className="overflow-y-auto p-2 flex-1 scrollbar-thin">
-                    {batchFilteredStudents
+                    {students.filter(s => s && s.batch === activeSession?.batch)
                        .filter(s => s && attendanceData[s._id] === 'present' && (s.name.toLowerCase().includes(searchTerm.toLowerCase()) || s.studentId.toLowerCase().includes(searchTerm.toLowerCase())))
                        .map(s => (
                         <div 
@@ -384,7 +451,7 @@ const SubjectAttendanceSessions = () => {
                            </div>
                         </div>
                        ))}
-                    {batchFilteredStudents.filter(s => s && attendanceData[s._id] === 'present').length === 0 && (
+                    {students.filter(s => s && s.batch === activeSession?.batch).filter(s => s && attendanceData[s._id] === 'present').length === 0 && (
                        <p className="text-center text-slate-400 text-xs font-bold mt-10 uppercase">No students marked present.</p>
                     )}
                  </div>
@@ -403,7 +470,7 @@ const SubjectAttendanceSessions = () => {
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {filteredSessions.map(session => (
-            <div key={session._id} className="bg-white p-6 rounded-3xl shadow-lg shadow-slate-200/50 border border-slate-100">
+            <div key={session._id} className="bg-white p-6 rounded-3xl shadow-lg shadow-slate-200/50 border border-black">
                <div className="flex justify-between items-start mb-4">
                   <div>
                     <h3 className="text-xl font-black text-slate-800 flex items-center gap-2"><FiCalendar className="text-emerald-500" /> {new Date(session.date).toLocaleDateString()}</h3>
@@ -425,8 +492,8 @@ const SubjectAttendanceSessions = () => {
                   </div>
                </div>
 
-               <div className="pt-4 border-t border-slate-100 flex gap-2">
-                  <button onClick={() => openMarkingPanel(session)} className="flex-1 py-2 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold rounded-xl text-xs uppercase tracking-widest flex items-center justify-center gap-2">
+               <div className="pt-4 border-t border-black flex gap-2">
+                  <button onClick={() => openMarkingPanel(session)} className="flex-1 py-2 bg-white hover:bg-slate-100 text-slate-700 font-bold rounded-xl text-xs uppercase tracking-widest flex items-center justify-center gap-2">
                      <FiEdit3 /> Manage / View Details
                   </button>
                   {session.status === 'draft' && (
@@ -447,7 +514,7 @@ const SubjectAttendanceSessions = () => {
           ))}
 
           {filteredSessions.length === 0 && (
-            <div className="col-span-1 lg:col-span-2 text-center py-20 bg-slate-50/50 rounded-3xl border border-dashed border-slate-300">
+            <div className="col-span-1 lg:col-span-2 text-center py-20 bg-white/50 rounded-3xl border border-dashed border-black">
                {students.length === 0 ? (
                  <div className="flex flex-col items-center">
                    <FiUsers className="mx-auto h-16 w-16 text-slate-300 mb-4" />
