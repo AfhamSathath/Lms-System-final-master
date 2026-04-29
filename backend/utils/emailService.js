@@ -2266,6 +2266,112 @@ class EmailService {
       }
     });
   }
+  // --- EXAM TIMETABLE NOTIFICATIONS ---
+  async sendTimetablePendingDean(dean, timetable) {
+    const html = `
+      <h2 style="font-size: 20px; font-weight: 900; color: #1e3a8a; margin-top: 0;">Authorization Required: Exam Timetable</h2>
+      <p>Dear Dean <strong>${dean.name}</strong>,</p>
+      <p>A new exam timetable schedule has been submitted for your approval. Please review the details below:</p>
+      <div style="background: #f1f5f9; border-left: 4px solid #1e3a8a; padding: 20px; margin: 20px 0; border-radius: 8px;">
+        <p style="margin: 0 0 10px 0; font-weight: bold;">Schedule Details:</p>
+        <p style="margin: 5px 0;"><strong>Subject:</strong> ${timetable.subject?.name || 'N/A'} (${timetable.subject?.code || 'N/A'})</p>
+        <p style="margin: 5px 0;"><strong>Department:</strong> ${timetable.department}</p>
+        <p style="margin: 5px 0;"><strong>Exam Type:</strong> ${timetable.examType}</p>
+        <p style="margin: 5px 0;"><strong>Date:</strong> ${new Date(timetable.date).toDateString()}</p>
+        <p style="margin: 5px 0;"><strong>Time:</strong> ${timetable.startTime} - ${timetable.endTime}</p>
+      </div>
+      <a href="${process.env.FRONTEND_URL}/dean/timetables" style="display: inline-block; background-color: #1e3a8a; color: white; padding: 14px 40px; text-decoration: none; border-radius: 8px; font-weight: 800; font-size: 14px; text-transform: uppercase;">Review Schedule</a>
+    `;
+    return await this.sendEmail({ email: dean.email, subject: 'Action Required: Exam Timetable Approval', html });
+  }
+
+  async sendTimetablePendingHOD(hod, timetable) {
+    const html = `
+      <h2 style="font-size: 20px; font-weight: 900; color: #1e3a8a; margin-top: 0;">Supervisor Assignment Required</h2>
+      <p>Dear HOD <strong>${hod.name}</strong>,</p>
+      <p>The Dean has approved the exam timetable for the following subject. Please assign supervisors and publish the schedule:</p>
+      <div style="background: #f1f5f9; border-left: 4px solid #1e3a8a; padding: 20px; margin: 20px 0; border-radius: 8px;">
+        <p style="margin: 5px 0;"><strong>Subject:</strong> ${timetable.subject?.name || 'N/A'} (${timetable.subject?.code || 'N/A'})</p>
+        <p style="margin: 5px 0;"><strong>Department:</strong> ${timetable.department}</p>
+        <p style="margin: 5px 0;"><strong>Date:</strong> ${new Date(timetable.date).toDateString()}</p>
+        <p style="margin: 5px 0;"><strong>Time:</strong> ${timetable.startTime} - ${timetable.endTime}</p>
+      </div>
+      <a href="${process.env.FRONTEND_URL}/hod/timetable" style="display: inline-block; background-color: #1e3a8a; color: white; padding: 14px 40px; text-decoration: none; border-radius: 8px; font-weight: 800; font-size: 14px; text-transform: uppercase;">Assign Supervisors</a>
+    `;
+    return await this.sendEmail({ email: hod.email, subject: 'Action Required: Assign Supervisors for Exam', html });
+  }
+
+  async sendTimetablePublished(recipients, timetable) {
+    const html = `
+      <h2 style="font-size: 20px; font-weight: 900; color: #059669; margin-top: 0;">Exam Timetable Published</h2>
+      <p>The official exam schedule for the following subject has been published:</p>
+      <div style="background: #f0fdf4; border: 1px solid #86efac; padding: 20px; border-radius: 12px; margin: 20px 0;">
+        <p style="margin: 5px 0;"><strong>Subject:</strong> ${timetable.subject?.name || 'N/A'} (${timetable.subject?.code || 'N/A'})</p>
+        <p style="margin: 5px 0;"><strong>Date:</strong> ${new Date(timetable.date).toDateString()}</p>
+        <p style="margin: 5px 0;"><strong>Time:</strong> ${timetable.startTime} - ${timetable.endTime}</p>
+        <p style="margin: 5px 0;"><strong>Venue:</strong> ${timetable.venue}</p>
+      </div>
+      <p>Please check your portal for full details.</p>
+    `;
+    
+    const results = await Promise.all(recipients.map(email => 
+      this.sendEmail({ email, subject: `Published: Exam Timetable - ${timetable.subject?.code || 'Notification'}`, html })
+    ).filter(p => p));
+    return results;
+  }
+
+  async sendTimetableSupervisorAssignment(lecturer, timetable) {
+    const html = `
+      <h2 style="font-size: 20px; font-weight: 900; color: #1e3a8a; margin-top: 0;">Exam Supervision Assignment</h2>
+      <p>Dear <strong>${lecturer.name}</strong>,</p>
+      <p>You have been assigned as a supervisor for the following examination:</p>
+      <div style="background: #f1f5f9; border-left: 4px solid #1e3a8a; padding: 20px; margin: 20px 0; border-radius: 8px;">
+        <p style="margin: 5px 0;"><strong>Subject:</strong> ${timetable.subject?.name || 'N/A'} (${timetable.subject?.code || 'N/A'})</p>
+        <p style="margin: 5px 0;"><strong>Date:</strong> ${new Date(timetable.date).toDateString()}</p>
+        <p style="margin: 5px 0;"><strong>Time:</strong> ${timetable.startTime} - ${timetable.endTime}</p>
+        <p style="margin: 5px 0;"><strong>Venue:</strong> ${timetable.venue}</p>
+      </div>
+      <p>Please ensure your availability during the scheduled time.</p>
+      <a href="${process.env.FRONTEND_URL}/lecturer/timetable" style="display: inline-block; background-color: #1e3a8a; color: white; padding: 14px 40px; text-decoration: none; border-radius: 8px; font-weight: 800; font-size: 14px; text-transform: uppercase;">View My Schedule</a>
+    `;
+    return await this.sendEmail({ email: lecturer.email, subject: 'Official: Exam Supervision Assignment', html });
+  }
+
+  async sendTimetableRejected(recipient, timetable, rejectedByRole, reason = "Revisions required") {
+    const html = `
+      <div style="text-align: center; margin-bottom: 30px;">
+         <div style="display: inline-block; background: #fee2e2; color: #ef4444; padding: 12px 24px; border-radius: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; font-size: 12px; border: 1px solid #fca5a5;">
+            Action Required: Schedule Rejected
+         </div>
+      </div>
+      <h2 style="font-size: 20px; font-weight: 900; color: #1e293b; margin-top: 0;">Exam Timetable Rejection Notification</h2>
+      <p>The exam timetable for <strong>${timetable.subject?.code || 'N/A'}</strong> has been rejected by the <strong>${rejectedByRole.toUpperCase()}</strong>.</p>
+      <div style="background: #fdf2f2; border-left: 4px solid #ef4444; padding: 20px; margin: 20px 0; border-radius: 8px;">
+        <p style="margin: 0; font-weight: bold; color: #991b1b;">Reason for Rejection:</p>
+        <p style="margin: 10px 0 0 0; color: #b91c1c; font-style: italic;">"${reason}"</p>
+      </div>
+      <p>Please log in to the portal to make the necessary adjustments and resubmit for approval.</p>
+      <a href="${process.env.FRONTEND_URL}/registrar/timetables" style="display: inline-block; background-color: #ef4444; color: white; padding: 14px 40px; text-decoration: none; border-radius: 8px; font-weight: 800; font-size: 14px; text-transform: uppercase;">Revise Schedule</a>
+    `;
+    return await this.sendEmail({ email: recipient.email, subject: `Rejected: Exam Timetable - ${timetable.subject?.code || 'Notification'}`, html });
+  }
+  async sendLecturerCourseAssignmentEmail(lecturer, subject) {
+    const html = `
+      <h2 style="font-size: 22px; font-weight: 900; color: #1e3a8a; margin-top: 0;">New Subject Assignment</h2>
+      <p>Dear <strong>${lecturer.name}</strong>,</p>
+      <p>You have been officially assigned as the lecturer for the following subject:</p>
+      <div style="background: #f1f5f9; border-left: 4px solid #1e3a8a; padding: 20px; margin: 20px 0; border-radius: 8px;">
+        <p style="margin: 0 0 10px 0; font-weight: bold;">Subject Details:</p>
+        <p style="margin: 5px 0;"><strong>Code:</strong> ${subject.code}</p>
+        <p style="margin: 5px 0;"><strong>Name:</strong> ${subject.name}</p>
+        <p style="margin: 5px 0;"><strong>Credits:</strong> ${subject.credits || 'N/A'}</p>
+      </div>
+      <p>Please log in to your portal to manage the curriculum and view enrolled students.</p>
+      <a href="${process.env.FRONTEND_URL}/lecturer/dashboard" style="display: inline-block; background: #1e3a8a; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">Access Portal</a>
+    `;
+
+    return await this.sendEmail({ email: lecturer.email, subject: `Subject Assignment: ${subject.name} (${subject.code})`, html });
+  }
 
 }
 

@@ -70,110 +70,118 @@ const HodRepeatApprovals = () => {
 
         <div className="grid gap-6 lg:grid-cols-12">
           <div className="lg:col-span-12">
-            <div className="overflow-hidden rounded-[2rem] border border-black bg-white shadow-xl">
-              <table className="w-full min-w-max overflow-hidden text-left text-sm">
-                <thead className="border-b border-black bg-white text-slate-500 tracking-[0.1em] uppercase text-[11px]">
-                  <tr>
-                    <th className="px-6 py-4">Student</th>
-                    <th className="px-6 py-4">Subject</th>
-                    <th className="px-6 py-4">Reason</th>
-                    <th className="px-6 py-4">Previous Grade</th>
-                    <th className="px-6 py-4">Submitted</th>
-                    <th className="px-6 py-4">Action</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {pendingRegistrations.length === 0 ? (
+            <div className="rounded-[2rem] border border-black bg-white shadow-xl overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-max text-left text-sm">
+                  <thead className="border-b border-black bg-white text-slate-500 tracking-[0.1em] uppercase text-[11px]">
                     <tr>
-                      <td colSpan="6" className="px-6 py-12 text-center text-slate-500">
-                        No pending repeat applications at the moment.
-                      </td>
+                      <th className="px-6 py-4">Student</th>
+                      <th className="px-6 py-4">Subject</th>
+                      <th className="px-6 py-4">Reason</th>
+                      <th className="px-6 py-4">Previous Grade</th>
+                      <th className="px-6 py-4">Submitted</th>
+                      <th className="px-6 py-4">Action</th>
                     </tr>
-                  ) : (
-                    pendingRegistrations.map((registration) => {
-                      const student = registration.student || {};
-                      const subject = registration.subject || {};
-                      return (
-                        <tr key={registration._id} className="hover:bg-white transition-colors">
-                          <td className="px-6 py-5 align-middle">
-                            <div className="flex items-center gap-3">
-                              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600 font-bold">
-                                {student.name?.charAt(0) || 'S'}
-                              </div>
-                              <div>
-                                <p className="font-semibold text-slate-900">{student.name || 'Student'}</p>
-                                <p className="text-xs text-slate-400 uppercase tracking-[0.14em] mb-1.5">{student.studentId || student._id}</p>
-                                <div className="flex items-center gap-1.5 px-2 py-0.5 bg-indigo-50 text-indigo-600 rounded-lg border border-indigo-100/50 w-fit">
-                                  <div className="h-1 w-1 bg-indigo-400 rounded-full animate-pulse"></div>
-                                  <span className="text-[8px] font-black uppercase tracking-widest leading-none">Stage 2: Review</span>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {pendingRegistrations.length === 0 ? (
+                      <tr>
+                        <td colSpan="6" className="px-6 py-12 text-center text-slate-500">
+                          No pending repeat applications at the moment.
+                        </td>
+                      </tr>
+                    ) : (
+                      pendingRegistrations.map((registration) => {
+                        const student = registration.student || {};
+                        const subject = registration.subject || {};
+                        return (
+                          <tr key={registration._id} className="hover:bg-white transition-colors">
+                            <td className="px-6 py-5 align-middle">
+                              <div className="flex items-center gap-3">
+                                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600 font-bold">
+                                  {student.name?.charAt(0) || 'S'}
+                                </div>
+                                <div>
+                                  <p className="font-semibold text-slate-900">{student.name || 'Student'}</p>
+                                  <p className="text-xs text-slate-400 uppercase tracking-[0.14em] mb-1.5">{student.studentId || student._id}</p>
+                                  <div className="flex items-center gap-1.5 px-2 py-0.5 bg-indigo-50 text-indigo-600 rounded-lg border border-indigo-100/50 w-fit">
+                                    <div className="h-1 w-1 bg-indigo-400 rounded-full animate-pulse"></div>
+                                    <span className="text-[8px] font-black uppercase tracking-widest leading-none">Stage 2: Review</span>
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                          </td>
-                          <td className="px-6 py-5">
-                            <p className="font-semibold text-slate-900">{subject.name || registration.subjectName || 'Unknown Subject'}</p>
-                            <p className="text-xs uppercase tracking-[0.14em] text-slate-400">{subject.code || registration.subjectCode}</p>
-                          </td>
-                          <td className="px-6 py-5 max-w-[220px] text-slate-600 text-sm leading-relaxed">
-                            <div className="font-bold text-slate-800 uppercase text-[10px] tracking-widest mb-1 italic opacity-60">Basis</div>
-                            <p className="font-semibold text-slate-700 underline decoration-indigo-200 decoration-4 underline-offset-4 mb-2">{registration.repeatReason?.replace('_', ' ') || 'FAILED'}</p>
-                            {registration.additionalComments && (
-                              <>
-                                <div className="font-bold text-slate-400 uppercase text-[9px] tracking-widest mt-3 mb-1 italic">Student Context</div>
-                                <p className="text-xs font-medium text-slate-500 italic">"{registration.additionalComments}"</p>
-                              </>
-                            )}
+                            </td>
+                            <td className="px-6 py-5">
+                              <p className="font-semibold text-slate-900">{subject.name || registration.subjectName || 'Unknown Subject'}</p>
+                              <p className="text-xs uppercase tracking-[0.14em] text-slate-400">{subject.code || registration.subjectCode}</p>
+                            </td>
+                            <td className="px-6 py-5 text-slate-600 text-sm leading-relaxed">
+                              <div className="flex flex-col gap-4">
+                                <div>
+                                  <div className="font-bold text-slate-800 uppercase text-[10px] tracking-widest mb-1 italic opacity-60">Basis</div>
+                                  <p className="font-semibold text-slate-700 underline decoration-indigo-200 decoration-4 underline-offset-4 w-fit">
+                                    {registration.repeatReason?.replace('_', ' ') || 'FAILED'}
+                                  </p>
+                                  {registration.additionalComments && (
+                                    <div className="mt-3">
+                                      <div className="font-bold text-slate-400 uppercase text-[9px] tracking-widest mb-1 italic">Student Context</div>
+                                      <p className="text-xs font-medium text-slate-500 italic leading-snug">"{registration.additionalComments}"</p>
+                                    </div>
+                                  )}
+                                </div>
 
-                            {/* Previous Workflow Details (Lecturer) */}
-                            {registration.lecturerReviewStatus && registration.lecturerReviewStatus !== 'PENDING' && (
-                              <div className="mt-4 pt-4 border-t border-black bg-white/50 p-3 rounded-2xl">
-                                <div className="flex items-center justify-between mb-2">
-                                  <div className="font-bold text-slate-400 uppercase text-[8px] tracking-[0.2em] italic">Lecturer Decision</div>
-                                  <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest ${registration.lecturerReviewStatus === 'APPROVED' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>
-                                    {registration.lecturerReviewStatus}
-                                  </span>
-                                </div>
-                                {registration.lecturerReviewComments ? (
-                                  <p className="text-[11px] font-bold text-slate-600 italic leading-snug">"{registration.lecturerReviewComments}"</p>
-                                ) : (
-                                  <p className="text-[10px] font-medium text-slate-400 italic">No comments provided</p>
+                                {/* Previous Workflow Details (Lecturer) */}
+                                {registration.lecturerReviewStatus && registration.lecturerReviewStatus !== 'PENDING' && (
+                                  <div className="pt-4 border-t border-slate-100 bg-slate-50/50 p-4 rounded-2xl border-black border">
+                                    <div className="flex items-center justify-between mb-2 gap-4">
+                                      <div className="font-bold text-slate-400 uppercase text-[8px] tracking-[0.2em] italic">Lecturer Decision</div>
+                                      <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest shrink-0 ${registration.lecturerReviewStatus === 'APPROVED' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>
+                                        {registration.lecturerReviewStatus}
+                                      </span>
+                                    </div>
+                                    {registration.lecturerReviewComments ? (
+                                      <p className="text-[11px] font-bold text-slate-600 italic leading-snug">"{registration.lecturerReviewComments}"</p>
+                                    ) : (
+                                      <p className="text-[10px] font-medium text-slate-400 italic">No comments provided</p>
+                                    )}
+                                  </div>
                                 )}
                               </div>
-                            )}
-                          </td>
+                            </td>
 
-                          <td className="px-6 py-5">
-                            <span className="inline-flex rounded-full bg-amber-100 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-amber-700">
-                              {registration.previousAttempt?.grade || registration.previousGrade || 'N/A'}
-                            </span>
-                          </td>
-                          <td className="px-6 py-5 text-slate-500 text-xs uppercase tracking-[0.14em]">
-                            {registration.studentSubmittedAt ? new Date(registration.studentSubmittedAt).toLocaleDateString() : 'Unknown'}
-                          </td>
-                          <td className="px-6 py-5">
-                            <div className="flex flex-wrap gap-3">
-                              <button
-                                disabled={processingId === registration._id}
-                                onClick={() => handleReview(registration._id, 'APPROVE')}
-                                className="inline-flex items-center gap-2 rounded-2xl bg-emerald-600 px-4 py-2 text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
-                              >
-                                <FiCheck /> Approve
-                              </button>
-                              <button
-                                disabled={processingId === registration._id}
-                                onClick={() => handleReview(registration._id, 'REJECT')}
-                                className="inline-flex items-center gap-2 rounded-2xl bg-rose-600 px-4 py-2 text-white transition hover:bg-rose-700 disabled:cursor-not-allowed disabled:opacity-50"
-                              >
-                                <FiX /> Reject
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })
-                  )}
-                </tbody>
-              </table>
+                            <td className="px-6 py-5">
+                              <span className="inline-flex rounded-full bg-amber-100 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-amber-700">
+                                {registration.previousAttempt?.grade || registration.previousGrade || 'N/A'}
+                              </span>
+                            </td>
+                            <td className="px-6 py-5 text-slate-500 text-xs uppercase tracking-[0.14em]">
+                              {registration.studentSubmittedAt ? new Date(registration.studentSubmittedAt).toLocaleDateString() : 'Unknown'}
+                            </td>
+                            <td className="px-6 py-5">
+                              <div className="flex flex-wrap gap-3">
+                                <button
+                                  disabled={processingId === registration._id}
+                                  onClick={() => handleReview(registration._id, 'APPROVE')}
+                                  className="inline-flex items-center gap-2 rounded-2xl bg-emerald-600 px-4 py-2 text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
+                                >
+                                  <FiCheck /> Approve
+                                </button>
+                                <button
+                                  disabled={processingId === registration._id}
+                                  onClick={() => handleReview(registration._id, 'REJECT')}
+                                  className="inline-flex items-center gap-2 rounded-2xl bg-rose-600 px-4 py-2 text-white transition hover:bg-rose-700 disabled:cursor-not-allowed disabled:opacity-50"
+                                >
+                                  <FiX /> Reject
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </div>

@@ -75,7 +75,7 @@ const LecturerProfile = () => {
         {/* Profile Card */}
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
           {/* Cover Photo */}
-          <div className="h-32 bg-gradient-to-r from-green-600 to-teal-600"></div>
+          <div className="h-32 bg-white border-b border-black relative"></div>
 
           {/* Profile Info */}
           <div className="relative px-6 pb-6">
@@ -93,7 +93,7 @@ const LecturerProfile = () => {
               {!isEditing ? (
                 <button
                   onClick={() => setIsEditing(true)}
-                  className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                  className="flex items-center px-4 py-2 bg-white border border-black text-slate-800 font-bold uppercase text-xs tracking-widest rounded-xl hover:bg-slate-50 transition-all shadow-sm"
                 >
                   <FiEdit2 className="mr-2" />
                   Edit Profile
@@ -103,14 +103,14 @@ const LecturerProfile = () => {
                   <button
                     onClick={handleSubmit}
                     disabled={loading}
-                    className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
+                    className="flex items-center px-4 py-2 bg-slate-900 text-white border border-black rounded-xl hover:bg-black transition-colors disabled:opacity-50 font-bold uppercase text-xs tracking-widest"
                   >
                     <FiSave className="mr-2" />
                     {loading ? 'Saving...' : 'Save'}
                   </button>
                   <button
                     onClick={handleCancel}
-                    className="flex items-center px-4 py-2 bg-white0 text-white rounded-lg hover:bg-gray-600 transition-colors"
+                    className="flex items-center px-4 py-2 bg-white border border-black text-slate-600 rounded-xl hover:bg-slate-50 transition-colors font-bold uppercase text-xs tracking-widest"
                   >
                     <FiX className="mr-2" />
                     Cancel

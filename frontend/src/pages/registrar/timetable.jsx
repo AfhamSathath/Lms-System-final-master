@@ -225,7 +225,7 @@ const RegistrarTimetables = () => {
     }
   };
 
-  const canEdit = user?.role === 'exam_officer';
+  const canEdit = ['exam_officer', 'registrar', 'admin'].includes(user?.role);
   const canApproveDean = user?.role === 'dean';
   const canApproveHod = user?.role === 'hod';
 
@@ -339,11 +339,11 @@ const RegistrarTimetables = () => {
                 
                 <div className="flex items-center mt-2 px-2 py-1.5 rounded-lg bg-white border border-black w-fit">
                   <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500 mr-2">Status:</span>
-                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wide ${
-                    t.status === 'published' ? 'bg-white border border-black text-slate-800 border border-green-200' :
-                    t.status === 'pending_dean' ? 'bg-white border border-black text-slate-800 border border-blue-200' :
-                    t.status === 'pending_hod' ? 'bg-white border border-black text-slate-800 border border-orange-200' :
-                    'bg-gray-200 text-gray-800 border border-black'
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wide border border-black ${
+                    t.status === 'published' ? 'bg-green-100 text-green-800 border-green-300' :
+                    t.status === 'pending_dean' ? 'bg-blue-100 text-blue-800 border-blue-300' :
+                    t.status === 'pending_hod' ? 'bg-orange-100 text-orange-800 border-orange-300' :
+                    'bg-gray-100 text-gray-800 border-gray-300'
                   }`}>{t.status?.replace('_', ' ') || 'DRAFT'}</span>
                 </div>
 
@@ -360,7 +360,7 @@ const RegistrarTimetables = () => {
                   {canEdit && (
                     <>
                       {(!t.status || t.status === 'draft') && (
-                        <button onClick={() => handleStatusChange(t._id, 'pending_dean')} className="px-3 py-1 bg-white border border-black text-slate-700 text-xs font-bold rounded hover:bg-white border border-black transition-colors mr-auto">Send to Dean</button>
+                        <button onClick={() => handleStatusChange(t._id, 'pending_dean')} className="px-3 py-1 bg-purple-600 text-white text-xs font-bold rounded hover:bg-purple-700 transition-colors mr-auto shadow-sm">Send to Dean</button>
                       )}
                       <button onClick={() => openEditModal(t)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Edit"><FiEdit2 className="h-4 w-4" /></button>
                       <button onClick={() => handleDeleteTimetable(t._id)} className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Delete"><FiTrash2 className="h-4 w-4" /></button>
@@ -368,14 +368,20 @@ const RegistrarTimetables = () => {
                   )}
                   
                   {canApproveDean && t.status === 'pending_dean' && (
-                     <button onClick={() => handleStatusChange(t._id, 'pending_hod')} className="px-3 py-1.5 bg-white border border-black text-slate-700 text-xs font-bold rounded-lg hover:bg-white border border-black transition-colors shadow-sm">Approve & Send to HOD</button>
+                    <div className="flex gap-2 w-full">
+                       <button onClick={() => handleStatusChange(t._id, 'draft')} className="px-3 py-1.5 bg-red-100 text-red-700 text-xs font-bold rounded-lg hover:bg-red-200 transition-colors border border-red-200">Reject</button>
+                       <button onClick={() => handleStatusChange(t._id, 'pending_hod')} className="flex-1 px-3 py-1.5 bg-blue-600 text-white text-xs font-bold rounded-lg hover:bg-blue-700 transition-colors shadow-sm">Approve & Send to HOD</button>
+                    </div>
                   )}
                   
                   {canApproveHod && t.status === 'pending_hod' && (
-                     <>
-                       <button onClick={() => { setSelectedTimetable(t); setShowSupervisorModal(true); }} className="px-3 py-1.5 bg-white border border-black text-slate-700 text-xs font-bold rounded-lg hover:bg-white border border-black transition-colors shadow-sm mr-auto">Assign Supervisor</button>
-                       <button onClick={() => handleStatusChange(t._id, 'published')} className="px-4 py-1.5 bg-green-500 text-white text-xs font-bold rounded-lg hover:bg-green-600 transition-colors shadow-md">Publish</button>
-                     </>
+                     <div className="flex flex-col gap-2 w-full">
+                       <div className="flex gap-2">
+                         <button onClick={() => { setSelectedTimetable(t); setShowSupervisorModal(true); }} className="flex-1 px-3 py-1.5 bg-indigo-100 text-indigo-700 text-xs font-bold rounded-lg hover:bg-indigo-200 transition-colors border border-indigo-200">Assign Supervisor</button>
+                         <button onClick={() => handleStatusChange(t._id, 'pending_dean')} className="px-3 py-1.5 bg-red-100 text-red-700 text-xs font-bold rounded-lg hover:bg-red-200 transition-colors border border-red-200">Reject to Dean</button>
+                       </div>
+                       <button onClick={() => handleStatusChange(t._id, 'published')} className="w-full px-4 py-1.5 bg-green-600 text-white text-xs font-bold rounded-lg hover:bg-green-700 transition-colors shadow-md">Publish Timetable</button>
+                     </div>
                   )}
                 </div>
               </div>

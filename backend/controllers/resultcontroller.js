@@ -1,7 +1,7 @@
 // controllers/resultsController.js
 const Result = require('../models/result');
 const Subject = require('../models/course');
-const User = require('../models/User');
+const User = require('../models/user');
 const Notification = require('../models/notification');
 const LecturerAssignment = require('../models/LecturerAssignment');
 const emailService = require('../utils/emailService');
@@ -192,7 +192,7 @@ exports.getResultsByYear = async (req, res, next) => {
 exports.createResult = async (req, res, next) => {
   try {
     const { student, subject, year, semester, examType, marks } = req.body;
-    
+
     // Validate required fields
     if (!student) return res.status(400).json({ message: 'Student is required' });
     if (!subject) return res.status(400).json({ message: 'Subject is required' });
@@ -200,15 +200,15 @@ exports.createResult = async (req, res, next) => {
     if (semester === undefined || semester === null || semester === '') return res.status(400).json({ message: 'Semester is required' });
     if (marks === undefined || marks === null || marks === '') return res.status(400).json({ message: 'Marks are required' });
     if (!examType) return res.status(400).json({ message: 'Exam type is required' });
-    
+
     // Validate marks is a number
     const marksNum = Number(marks);
     if (isNaN(marksNum)) return res.status(400).json({ message: 'Marks must be a valid number' });
     if (marksNum < 0 || marksNum > 100) return res.status(400).json({ message: 'Marks must be between 0 and 100' });
-    
+
     const validYears = ['1st Year', '2nd Year', '3rd Year', '4th Year'];
     if (!validYears.includes(year)) return res.status(400).json({ message: 'Invalid year' });
-    
+
     const semesterNum = parseInt(semester);
     if (![1, 2].includes(semesterNum)) return res.status(400).json({ message: 'Semester must be 1 or 2' });
 
@@ -539,7 +539,7 @@ exports.bulkCreateResults = async (req, res, next) => {
 exports.getTranscript = async (req, res, next) => {
   try {
     const results = await Result.find({ student: req.params.studentId }).populate('subject', 'name code credits').sort({ year: 1, semester: 1 });
-    if (!results.length) return res.status(404).json({ message: 'No results found for this student' });
+    if (!results.length) return res.status(200).json({ success: false, message: 'No results found for this student' });
 
     const student = await User.findById(req.params.studentId).select('name studentId department');
     const transcript = { student, years: {}, cgpa: 0, totalCredits: 0, totalGradePoints: 0 };

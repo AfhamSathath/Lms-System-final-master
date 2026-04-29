@@ -60,6 +60,67 @@ const syncSessionToEnrollments = async (session) => {
   }
 };
 
+const LecturerAssignment = require('../models/LecturerAssignment');
+
+// Helper to auto-update lecturer assignment progress
+const updateLecturerAssignmentProgress = async (subjectId, lecturerId) => {
+  try {
+    console.log(`[progress] Updating progress for subject ${subjectId} and lecturer ${lecturerId}`);
+    
+    // Find the active assignment for this lecturer and subject
+    const assignment = await LecturerAssignment.findOne({
+      subject: subjectId,
+      lecturer: lecturerId,
+      isActive: true
+    });
+
+    if (!assignment) {
+      console.warn(`[progress] No active assignment found for lecturer ${lecturerId} and subject ${subjectId}`);
+      return;
+    }
+
+    // Get all approved attendance sessions for this subject/lecturer
+    // Note: We might want to include 'draft' or 'published_to_hod' too, 
+    // but usually 'approved_by_hod' is the definitive conduct.
+    // User said "based on attendance creation", so maybe all sessions that are NOT drafts?
+    // Let's include all sessions that are not drafts to show immediate progress.
+    const sessions = await AttendanceSession.find({
+      subject: subjectId,
+      lecturer: lecturerId,
+      status: { $in: ['published_to_hod', 'approved_by_hod'] }
+    });
+
+    // Sum up lecturer hours
+    const completedHours = sessions.reduce((sum, s) => sum + (s.lecturerHour || 0), 0);
+    
+    // Update the assignment
+    assignment.curriculum.lecturesCompleted = completedHours;
+    
+    // Calculate progress percentage
+    const totalItems = (assignment.curriculum.totalLectures || 0) +
+      (assignment.curriculum.totalPracticals || 0) +
+      (assignment.curriculum.totalAssignments || 0);
+    
+    const completedItems = (assignment.curriculum.lecturesCompleted || 0) +
+      (assignment.curriculum.practicalsCompleted || 0) +
+      (assignment.curriculum.assignmentsCompleted || 0);
+
+    assignment.curriculum.progressPercentage = totalItems > 0 ? Math.min(Math.round((completedItems / totalItems) * 100), 100) : 0;
+
+    // Auto-mark as completed if 100%
+    if (assignment.curriculum.progressPercentage === 100 && assignment.status !== 'completed') {
+      assignment.status = 'completed';
+    } else if (assignment.curriculum.progressPercentage < 100 && assignment.status === 'completed') {
+      assignment.status = 'active';
+    }
+
+    await assignment.save();
+    console.log(`[progress] Progress updated to ${assignment.curriculum.progressPercentage}%`);
+  } catch (error) {
+    console.error('[progress] Error updating assignment progress:', error);
+  }
+};
+
 // @desc    Create an attendance session
 // @route   POST /api/attendance-sessions
 // @access  Private (Lecturer)
@@ -115,6 +176,9 @@ exports.updateSession = async (req, res, next) => {
     // Sync to Enrollment models
     await syncSessionToEnrollments(session);
 
+    // Update lecturer assignment progress
+    await updateLecturerAssignmentProgress(session.subject, session.lecturer);
+
     res.json({
       success: true,
       session
@@ -165,6 +229,9 @@ exports.updateAttendanceRecords = async (req, res, next) => {
     // Sync to Enrollment models
     await syncSessionToEnrollments(session);
 
+    // Update lecturer assignment progress
+    await updateLecturerAssignmentProgress(session.subject, session.lecturer);
+
     res.json({
       success: true,
       message: 'Attendance records updated and synced with enrollments',
@@ -187,7 +254,12 @@ exports.deleteSession = async (req, res, next) => {
       return res.status(403).json({ success: false, message: 'Cannot delete approved session' });
     }
 
+    const { subject, lecturer } = session;
     await session.deleteOne();
+
+    // Update lecturer assignment progress after deletion
+    await updateLecturerAssignmentProgress(subject, lecturer);
+
     res.json({ success: true, message: 'Session removed' });
   } catch (error) {
     next(error);
@@ -208,6 +280,9 @@ exports.submitToHOD = async (req, res, next) => {
 
     session.status = 'published_to_hod';
     await session.save();
+
+    // Update lecturer assignment progress
+    await updateLecturerAssignmentProgress(session.subject, session.lecturer);
 
     // Notify HOD of the department
     const hod = await User.findOne({
@@ -258,6 +333,9 @@ exports.approveSession = async (req, res, next) => {
 
     session.status = 'approved_by_hod';
     await session.save();
+
+    // Update lecturer assignment progress
+    await updateLecturerAssignmentProgress(session.subject, session.lecturer);
 
     res.json({ success: true, message: 'Approved' });
   } catch (error) {

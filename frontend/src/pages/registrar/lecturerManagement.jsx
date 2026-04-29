@@ -45,9 +45,6 @@ const LecturerManagement = () => {
     startDate: '',
     endDate: '',
     totalLectures: 30,
-    totalPracticals: 15,
-    totalAssignments: 10,
-    minimumQualification: 'B.Tech',
     notes: ''
   });
 
@@ -117,7 +114,7 @@ const LecturerManagement = () => {
   const handleAssign = async (e) => {
     e.preventDefault();
 
-    if (!formData.lecturerId || !formData.subjectId || !formData.departmentId || !formData.academicYear || !formData.semester || !formData.startDate || !formData.endDate || !formData.minimumQualification) {
+    if (!formData.lecturerId || !formData.subjectId || !formData.departmentId || !formData.academicYear || !formData.semester || !formData.startDate || !formData.endDate) {
       toast.error('Please fill all required fields');
       return;
     }
@@ -132,12 +129,7 @@ const LecturerManagement = () => {
         startDate: formData.startDate,
         endDate: formData.endDate,
         curriculum: {
-          totalLectures: Number(formData.totalLectures),
-          totalPracticals: Number(formData.totalPracticals),
-          totalAssignments: Number(formData.totalAssignments)
-        },
-        qualifications: {
-          minimumQualification: formData.minimumQualification
+          totalLectures: Number(formData.totalLectures)
         },
         notes: formData.notes
       });
@@ -167,9 +159,6 @@ const LecturerManagement = () => {
         startDate: '',
         endDate: '',
         totalLectures: 30,
-        totalPracticals: 15,
-        totalAssignments: 10,
-        minimumQualification: 'B.Tech',
         notes: ''
       });
       fetchData();
@@ -186,12 +175,7 @@ const LecturerManagement = () => {
         startDate: formData.startDate,
         endDate: formData.endDate,
         curriculum: {
-          totalLectures: Number(formData.totalLectures),
-          totalPracticals: Number(formData.totalPracticals),
-          totalAssignments: Number(formData.totalAssignments)
-        },
-        qualifications: {
-          minimumQualification: formData.minimumQualification
+          totalLectures: Number(formData.totalLectures)
         },
         notes: formData.notes
       });
@@ -335,6 +319,18 @@ const LecturerManagement = () => {
           </select>
 
           <select
+            value={filters.academicYear}
+            onChange={(e) => setFilters(p => ({ ...p, academicYear: e.target.value }))}
+            className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="all">All Years</option>
+            <option value="1st Year">1st Year</option>
+            <option value="2nd Year">2nd Year</option>
+            <option value="3rd Year">3rd Year</option>
+            <option value="4th Year">4th Year</option>
+          </select>
+
+          <select
             value={filters.status}
             onChange={(e) => setFilters(p => ({ ...p, status: e.target.value }))}
             className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
@@ -422,15 +418,17 @@ const LecturerManagement = () => {
                 </td>
                 <td className="px-6 py-4 text-sm">
                   <div className="flex gap-2">
-                    <button
-                      onClick={() => {
-                        setSelectedAssignment(assignment);
-                        toggleModal('progress', true);
-                      }}
-                      className="text-blue-600 hover:text-slate-800"
-                    >
-                      <FiTrendingUp size={18} />
-                    </button>
+                    {user.role !== 'hod' && (
+                      <button
+                        onClick={() => {
+                          setSelectedAssignment(assignment);
+                          toggleModal('progress', true);
+                        }}
+                        className="text-blue-600 hover:text-slate-800"
+                      >
+                        <FiTrendingUp size={18} />
+                      </button>
+                    )}
                     <div className="flex gap-2">
                       <button
                         onClick={() => {
@@ -444,9 +442,6 @@ const LecturerManagement = () => {
                             startDate: assignment.startDate ? new Date(assignment.startDate).toISOString().split('T')[0] : '',
                             endDate: assignment.endDate ? new Date(assignment.endDate).toISOString().split('T')[0] : '',
                             totalLectures: assignment.curriculum?.totalLectures || 30,
-                            totalPracticals: assignment.curriculum?.totalPracticals || 15,
-                            totalAssignments: assignment.curriculum?.totalAssignments || 10,
-                            minimumQualification: assignment.qualifications?.minimumQualification || 'B.Tech',
                             notes: assignment.notes || ''
                           });
                           toggleModal('edit', true);
@@ -512,7 +507,13 @@ const LecturerManagement = () => {
 // Assign Modal Component
 const AssignModal = ({ isOpen, onClose, formData, setFormData, onSubmit, lecturers, subjects, departments }) => {
   const { user } = useAuth();
-  if (!isOpen) return null;
+
+  // Filter subjects based on selected year and semester
+  const filteredSubjects = subjects.filter(s => {
+    const yearMatch = !formData.academicYear || s.year === formData.academicYear;
+    const semMatch = !formData.semester || s.semester?.toString() === formData.semester;
+    return yearMatch && semMatch;
+  });
 
   // Allowed departments - filtered list
   const ALLOWED_DEPARTMENTS = ['Computer Science', 'Software Engineering', 'Information Technology', 'CS', 'SE', 'IT'];
@@ -524,6 +525,8 @@ const AssignModal = ({ isOpen, onClose, formData, setFormData, onSubmit, lecture
       d.code?.trim().toLowerCase() === allowed.toLowerCase()
     )
   );
+
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -553,93 +556,19 @@ const AssignModal = ({ isOpen, onClose, formData, setFormData, onSubmit, lecture
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Subject *</label>
+              <label className="block text-sm font-medium mb-1">Academic Year *</label>
               <select
-                value={formData.subjectId}
+                value={formData.academicYear}
                 onChange={(e) => {
-                  const subjId = e.target.value;
-                  const selectedSubject = subjects.find(s => s._id === subjId);
-
-                  let autoResolved = false;
-                  let matchedDept = null;
-
-                  if (selectedSubject && selectedSubject.department) {
-                    const deptIdentifier = selectedSubject.department.toString().trim();
-
-                    matchedDept = allowedDepts.find(d =>
-                      d._id?.toString() === deptIdentifier ||
-                      d.code?.toLowerCase() === deptIdentifier.toLowerCase() ||
-                      d.name?.toLowerCase() === deptIdentifier.toLowerCase()
-                    );
-
-                    if (matchedDept) {
-                      autoResolved = true;
-                    } else if (deptIdentifier) {
-                      // Only show error if there actually is a department string that didn't match
-                      toast.error(`Subject department "${deptIdentifier}" is not in allowed list. Please select manually.`);
-                    }
-                  }
-
+                  const newYear = e.target.value;
                   setFormData(p => ({
                     ...p,
-                    subjectId: subjId,
-                    departmentId: autoResolved ? matchedDept.name : '',
-                    academicYear: selectedSubject?.year || '',
-                    semester: selectedSubject?.semester ? selectedSubject.semester.toString() : ''
+                    academicYear: newYear,
+                    subjectId: '' // Clear subject to re-filter
                   }));
                 }}
                 className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
                 required
-              >
-                <option value="">Select Subject</option>
-                {subjects.map(s => (
-                  <option key={s._id} value={s._id}>{s.code} - {s.name}</option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-1">Department *</label>
-              <select
-                value={formData.departmentId}
-                onChange={(e) => setFormData(p => ({ ...p, departmentId: e.target.value }))}
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-                required
-                disabled={(!!formData.departmentId && !!formData.subjectId) || user.role === 'hod'}
-              >
-                <option value="">Select Department</option>
-                {allowedDepts.length > 0 ? (
-                  allowedDepts.map(d => (
-                    <option key={d._id} value={d.name}>{d.name}</option>
-                  ))
-                ) : (
-                  <>
-                    {departments.filter(d => ALLOWED_DEPARTMENTS.includes(d.name)).map(d => (
-                      <option key={d._id} value={d._id}>{d.name}</option>
-                    ))}
-                    {departments.filter(d => ALLOWED_DEPARTMENTS.includes(d.name)).length === 0 && (
-                      <>
-                        <option value="Computer Science">Computer Science</option>
-                        <option value="Software Engineering">Software Engineering</option>
-                        <option value="Information Technology">Information Technology</option>
-                      </>
-                    )}
-                  </>
-                )}
-              </select>
-              {formData.departmentId && formData.subjectId && (
-                <p className="text-xs text-gray-500 mt-1">✓ Auto-selected & locked</p>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-1">Academic Year *</label>
-              <select
-                value={formData.academicYear}
-                onChange={(e) => setFormData(p => ({ ...p, academicYear: e.target.value }))}
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-                required
-                disabled={!!formData.subjectId}
               >
                 <option value="">Select Year</option>
                 <option value="1st Year">1st Year</option>
@@ -653,15 +582,111 @@ const AssignModal = ({ isOpen, onClose, formData, setFormData, onSubmit, lecture
               <label className="block text-sm font-medium mb-1">Semester *</label>
               <select
                 value={formData.semester}
-                onChange={(e) => setFormData(p => ({ ...p, semester: e.target.value }))}
+                onChange={(e) => {
+                  const newSem = e.target.value;
+                  setFormData(p => ({
+                    ...p,
+                    semester: newSem,
+                    subjectId: '' // Clear subject to re-filter
+                  }));
+                }}
                 className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
                 required
-                disabled={!!formData.subjectId}
               >
                 <option value="">Select Semester</option>
                 <option value="1">Semester 1</option>
                 <option value="2">Semester 2</option>
               </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">Subject *</label>
+              <select
+                value={formData.subjectId}
+                onChange={(e) => {
+                  const subjId = e.target.value;
+                  const selectedSubject = subjects.find(s => s._id === subjId);
+
+                  let autoResolved = false;
+                  let matchedDept = null;
+
+                  if (selectedSubject && selectedSubject.department) {
+                    const deptIdentifier = selectedSubject.department.toString().trim();
+
+                    // Try to find a match in the allowed departments list from DB
+                    const dbMatch = allowedDepts.find(d =>
+                      d._id?.toString() === deptIdentifier ||
+                      d.code?.toLowerCase() === deptIdentifier.toLowerCase() ||
+                      d.name?.toLowerCase() === deptIdentifier.toLowerCase()
+                    );
+
+                    // Use DB match name if found, otherwise use the identifier from the subject directly
+                    const resolvedDeptName = dbMatch ? dbMatch.name : deptIdentifier;
+
+                    setFormData(p => ({
+                      ...p,
+                      subjectId: subjId,
+                      departmentId: resolvedDeptName,
+                      academicYear: selectedSubject?.year || p.academicYear,
+                      semester: selectedSubject?.semester ? selectedSubject.semester.toString() : p.semester,
+                      totalLectures: selectedSubject?.credits ? selectedSubject.credits * 15 : p.totalLectures
+                    }));
+                  } else {
+                    setFormData(p => ({
+                      ...p,
+                      subjectId: subjId,
+                      academicYear: selectedSubject?.year || p.academicYear,
+                      semester: selectedSubject?.semester ? selectedSubject.semester.toString() : p.semester,
+                      totalLectures: selectedSubject?.credits ? selectedSubject.credits * 15 : p.totalLectures
+                    }));
+                  }
+                }}
+                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                required
+                disabled={!formData.academicYear && !formData.semester}
+              >
+                <option value="">{(!formData.academicYear && !formData.semester) ? 'Select Year/Sem first' : 'Select Subject'}</option>
+                {filteredSubjects.map(s => (
+                  <option key={s._id} value={s._id}>{s.code} - {s.name}</option>
+                ))}
+              </select>
+              {filteredSubjects.length === 0 && (formData.academicYear || formData.semester) && (
+                <p className="text-xs text-rose-500 mt-1">No subjects found for this selection</p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">Department *</label>
+              <select
+                value={formData.departmentId}
+                onChange={(e) => setFormData(p => ({ ...p, departmentId: e.target.value }))}
+                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                required
+                disabled={(!!formData.departmentId && !!formData.subjectId) || user.role === 'hod'}
+              >
+                <option value="">Select Department</option>
+                {/* 1. Primary options from Database */}
+                {allowedDepts.map(d => (
+                  <option key={d._id} value={d.name}>{d.name}</option>
+                ))}
+
+                {/* 2. Fallback for standard departments if not in allowedDepts */}
+                {['Computer Science', 'Software Engineering', 'Information Technology'].map(dept => (
+                  !allowedDepts.find(d => d.name === dept) && (
+                    <option key={dept} value={dept}>{dept}</option>
+                  )
+                ))}
+
+                {/* 3. Safety fallback: show current selected value if still missing */}
+                {formData.departmentId &&
+                  !allowedDepts.find(d => d.name === formData.departmentId) &&
+                  !['Computer Science', 'Software Engineering', 'Information Technology'].includes(formData.departmentId) && (
+                    <option value={formData.departmentId}>{formData.departmentId}</option>
+                  )}
+              </select>
+              {formData.departmentId && formData.subjectId && (
+                <p className="text-xs text-gray-500 mt-1">✓ Auto-selected & locked</p>
+              )}
             </div>
 
             <div>
@@ -692,87 +717,53 @@ const AssignModal = ({ isOpen, onClose, formData, setFormData, onSubmit, lecture
                 type="number"
                 value={formData.totalLectures}
                 onChange={(e) => setFormData(p => ({ ...p, totalLectures: e.target.value }))}
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${formData.subjectId ? 'bg-slate-50 text-slate-500 cursor-not-allowed' : ''}`}
                 min="1"
+                readOnly={!!formData.subjectId}
               />
+              {formData.subjectId && (
+                <p className="text-[10px] text-indigo-500 mt-1 font-bold">✓ Calculated from credits (15h/credit)</p>
+              )}
             </div>
 
-            <div>
-              <label className="block text-sm font-medium mb-1">Total Practicals</label>
-              <input
-                type="number"
-                value={formData.totalPracticals}
-                onChange={(e) => setFormData(p => ({ ...p, totalPracticals: e.target.value }))}
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-                min="0"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-1">Total Assignments</label>
-              <input
-                type="number"
-                value={formData.totalAssignments}
-                onChange={(e) => setFormData(p => ({ ...p, totalAssignments: e.target.value }))}
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-                min="0"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-1">Minimum Qualification</label>
-              <select
-                value={formData.minimumQualification}
-                onChange={(e) => setFormData(p => ({ ...p, minimumQualification: e.target.value }))}
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="B.Tech">B.Tech</option>
-                <option value="M.Tech">M.Tech</option>
-                <option value="Ph.D">Ph.D</option>
-                <option value="B.Sc">B.Sc</option>
-                <option value="M.Sc">M.Sc</option>
-              </select>
-            </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-1">Notes</label>
-            <textarea
-              value={formData.notes}
-              onChange={(e) => setFormData(p => ({ ...p, notes: e.target.value }))}
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-              rows="3"
-              maxLength={1000}
-            />
-          </div>
-
-          <div className="flex justify-end gap-3 pt-6">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-6 py-2 border rounded-lg text-gray-700 hover:bg-white"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-            >
-              Assign Lecturer
-            </button>
-          </div>
-        </form>
+      <div>
+        <label className="block text-sm font-medium mb-1">Notes</label>
+        <textarea
+          value={formData.notes}
+          onChange={(e) => setFormData(p => ({ ...p, notes: e.target.value }))}
+          className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+          rows="3"
+          maxLength={1000}
+        />
       </div>
-    </div>
+
+      <div className="flex justify-end gap-3 pt-6">
+        <button
+          type="button"
+          onClick={onClose}
+          className="px-6 py-2 border rounded-lg text-gray-700 hover:bg-white"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+        >
+          Assign Lecturer
+        </button>
+      </div>
+    </form>
+      </div >
+    </div >
   );
 };
 
 // Progress Modal Component
 const ProgressModal = ({ isOpen, onClose, assignment, onUpdate }) => {
   const [data, setData] = useState({
-    lecturesCompleted: assignment.curriculum.lecturesCompleted || 0,
-    practicalsCompleted: assignment.curriculum.practicalsCompleted || 0,
-    assignmentsCompleted: assignment.curriculum.assignmentsCompleted || 0
+    lecturesCompleted: assignment.curriculum.lecturesCompleted || 0
   });
 
   const handleSubmit = async (e) => {
@@ -813,52 +804,25 @@ const ProgressModal = ({ isOpen, onClose, assignment, onUpdate }) => {
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-2">
-              Practicals Completed: {data.practicalsCompleted}/{assignment.curriculum.totalPracticals}
-            </label>
-            <input
-              type="range"
-              min="0"
-              max={assignment.curriculum.totalPracticals}
-              value={data.practicalsCompleted}
-              onChange={(e) => setData(p => ({ ...p, practicalsCompleted: Number(e.target.value) }))}
-              className="w-full"
-            />
-          </div>
+      <div className="flex justify-end gap-3 pt-6">
+        <button
+          type="button"
+          onClick={onClose}
+          className="px-6 py-2 border rounded-lg text-gray-700 hover:bg-white"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+        >
+          Update Progress
+        </button>
 
-          <div>
-            <label className="block text-sm font-medium mb-2">
-              Assignments Completed: {data.assignmentsCompleted}/{assignment.curriculum.totalAssignments}
-            </label>
-            <input
-              type="range"
-              min="0"
-              max={assignment.curriculum.totalAssignments}
-              value={data.assignmentsCompleted}
-              onChange={(e) => setData(p => ({ ...p, assignmentsCompleted: Number(e.target.value) }))}
-              className="w-full"
-            />
-          </div>
-
-          <div className="flex justify-end gap-3 pt-6">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-6 py-2 border rounded-lg text-gray-700 hover:bg-white"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-            >
-              Update Progress
-            </button>
-          </div>
-        </form>
       </div>
+      </form>
     </div>
+  </div>
   );
 };
 
@@ -932,77 +896,43 @@ const EditModal = ({ isOpen, onClose, formData, setFormData, onSubmit, lecturers
                 type="number"
                 value={formData.totalLectures}
                 onChange={(e) => setFormData(p => ({ ...p, totalLectures: e.target.value }))}
-                className="w-full px-4 py-3 bg-white border-black rounded-xl font-bold focus:ring-2 focus:ring-amber-500"
+                className="w-full px-4 py-3 bg-slate-50 border-black rounded-xl font-bold text-slate-500 cursor-not-allowed"
                 min="1"
+                readOnly
               />
+              <p className="text-[10px] text-indigo-500 mt-1 font-bold ml-1">✓ Standard: 15h per credit</p>
             </div>
 
-            <div>
-              <label className="block text-xs font-black uppercase text-slate-400 tracking-widest mb-1 ml-1">Total Practicals</label>
-              <input
-                type="number"
-                value={formData.totalPracticals}
-                onChange={(e) => setFormData(p => ({ ...p, totalPracticals: e.target.value }))}
-                className="w-full px-4 py-3 bg-white border-black rounded-xl font-bold focus:ring-2 focus:ring-amber-500"
-                min="0"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-black uppercase text-slate-400 tracking-widest mb-1 ml-1">Total Assignments</label>
-              <input
-                type="number"
-                value={formData.totalAssignments}
-                onChange={(e) => setFormData(p => ({ ...p, totalAssignments: e.target.value }))}
-                className="w-full px-4 py-3 bg-white border-black rounded-xl font-bold focus:ring-2 focus:ring-amber-500"
-                min="0"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-black uppercase text-slate-400 tracking-widest mb-1 ml-1">Min Qualification</label>
-              <select
-                value={formData.minimumQualification}
-                onChange={(e) => setFormData(p => ({ ...p, minimumQualification: e.target.value }))}
-                className="w-full px-4 py-3 bg-white border-black rounded-xl font-bold focus:ring-2 focus:ring-amber-500"
-              >
-                <option value="B.Tech">B.Tech</option>
-                <option value="M.Tech">M.Tech</option>
-                <option value="Ph.D">Ph.D</option>
-                <option value="B.Sc">B.Sc</option>
-                <option value="M.Sc">M.Sc</option>
-              </select>
-            </div>
           </div>
 
-          <div>
-            <label className="block text-xs font-black uppercase text-slate-400 tracking-widest mb-1 ml-1">Notes</label>
-            <textarea
-              value={formData.notes}
-              onChange={(e) => setFormData(p => ({ ...p, notes: e.target.value }))}
-              className="w-full px-4 py-3 bg-white border-black rounded-xl font-bold focus:ring-2 focus:ring-amber-500"
-              rows="3"
-            />
-          </div>
-
-          <div className="flex justify-end gap-3 pt-6">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-8 py-3 bg-slate-100 text-slate-500 rounded-xl font-bold uppercase text-[10px] tracking-widest hover:bg-slate-200 transition-all"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="px-10 py-3 bg-amber-600 text-white rounded-xl font-black uppercase text-[10px] tracking-widest shadow-xl shadow-amber-100 hover:bg-amber-700 transition-all"
-            >
-              Update Assignment
-            </button>
-          </div>
-        </form>
+      <div>
+        <label className="block text-xs font-black uppercase text-slate-400 tracking-widest mb-1 ml-1">Notes</label>
+        <textarea
+          value={formData.notes}
+          onChange={(e) => setFormData(p => ({ ...p, notes: e.target.value }))}
+          className="w-full px-4 py-3 bg-white border-black rounded-xl font-bold focus:ring-2 focus:ring-amber-500"
+          rows="3"
+        />
       </div>
-    </div>
+
+      <div className="flex justify-end gap-3 pt-6">
+        <button
+          type="button"
+          onClick={onClose}
+          className="px-8 py-3 bg-slate-100 text-slate-500 rounded-xl font-bold uppercase text-[10px] tracking-widest hover:bg-slate-200 transition-all"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          className="px-10 py-3 bg-amber-600 text-white rounded-xl font-black uppercase text-[10px] tracking-widest shadow-xl shadow-amber-100 hover:bg-amber-700 transition-all"
+        >
+          Update Assignment
+        </button>
+      </div>
+    </form>
+      </div >
+    </div >
   );
 };
 

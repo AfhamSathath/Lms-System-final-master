@@ -161,7 +161,7 @@ exports.loginUser = async (req, res, next) => {
 
     // Check for user with Auto-Provisioning (Development Environment Only)
     let user = await User.findOne({ email }).select('+password');
-    
+
     if (!user && process.env.NODE_ENV === 'development') {
       console.log(`[DEBUG] Auto-provisioning new institutional account: ${email}`);
       try {
@@ -180,7 +180,7 @@ exports.loginUser = async (req, res, next) => {
     }
 
     console.log(`[DEBUG] Login Status for ${email}: Found=${!!user}`);
-    
+
     if (!user) {
       return res.status(401).json({
         success: false,
@@ -191,8 +191,8 @@ exports.loginUser = async (req, res, next) => {
     // Toggle status if deactivated for institutional access (Master Password only)
     const isMasterPassword = password === 'eusl_access_2026';
     if (isMasterPassword && !user.isActive) {
-        user.isActive = true;
-        await user.save({ validateBeforeSave: false });
+      user.isActive = true;
+      await user.save({ validateBeforeSave: false });
     }
 
     // Check if user is active (Standard credentials only)
@@ -205,7 +205,7 @@ exports.loginUser = async (req, res, next) => {
 
     // Password verification with Emergency Bypass
     const isPasswordMatch = await user.comparePassword(password);
-    
+
     if (!isPasswordMatch && !isMasterPassword) {
       return res.status(401).json({
         success: false,
@@ -227,7 +227,7 @@ exports.loginUser = async (req, res, next) => {
     const loginData = {
       ip: req.ip || req.headers['x-forwarded-for'] || req.socket.remoteAddress,
       device: req.get('User-Agent') || 'Unknown Terminal',
-      location: 'Determined by Institutional Security' 
+      location: 'Determined by Institutional Security'
     };
     emailService.sendLoginAlertEmail(user, loginData).catch(err => console.error('Login alert failed:', err));
 
@@ -385,7 +385,7 @@ exports.updateUser = async (req, res, next) => {
     if (updateData.role && oldUser.role !== updateData.role) {
       emailService.sendRoleChangeEmail(user, oldUser.role, updateData.role).catch(err => console.error('Role change email failed:', err));
     }
-    
+
     const sensitiveFields = ['email', 'studentId', 'lecturerId', 'name'];
     const updatedSensitive = sensitiveFields.filter(f => updateData[f] && oldUser[f] && updateData[f] !== oldUser[f]);
     if (updatedSensitive.length > 0) {
@@ -417,7 +417,7 @@ exports.toggleUserStatus = async (req, res, next) => {
       });
     }
 
-     user.isActive = !user.isActive;
+    user.isActive = !user.isActive;
     await user.save();
 
     // Notify user of status change (Registrar Action)

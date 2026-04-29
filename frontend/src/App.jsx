@@ -93,6 +93,7 @@ import HodProfile from './pages/hod/profile';
 import HodTimetable from './pages/hod/timetable';
 import HodRepeatApprovals from './pages/hod/repeatApprovals';
 import HODAttendanceReview from './pages/hod/attendanceReview';
+import HodProgress from './pages/hod/progress';
 
 // Dean Pages
 import DeanDashboard from './pages/dean/dashboard';
@@ -260,6 +261,7 @@ function MainRoutes() {
         <Route path="notifications" element={<HodNotifications />} />
         <Route path="repeats" element={<HodRepeatApprovals />} />
         <Route path="attendance-review" element={<HODAttendanceReview />} />
+        <Route path="progress" element={<HodProgress />} />
         <Route path="medical" element={<HodMedicalApprovals />} />
         <Route path="profile" element={<HodProfile />} />
       </Route>

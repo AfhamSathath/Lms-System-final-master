@@ -36,6 +36,13 @@ const RegistrarUsers = () => {
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState(null);
 
+  const getImageUrl = (path) => {
+    if (!path) return null;
+    if (path.startsWith('http')) return path;
+    const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+    return `${baseUrl}${path.startsWith('/') ? '' : '/'}${path}`;
+  };
+
   // Define faculties and departments
   const facultyData = {
     'Technological Studies': ['Computer Science', 'Software Engineering', 'Information Technology'],
@@ -929,8 +936,12 @@ const RegistrarUsers = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
-                        <div className="h-10 w-10 rounded-full bg-white border border-black flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
-                          {getInitials(u.name)}
+                        <div className="h-10 w-10 rounded-full bg-white border border-black flex items-center justify-center font-bold text-sm flex-shrink-0 overflow-hidden">
+                          {u.profilePicture ? (
+                            <img src={getImageUrl(u.profilePicture)} alt={u.name} className="w-full h-full object-cover" />
+                          ) : (
+                            <span className="text-slate-800">{getInitials(u.name)}</span>
+                          )}
                         </div>
                         <div className="ml-4">
                           <div className="text-sm font-medium text-gray-900">{u.name || 'N/A'}</div>
@@ -1568,8 +1579,12 @@ const UserProfile = ({ user, roles, onEdit, onToggleStatus, onClose, getRoleBadg
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center space-x-4">
-        <div className="h-20 w-20 rounded-full bg-white border border-black flex items-center justify-center text-white font-bold text-3xl">
-          {user.name?.charAt(0).toUpperCase()}
+        <div className="h-20 w-20 rounded-full bg-white border border-black flex items-center justify-center font-bold text-3xl overflow-hidden">
+          {user.profilePicture ? (
+            <img src={user.profilePicture.startsWith('http') ? user.profilePicture : `${import.meta.env.VITE_API_URL || 'http://localhost:5001'}${user.profilePicture.startsWith('/') ? '' : '/'}${user.profilePicture}`} alt={user.name} className="w-full h-full object-cover" />
+          ) : (
+            <span className="text-slate-800">{user.name?.charAt(0).toUpperCase()}</span>
+          )}
         </div>
         <div className="flex-1">
           <h2 className="text-2xl font-bold text-gray-900">{user.name}</h2>

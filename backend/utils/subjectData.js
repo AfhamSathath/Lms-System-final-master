@@ -216,7 +216,7 @@ const informationTechnologySubjects = {
 
 // Helper function to get subjects by department
 const getDepartmentSubjects = (department) => {
-  switch(department) {
+  switch (department) {
     case 'Computer Science':
       return computerScienceSubjects;
     case 'Software Engineering':
@@ -232,15 +232,15 @@ const getDepartmentSubjects = (department) => {
 const getAllSubjectsForSeeding = () => {
   const allSubjects = [];
   const departments = ['Computer Science', 'Software Engineering', 'Information Technology'];
-  
+
   departments.forEach(dept => {
     const deptSubjects = getDepartmentSubjects(dept);
-    
+
     Object.keys(deptSubjects).forEach(year => {
       ['semester1', 'semester2'].forEach(semKey => {
         const semester = semKey === 'semester1' ? 1 : 2;
         const subjects = deptSubjects[year][semKey] || [];
-        
+
         subjects.forEach(sub => {
           allSubjects.push({
             ...sub,
@@ -253,7 +253,7 @@ const getAllSubjectsForSeeding = () => {
       });
     });
   });
-  
+
   return allSubjects;
 };
 

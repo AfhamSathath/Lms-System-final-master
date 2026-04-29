@@ -41,8 +41,8 @@ const lecturerAssignmentSchema = new mongoose.Schema({
   curriculum: {
     totalLectures: {
       type: Number,
-      required: [true, 'Total lectures required'],
-      min: 1
+      default: 0,
+      min: 0
     },
     totalPracticals: {
       type: Number,
@@ -74,11 +74,6 @@ const lecturerAssignmentSchema = new mongoose.Schema({
 
   // Qualification Requirements
   qualifications: {
-    minimumQualification: {
-      type: String,
-      enum: ['B.Tech', 'M.Tech', 'Ph.D', 'B.Sc', 'M.Sc'],
-      required: [true, 'Minimum qualification required']
-    },
     hasQualification: {
       type: Boolean,
       default: false
@@ -166,4 +161,4 @@ lecturerAssignmentSchema.index({ lecturer: 1, department: 1, subject: 1, semeste
 lecturerAssignmentSchema.index({ department: 1, academicYear: 1, semester: 1 });
 lecturerAssignmentSchema.index({ lecturer: 1, isActive: 1 });
 
-module.exports = mongoose.model('LecturerAssignment', lecturerAssignmentSchema);
+module.exports = mongoose.models.LecturerAssignment || mongoose.model('LecturerAssignment', lecturerAssignmentSchema);

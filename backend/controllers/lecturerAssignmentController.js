@@ -10,7 +10,7 @@ const Department = require('../models/Department');
 const mongoose = require('mongoose');
 
 
-exports.assignLecturerToSubject = async (req, res) => {
+exports.assignLecturerToSubject = async (req, res, next) => {
   try {
     console.log('Assign Lecturer Request Body:', req.body);
     const { lecturerId, departmentId, subjectId } = req.body;
@@ -78,11 +78,14 @@ exports.assignLecturerToSubject = async (req, res) => {
       startDate: req.body.startDate,
       endDate: req.body.endDate,
       curriculum: {
-        totalLectures: Number(req.body.curriculum?.totalLectures || 30),
+        totalLectures: Number(req.body.curriculum?.totalLectures || subject.credits * 15 || 30),
         totalPracticals: Number(req.body.curriculum?.totalPracticals || 0),
         totalAssignments: Number(req.body.curriculum?.totalAssignments || 0)
       },
-      qualifications: req.body.qualifications,
+      qualifications: req.body.qualifications || {
+        hasQualification: false,
+        qualificationProof: ''
+      },
       notes: req.body.notes
     });
 
@@ -99,10 +102,9 @@ exports.assignLecturerToSubject = async (req, res) => {
     });
   } catch (err) {
     console.error('Error assigning lecturer:', err);
-    res.status(500).json({
-      success: false,
-      message: err.message || 'Server error'
-    });
+    // Use next(err) to let the global error handler handle it, 
+    // which provides better error messages for Mongoose validation errors
+    next(err);
   }
 };
 
@@ -121,9 +123,9 @@ exports.getLecturerSubjects = async (req, res, next) => {
 
     // 1. Find all subjects in the Subject collection assigned to this lecturer
     const Course = mongoose.model('Subject');
-    const primarySubjects = await Course.find({ 
+    const primarySubjects = await Course.find({
       lecturer: lecturerId,
-      isActive: true 
+      isActive: true
     });
 
     // 2. Build filter for tracking assignments
@@ -156,17 +158,17 @@ exports.getLecturerSubjects = async (req, res, next) => {
             startDate: new Date(),
             endDate: new Date(new Date().setMonth(new Date().getMonth() + 4)),
             curriculum: {
-              totalLectures: 30,
+              totalLectures: sub.credits ? sub.credits * 15 : 30,
               totalPracticals: sub.category === 'Practical' ? 15 : 0,
               totalAssignments: 5
             },
             qualifications: {
-              minimumQualification: 'B.Sc'
+              hasQualification: true
             },
             status: 'active',
             isActive: true
           });
-          
+
           // Re-fetch or add to list
           const populated = await LecturerAssignment.findById(newAssign._id).populate('subject', 'name code credits semester year department category');
           assignments.unshift(populated);
@@ -442,11 +444,11 @@ exports.getAllAssignments = async (req, res, next) => {
 exports.updateAssignment = async (req, res, next) => {
   try {
     const { assignmentId } = req.params;
-    const { 
-      startDate, 
-      endDate, 
-      curriculum, 
-      qualifications, 
+    const {
+      startDate,
+      endDate,
+      curriculum,
+      qualifications,
       notes,
       lecturerId,
       status
@@ -469,7 +471,7 @@ exports.updateAssignment = async (req, res, next) => {
       if (curriculum.totalLectures !== undefined) assignment.curriculum.totalLectures = Number(curriculum.totalLectures);
       if (curriculum.totalPracticals !== undefined) assignment.curriculum.totalPracticals = Number(curriculum.totalPracticals);
       if (curriculum.totalAssignments !== undefined) assignment.curriculum.totalAssignments = Number(curriculum.totalAssignments);
-      
+
       // Re-calculate progress percentage
       const totalItems = assignment.curriculum.totalLectures +
         assignment.curriculum.totalPracticals +
@@ -482,11 +484,11 @@ exports.updateAssignment = async (req, res, next) => {
 
     // Update qualifications
     if (qualifications) {
-      if (qualifications.minimumQualification) assignment.qualifications.minimumQualification = qualifications.minimumQualification;
+      if (qualifications.hasQualification !== undefined) assignment.qualifications.hasQualification = qualifications.hasQualification;
     }
 
     await assignment.save();
-    
+
     const updated = await LecturerAssignment.findById(assignmentId)
       .populate('lecturer', 'name email lecturerId department')
       .populate('subject', 'name code credits');

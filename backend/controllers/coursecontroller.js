@@ -70,13 +70,13 @@ const getRoleBasedQuery = async (req, baseQuery = {}) => {
       student: req.user.id,
       enrollmentStatus: 'enrolled'
     });
-    
+
     const enrolledSubjectIds = studentEnrollments.map(e => e.course);
     query._id = { $in: enrolledSubjectIds };
   } else if (req.user.role === 'lecturer') {
     // Lecturers only see assigned subjects
     const assignedIds = await getAssignedSubjectIds(req.user.id);
-    
+
     // If there's already an $or in baseQuery, we need to be careful
     // But usually there isn't. We'll use $and to combine with existing filters
     const assignmentFilter = {
@@ -85,7 +85,7 @@ const getRoleBasedQuery = async (req, baseQuery = {}) => {
         { _id: { $in: assignedIds } }
       ]
     };
-    
+
     if (query.$or) {
       // Rare case: merge multiple $ors
       return { $and: [query, assignmentFilter] };
@@ -97,7 +97,7 @@ const getRoleBasedQuery = async (req, baseQuery = {}) => {
     query.department = req.user.department;
   }
   // Admins, Deans, etc. see everything in the baseQuery
-  
+
   return query;
 };
 
@@ -131,7 +131,7 @@ exports.getSubject = async (req, res, next) => {
   try {
     const baseQuery = { _id: req.params.id };
     const query = await getRoleBasedQuery(req, baseQuery);
-    
+
     const subject = await Subject.findOne(query)
       .populate('lecturer', 'name email lecturerId');
 
@@ -277,7 +277,7 @@ exports.deleteSubject = async (req, res, next) => {
 exports.getSubjectsByYearAndSemester = async (req, res, next) => {
   try {
     let { year, semester } = req.params;
-    
+
     const query = await getRoleBasedQuery(req, {
       year: formatYear(year),
       semester: parseInt(semester)
@@ -447,7 +447,7 @@ exports.assignLecturer = async (req, res, next) => {
           startDate: new Date(),
           endDate: new Date(new Date().setMonth(new Date().getMonth() + 4)),
           curriculum: {
-            totalLectures: 30,
+            totalLectures: subject.credits ? subject.credits * 15 : 30,
             totalPracticals: subject.category === 'Practical' ? 15 : 0,
             totalAssignments: 5
           },
@@ -577,18 +577,23 @@ exports.seedSubjects = async (req, res, next) => {
 
     for (const subjectData of subjectsToSeed) {
       try {
-        // Check if subject already exists
-        const existing = await Subject.findOne({
-          code: subjectData.code,
-          year: subjectData.year,
-          semester: subjectData.semester,
-          department: subjectData.department
-        });
-
-        if (!existing) {
-          const subject = await Subject.create(subjectData);
-          results.push(subject);
-        }
+        // Update or create subject
+        const subject = await Subject.findOneAndUpdate(
+          {
+            code: subjectData.code,
+            year: subjectData.year,
+            semester: subjectData.semester,
+            department: subjectData.department
+          },
+          {
+            $set: {
+              ...subjectData,
+              isActive: true
+            }
+          },
+          { upsert: true, new: true }
+        );
+        results.push(subject);
       } catch (error) {
         errors.push(error.message);
       }

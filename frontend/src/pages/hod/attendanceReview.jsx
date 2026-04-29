@@ -348,6 +348,7 @@ const StudentAttendanceDashboard = ({
   group, onReview, onPublish, reviewing, selectedEnrollment, onSelectEnrollment, getStatusColor, isExpanded, onToggle 
 }) => {
   const { student, semesters, needsReviewTotal, totalEnrollments } = group;
+  const [filterEnrollmentId, setFilterEnrollmentId] = useState(null);
 
   return (
     <div className="bg-white rounded-3xl shadow-xl border border-black overflow-hidden transition-all duration-300 hover:shadow-2xl">
@@ -356,8 +357,8 @@ const StudentAttendanceDashboard = ({
         <div className="flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-6">
             <div className="relative">
-              <div className="bg-white/20 backdrop-blur-xl rounded-2xl p-4 shadow-inner">
-                <FiUser className="w-10 h-10 text-white" />
+              <div className="bg-slate-100 rounded-2xl p-4 shadow-inner border border-black">
+                <FiUser className="w-10 h-10 text-slate-700" />
               </div>
               {needsReviewTotal > 0 && (
                 <span className="absolute -top-2 -right-2 bg-rose-500 text-white text-[10px] font-bold px-2 py-1 rounded-full animate-bounce shadow-lg">
@@ -368,21 +369,21 @@ const StudentAttendanceDashboard = ({
             <div>
               <h3 className="text-2xl font-black text-slate-900 tracking-tight">{student?.name}</h3>
               <div className="flex items-center gap-3 mt-1">
-                <span className="text-indigo-100 text-sm font-medium tracking-wide bg-white/10 px-3 py-0.5 rounded-full">{student?.studentId}</span>
-                <span className="h-1 w-1 bg-white/30 rounded-full"></span>
-                <span className="text-indigo-200 text-xs font-bold uppercase tracking-widest">{student?.department}</span>
+                <span className="text-slate-600 text-sm font-medium tracking-wide bg-slate-100 px-3 py-0.5 rounded-full border border-black">{student?.studentId}</span>
+                <span className="h-1 w-1 bg-slate-300 rounded-full"></span>
+                <span className="text-indigo-600 text-xs font-bold uppercase tracking-widest">{student?.department}</span>
               </div>
             </div>
           </div>
           
           <div className="flex items-center gap-4">
-            <div className="text-center px-4 py-2 bg-white/10 backdrop-blur-sm rounded-2xl border border-white/10">
-              <p className="text-white/60 text-[10px] uppercase font-black tracking-widest mb-1">Enrolled Subjects</p>
-              <p className="text-xl font-black text-white">{totalEnrollments}</p>
+            <div className="text-center px-4 py-2 bg-slate-50 rounded-2xl border border-black">
+              <p className="text-slate-500 text-[10px] uppercase font-black tracking-widest mb-1">Enrolled Subjects</p>
+              <p className="text-xl font-black text-slate-900">{totalEnrollments}</p>
             </div>
             <button 
               onClick={onToggle}
-              className="p-3 bg-white/20 hover:bg-white/30 backdrop-blur-md rounded-2xl text-white transition-all shadow-lg active:scale-95"
+              className="p-3 bg-white hover:bg-slate-100 border border-black rounded-2xl text-slate-800 transition-all shadow-sm active:scale-95"
             >
               {isExpanded ? <FiChevronUp size={24} /> : <FiChevronDown size={24} />}
             </button>
@@ -439,6 +440,8 @@ const StudentAttendanceDashboard = ({
                       isSelected={selectedEnrollment === enrollment._id}
                       onSelect={() => onSelectEnrollment(selectedEnrollment === enrollment._id ? null : enrollment._id)}
                       getStatusColor={getStatusColor}
+                      isFiltered={filterEnrollmentId === enrollment._id}
+                      onFilter={() => setFilterEnrollmentId(filterEnrollmentId === enrollment._id ? null : enrollment._id)}
                     />
                   ))}
                 </div>
@@ -450,11 +453,27 @@ const StudentAttendanceDashboard = ({
               <div className="bg-slate-800 px-6 py-4 flex justify-between items-center">
                 <h5 className="text-white font-black uppercase tracking-widest text-xs flex items-center gap-2">
                   <FiClock className="text-indigo-400" />
-                  Consolidated Attendance History
+                  {filterEnrollmentId ? (
+                    `Attendance History: ${group.enrollments.find(e => e._id === filterEnrollmentId)?.course?.name}`
+                  ) : (
+                    'Consolidated Attendance History'
+                  )}
                 </h5>
-                <span className="text-slate-400 text-[10px] font-bold uppercase tracking-widest">Combined Subject Log</span>
+                <div className="flex items-center gap-4">
+                  {filterEnrollmentId && (
+                    <button 
+                      onClick={() => setFilterEnrollmentId(null)}
+                      className="text-[10px] text-white bg-indigo-600 hover:bg-indigo-700 px-3 py-1 rounded-full font-bold uppercase tracking-widest transition-colors"
+                    >
+                      Show All Subjects
+                    </button>
+                  )}
+                  <span className="text-slate-400 text-[10px] font-bold uppercase tracking-widest">
+                    {filterEnrollmentId ? 'Subject Log' : 'Combined Subject Log'}
+                  </span>
+                </div>
               </div>
-              <div className="p-0">
+              <div className="p-0 overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                   <thead className="bg-white border-b border-black font-black uppercase text-[10px] text-slate-500 tracking-widest">
                     <tr>
@@ -466,9 +485,11 @@ const StudentAttendanceDashboard = ({
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
-                    {(group.enrollments || []).flatMap(e => 
-                      (e.attendance || []).map(r => ({ ...r, course: e.course }))
-                    ).sort((a,b) => new Date(b.date) - new Date(a.date)).slice(0, 10).map((record, i) => (
+                    {(group.enrollments || [])
+                      .filter(e => !filterEnrollmentId || e._id === filterEnrollmentId)
+                      .flatMap(e => 
+                        (e.attendance || []).map(r => ({ ...r, course: e.course }))
+                      ).sort((a,b) => new Date(b.date) - new Date(a.date)).slice(0, filterEnrollmentId ? 50 : 10).map((record, i) => (
                       <tr key={i} className="hover:bg-white transition-colors">
                         <td className="px-6 py-4">
                           <p className="font-bold text-slate-700 text-sm">
@@ -509,7 +530,9 @@ const StudentAttendanceDashboard = ({
   );
 };
 
-const SubjectStatItem = ({ enrollment, onReview, onPublish, reviewing, isSelected, onSelect, getStatusColor }) => {
+const SubjectStatItem = ({ 
+  enrollment, onReview, onPublish, reviewing, isSelected, onSelect, getStatusColor, isFiltered, onFilter 
+}) => {
   const [reviews, setReviews] = useState({});
   const [publishing, setPublishing] = useState(false);
 
@@ -548,11 +571,22 @@ const SubjectStatItem = ({ enrollment, onReview, onPublish, reviewing, isSelecte
   );
 
   return (
-    <div className={`bg-white rounded-2xl border transition-all ${isSelected ? 'ring-2 ring-indigo-500 border-transparent shadow-lg' : 'border-black'}`}>
+    <div 
+      onClick={onFilter}
+      className={`bg-white rounded-2xl border cursor-pointer transition-all ${
+        isFiltered 
+          ? 'border-indigo-600 ring-2 ring-indigo-500/20 shadow-lg scale-[1.02]' 
+          : isSelected 
+            ? 'ring-2 ring-indigo-500 border-transparent shadow-lg' 
+            : 'border-black hover:border-indigo-400'
+      }`}
+    >
       <div className="p-4">
         <div className="flex justify-between items-start mb-4">
           <div className="flex-1">
-            <h5 className="text-sm font-black text-slate-800 uppercase tracking-tight">{enrollment.course?.name}</h5>
+            <h5 className={`text-sm font-black uppercase tracking-tight transition-colors ${isFiltered ? 'text-indigo-600' : 'text-slate-800'}`}>
+              {enrollment.course?.name}
+            </h5>
             <p className="text-[10px] font-bold text-slate-400 tracking-widest uppercase mt-0.5">{enrollment.course?.code}</p>
           </div>
           <div className="text-right">
@@ -582,7 +616,10 @@ const SubjectStatItem = ({ enrollment, onReview, onPublish, reviewing, isSelecte
         </div>
 
         <button 
-          onClick={onSelect}
+          onClick={(e) => {
+            e.stopPropagation();
+            onSelect();
+          }}
           className={`w-full py-2.5 rounded-xl font-black uppercase text-[10px] tracking-widest transition-all ${
             isSelected 
               ? 'bg-rose-50 text-rose-600 border border-rose-200' 

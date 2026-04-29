@@ -231,7 +231,6 @@ const HodSubjects = () => {
   const { user } = useAuth();
   const [subjects, setSubjects] = useState([]);
   const [filteredSubjects, setFilteredSubjects] = useState([]);
-  const [lecturers, setLecturers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState(null);
   const [availableSubjects, setAvailableSubjects] = useState([]);
@@ -245,10 +244,8 @@ const HodSubjects = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showSeedModal, setShowSeedModal] = useState(false);
   const [showBulkUploadModal, setShowBulkUploadModal] = useState(false);
-  const [showAssignModal, setShowAssignModal] = useState(false);
   
   const [selectedSubject, setSelectedSubject] = useState(null);
-  const [selectedLecturer, setSelectedLecturer] = useState(null);
   const [bulkFile, setBulkFile] = useState(null);
   
   const [formData, setFormData] = useState({
@@ -260,7 +257,6 @@ const HodSubjects = () => {
     category: 'Lecture',
     hasPractical: false,
     practicalCode: '',
-    lecturer: '',
     description: '',
     department: user.department
   });
@@ -290,20 +286,11 @@ const HodSubjects = () => {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const [subjectsRes, lecturersRes] = await Promise.all([
-        api.get(`/api/subjects?department=${encodeURIComponent(user.department)}`),
-        api.get('/api/auth/users?role=lecturer')
-      ]);
+      const subjectsRes = await api.get(`/api/subjects?department=${encodeURIComponent(user.department)}`);
 
       const subjectsList = subjectsRes.data.subjects;
       setSubjects(subjectsList);
       setFilteredSubjects(subjectsList);
-      
-      // Filter lecturers by HOD department
-      const deptLecturers = (lecturersRes.data.users || []).filter(l => 
-        (l.department || '').toLowerCase() === (user.department || '').toLowerCase()
-      );
-      setLecturers(deptLecturers);
       
     } catch (error) {
       toast.error('Failed to fetch data');
@@ -372,7 +359,6 @@ const HodSubjects = () => {
       category: 'Lecture',
       hasPractical: false,
       practicalCode: '',
-      lecturer: '',
       description: '',
     });
   };
@@ -408,7 +394,6 @@ const HodSubjects = () => {
       category: subject.category || 'Lecture',
       hasPractical: subject.hasPractical || false,
       practicalCode: subject.practicalCode || '',
-      lecturer: subject.lecturer?._id || '',
       description: subject.description || ''
     });
     setShowEditModal(true);
@@ -511,27 +496,6 @@ const HodSubjects = () => {
     return colors[category] || 'bg-white border border-black text-gray-800';
   };
 
-  const handleAssignClick = (subject) => {
-    setSelectedSubject(subject);
-    setSelectedLecturer(subject.lecturer);
-    setShowAssignModal(true);
-  };
-
-  const handleAssignSubmit = async (e) => {
-    e.preventDefault();
-    if (!selectedLecturer) return toast.error('Please select a lecturer');
-
-    try {
-      await api.put(`/api/subjects/${selectedSubject._id}/assign-lecturer`, {
-        lecturerId: selectedLecturer._id
-      });
-      toast.success('Lecturer assigned successfully');
-      setShowAssignModal(false);
-      fetchData();
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Assignment failed');
-    }
-  };
 
   if (loading) return <Loader fullScreen />;
 
@@ -551,6 +515,12 @@ const HodSubjects = () => {
                 className="px-6 py-3 bg-indigo-600 text-white rounded-2xl font-bold hover:bg-indigo-700 transition-all flex items-center gap-2"
               >
                 <FiPlus /> Add Subject
+              </button>
+              <button
+                onClick={() => setShowSeedModal(true)}
+                className="px-6 py-3 bg-white text-indigo-600 rounded-2xl font-bold hover:bg-indigo-50 border border-indigo-600 transition-all flex items-center gap-2"
+              >
+                <FiRefreshCw /> Bulk Update
               </button>
               <button
                 onClick={fetchData}
@@ -633,17 +603,6 @@ const HodSubjects = () => {
                   <span className="text-[10px] font-black uppercase text-slate-400">{subject.credits} Credits</span>
                 </div>
 
-                <div className="bg-white rounded-2xl p-4 flex items-center justify-between mb-8 group-hover:bg-indigo-50/50 transition-colors">
-                  <div className="flex items-center gap-3 text-left">
-                    <div className="w-8 h-8 rounded-lg bg-white border border-black flex items-center justify-center text-xs text-slate-400">
-                      <FiUser />
-                    </div>
-                    <div>
-                      <p className="text-[9px] font-black uppercase text-slate-300 tracking-widest leading-none mb-1">In Charge</p>
-                      <p className="text-xs font-bold text-slate-600 leading-tight truncate w-32">{subject.lecturer?.name || 'Unassigned'}</p>
-                    </div>
-                  </div>
-                </div>
 
                 <div className="flex gap-3">
                   <Link 
@@ -678,7 +637,7 @@ const HodSubjects = () => {
               onClick={() => setShowSeedModal(true)}
               className="px-8 py-4 bg-indigo-600 text-white rounded-2xl font-black uppercase tracking-widest hover:bg-indigo-700 transition-all"
             >
-              Seed Default Subjects
+              Sync with Curriculum
             </button>
           </div>
         )}
@@ -790,22 +749,6 @@ const HodSubjects = () => {
                 className="w-full px-5 py-4 bg-white border-none rounded-2xl font-bold focus:ring-2 focus:ring-indigo-500"
               >
                 {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
-              </select>
-            </div>
-            <div className="space-y-1">
-              <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Initial Lecturer</label>
-              <select
-                name="lecturer"
-                value={formData.lecturer}
-                onChange={handleInputChange}
-                className="w-full px-5 py-4 bg-white border-none rounded-2xl font-bold focus:ring-2 focus:ring-indigo-500"
-              >
-                <option value="">Leave Unassigned</option>
-                {lecturers.map(l => (
-                  <option key={l._id} value={l._id}>
-                    {l.name}
-                  </option>
-                ))}
               </select>
             </div>
           </div>
@@ -922,22 +865,6 @@ const HodSubjects = () => {
                 {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
               </select>
             </div>
-            <div className="space-y-1">
-              <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Lecturer In Charge</label>
-              <select
-                name="lecturer"
-                value={formData.lecturer}
-                onChange={handleInputChange}
-                className="w-full px-5 py-4 bg-white border-none rounded-2xl font-bold focus:ring-2 focus:ring-indigo-500"
-              >
-                <option value="">Unassigned</option>
-                {lecturers.map(l => (
-                  <option key={l._id} value={l._id}>
-                    {l.name}
-                  </option>
-                ))}
-              </select>
-            </div>
           </div>
 
           <button type="submit" className="w-full py-5 bg-indigo-600 text-white rounded-2xl font-black uppercase tracking-widest hover:bg-indigo-700 transition-all transform active:scale-95 shadow-xl shadow-indigo-100">
@@ -950,12 +877,12 @@ const HodSubjects = () => {
       <Modal
         isOpen={showSeedModal}
         onClose={() => setShowSeedModal(false)}
-        title="Initialize Curriculum"
+        title="Sync Curriculum Data"
       >
         <div className="pt-4 space-y-6">
-          <div className="p-6 bg-amber-50 border border-amber-100 rounded-[2rem] flex items-center gap-4">
-            <div className="bg-white p-3 rounded-2xl text-amber-600 text-xl shadow-sm"><FiAlertCircle /></div>
-            <p className="text-xs font-bold text-amber-700 leading-tight">This will populate the official curriculum for the <span className="underline">{user.department}</span> department. Existing subjects will not be duplicated.</p>
+          <div className="p-6 bg-indigo-50 border border-indigo-100 rounded-[2rem] flex items-center gap-4">
+            <div className="bg-white p-3 rounded-2xl text-indigo-600 text-xl shadow-sm"><FiInfo /></div>
+            <p className="text-xs font-bold text-indigo-700 leading-tight">This will sync the subjects in your department with the official curriculum. It will add missing subjects and update existing ones with latest names/credits.</p>
           </div>
 
           <p className="text-sm text-slate-500 font-medium px-2">Continuing will automatically create all standard subjects for Year 1-4 based on the authorized faculty curriculum data.</p>
@@ -965,7 +892,7 @@ const HodSubjects = () => {
               onClick={handleSeedSubjects}
               className="w-full py-5 bg-indigo-600 text-white rounded-2xl font-black uppercase tracking-widest shadow-xl shadow-indigo-100 hover:bg-indigo-700 transition-all flex items-center justify-center gap-3"
             >
-              <FiCheckCircle /> Confirm Initialization
+              <FiCheckCircle /> Sync Now
             </button>
             <button
               onClick={() => setShowSeedModal(false)}
@@ -1018,49 +945,7 @@ const HodSubjects = () => {
         </form>
       </Modal>
 
-      {/* Assign Lecturer Modal */}
-      <Modal 
-        isOpen={showAssignModal} 
-        onClose={() => setShowAssignModal(false)}
-        title="Appoint Course Lecturer"
-      >
-         <form onSubmit={handleAssignSubmit} className="space-y-6 pt-4">
-            <div className="p-6 bg-indigo-50 border border-indigo-100 rounded-[2rem] flex items-center gap-4 mb-4">
-               <div className="bg-white p-3 rounded-2xl text-indigo-600 text-xl shadow-sm"><FiInfo /></div>
-               <p className="text-xs font-bold text-slate-700 leading-tight">Assigning a lecturer gives them grading and enrollment control for this subject.</p>
-            </div>
 
-            <div className="space-y-2">
-               <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Select Lecturer</label>
-               <div className="max-h-60 overflow-y-auto space-y-2 pr-2 custom-scrollbar">
-                  {lecturers.map(l => (
-                    <button
-                      key={l._id}
-                      type="button"
-                      onClick={() => setSelectedLecturer(l)}
-                      className={`w-full text-left p-4 rounded-2xl transition-all flex items-center justify-between border-2 ${selectedLecturer?._id === l._id ? 'border-indigo-600 bg-indigo-50 text-indigo-600 shadow-sm' : 'border-transparent bg-slate-50 hover:bg-slate-100 text-slate-600'}`}
-                    >
-                       <div className="flex items-center gap-3">
-                          <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold ${selectedLecturer?._id === l._id ? 'bg-indigo-600 text-white' : 'bg-white text-slate-400'}`}>
-                             {l.name[0]}
-                          </div>
-                          <div>
-                             <p className="font-bold text-sm tracking-tight">{l.name}</p>
-                             <p className="text-[10px] opacity-60 font-medium">{l.email}</p>
-                          </div>
-                       </div>
-                       {selectedLecturer?._id === l._id && <FiCheckCircle />}
-                    </button>
-                  ))}
-                  {lecturers.length === 0 && <p className="text-center py-4 text-slate-400 text-xs font-bold uppercase tracking-widest">No lecturers found in your department</p>}
-               </div>
-            </div>
-
-            <button type="submit" className="w-full py-5 bg-indigo-600 text-white rounded-2xl font-black uppercase tracking-widest shadow-xl shadow-indigo-100 hover:bg-indigo-700 transition-all transform active:scale-95">
-               Confirm Appointment
-            </button>
-         </form>
-      </Modal>
     </div>
   );
 };

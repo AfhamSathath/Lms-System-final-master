@@ -231,6 +231,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           {
             category: 'Academic Review', items: [
               { name: 'Attendance Oversight', path: 'attendance-review', icon: FiCheckSquare },
+              { name: 'Teaching Progress', path: 'progress', icon: FiActivity },
               { name: 'Student Results', path: 'results', icon: FiTrendingUp },
               { name: 'Medical Approvals', path: 'medical', icon: FiActivity },
               { name: 'Repeat Registrations', path: 'repeats', icon: FiRefreshCw },
@@ -267,6 +268,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         { name: 'Enrollment', path: 'enrollment', icon: FiUsers },
         { name: 'Curriculum', path: 'curriculum', icon: FiBook },
         { name: 'Transcripts', path: 'transcripts', icon: FiFile },
+        { name: 'Timetable Mgmt', path: 'timetables', icon: FiCalendar },
         { name: 'My Profile', path: 'profile', icon: FiUser }
         ];
       case 'bursar':
@@ -400,9 +402,9 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         </button>
 
         <div className={`flex items-center justify-center py-6 border-b border-red-900/50 ${isOpen ? 'px-4' : 'px-2'}`}>
-          <div className={`bg-gradient-to-br ${getRoleColor()} rounded-xl flex items-center justify-center shadow-sm
+          <div className={`bg-white rounded-xl flex items-center justify-center shadow-sm overflow-hidden border border-red-900/50
             ${isOpen ? 'w-10 h-10' : 'w-10 h-10'}`}>
-            <span className="text-white font-bold text-lg tracking-wider">LMS</span>
+            <img src="/esn.webp" alt="EUSL Logo" className="w-full h-full object-contain" />
           </div>
           {isOpen && (
             <div className="ml-3 flex flex-col">

@@ -21,7 +21,7 @@ const SubjectAttendanceSessions = () => {
   const [showCreate, setShowCreate] = useState(false);
   const [newSession, setNewSession] = useState({
     date: new Date().toISOString().split('T')[0],
-    startTime: '08:30 AM',
+    startTime: '08:30',
     lecturerHour: 2,
     batch: '2024/2025'
   });
@@ -86,7 +86,7 @@ const SubjectAttendanceSessions = () => {
         setEditSessionId(null);
         setNewSession({
           date: new Date().toISOString().split('T')[0],
-          startTime: '08:30 AM',
+          startTime: '08:30',
           lecturerHour: 2,
           batch: '2024/2025'
         });
@@ -247,7 +247,7 @@ const SubjectAttendanceSessions = () => {
                 setEditSessionId(null);
                 setNewSession({
                   date: new Date().toISOString().split('T')[0],
-                  startTime: '08:30 AM',
+                  startTime: '08:30',
                   lecturerHour: 2,
                   batch: '2024/2025'
                 });

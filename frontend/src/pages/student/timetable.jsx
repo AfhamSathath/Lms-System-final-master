@@ -62,45 +62,69 @@ const StudentTimetable = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold text-gray-800 mb-6">My Exam Timetable</h1>
+      <div className="mb-8">
+        <h1 className="text-4xl font-black text-gray-900 tracking-tight">My Exam Timetable</h1>
+        <p className="text-gray-500 mt-2 text-lg">Stay prepared for your upcoming academic assessments.</p>
+      </div>
       
       {/* Filters */}
-      <div className="bg-white rounded-xl shadow p-4 mb-6 flex gap-4">
-        <select value={selectedYear} onChange={e => setSelectedYear(e.target.value)} className="border border-black rounded-lg px-4 py-2 focus:ring-2 focus:ring-purple-500">
-          <option value="all">All Years</option>
-          {academicYears.map(y => <option key={y} value={y}>{y}</option>)}
-        </select>
-        <select value={selectedSemester} onChange={e => setSelectedSemester(e.target.value)} className="border border-black rounded-lg px-4 py-2 focus:ring-2 focus:ring-purple-500">
-          <option value="all">All Semesters</option>
-          {semesters.map(s => <option key={s} value={s}>Semester {s}</option>)}
-        </select>
+      <div className="bg-white rounded-2xl shadow-xl p-6 mb-10 flex flex-wrap gap-4 border border-black items-end">
+        <div className="flex-1 min-w-[200px]">
+          <label className="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">Filter by Year</label>
+          <select value={selectedYear} onChange={e => setSelectedYear(e.target.value)} className="w-full border border-black rounded-xl px-4 py-3 focus:ring-4 focus:ring-purple-500/20 focus:outline-none transition-all appearance-none bg-white font-bold">
+            <option value="all">All Academic Years</option>
+            {academicYears.map(y => <option key={y} value={y}>{y}</option>)}
+          </select>
+        </div>
+        <div className="flex-1 min-w-[200px]">
+          <label className="block text-xs font-black uppercase tracking-widest text-gray-400 mb-2">Filter by Semester</label>
+          <select value={selectedSemester} onChange={e => setSelectedSemester(e.target.value)} className="w-full border border-black rounded-xl px-4 py-3 focus:ring-4 focus:ring-purple-500/20 focus:outline-none transition-all appearance-none bg-white font-bold">
+            <option value="all">All Semesters</option>
+            {semesters.map(s => <option key={s} value={s}>Semester {s}</option>)}
+          </select>
+        </div>
       </div>
 
       {Object.keys(timetablesGrouped).length === 0 ? (
-        <p className="text-gray-600">No applicable upcoming exams found.</p>
+        <div className="text-center py-20 bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200">
+          <FiCalendar className="mx-auto h-16 w-16 text-gray-300 mb-4" />
+          <p className="text-gray-500 text-xl font-medium">No applicable upcoming exams found.</p>
+          <p className="text-gray-400 mt-1">Check back later or contact your department.</p>
+        </div>
       ) : (
-        <div className="space-y-8">
+        <div className="space-y-12">
           {Object.entries(timetablesGrouped).map(([semester, exams]) => (
-            <div key={semester} className="bg-white p-6 rounded-xl shadow-lg border border-black">
-              <h2 className="text-2xl font-bold mb-4 text-slate-700 bg-white border border-black inline-block px-4 py-2 rounded-lg">{semester} Examinations</h2>
-              <div className="space-y-4">
+            <div key={semester} className="relative">
+              <div className="flex items-center mb-6">
+                <h2 className="text-2xl font-black text-gray-900 pr-6 bg-white z-10">{semester} Examinations</h2>
+                <div className="flex-1 h-px bg-gray-200"></div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                 {exams.map((t) => (
-                  <div key={t._id} className="bg-white border-l-4 border-purple-500 p-4 rounded-r-lg hover:shadow-md transition-shadow">
-                    <div className="flex justify-between items-start mb-2">
-                      <div>
-                        <h3 className="text-lg font-bold text-gray-800">{t.subject?.name || 'Unknown Subject'} <span className="text-sm font-normal text-gray-500 ml-2">({t.subject?.code || 'N/A'})</span></h3>
-                        <p className="text-sm text-gray-600 mt-1 capitalize">{t.examType} Exam</p>
+                  <div key={t._id} className="bg-white border border-black rounded-3xl p-6 shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 group">
+                    <div className="flex justify-between items-start mb-6">
+                      <div className="bg-purple-600 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-tighter shadow-md">
+                        {t.examType || 'Final'}
                       </div>
+                      <span className="text-[10px] font-bold text-gray-400 uppercase">{t.subject?.code}</span>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-700 mt-3">
-                      <div className="flex items-center bg-white px-3 py-2 rounded shadow-sm">
-                        <FiCalendar className="mr-2 text-purple-500" /> <span className="font-medium">{format(new Date(t.date), 'EEEE, MMMM do, yyyy')}</span>
+                    
+                    <h3 className="text-xl font-black text-gray-900 mb-6 leading-tight group-hover:text-purple-600 transition-colors">
+                      {t.subject?.name || 'Unknown Subject'}
+                    </h3>
+
+                    <div className="space-y-3">
+                      <div className="flex items-center text-gray-700 bg-gray-50 p-3 rounded-2xl border border-gray-100 group-hover:bg-purple-50 group-hover:border-purple-100 transition-colors">
+                        <FiCalendar className="mr-3 text-purple-500 h-5 w-5" /> 
+                        <span className="font-bold text-sm">{format(new Date(t.date), 'EEEE, MMM do, yyyy')}</span>
                       </div>
-                      <div className="flex items-center bg-white px-3 py-2 rounded shadow-sm">
-                        <FiClock className="mr-2 text-purple-500" /> <span className="font-medium">{t.startTime} - {t.endTime}</span>
+                      <div className="flex items-center text-gray-700 bg-gray-50 p-3 rounded-2xl border border-gray-100 group-hover:bg-green-50 group-hover:border-green-100 transition-colors">
+                        <FiClock className="mr-3 text-green-500 h-5 w-5" /> 
+                        <span className="font-bold text-sm">{t.startTime} - {t.endTime}</span>
                       </div>
-                      <div className="flex items-center bg-white px-3 py-2 rounded shadow-sm">
-                        <FiMapPin className="mr-2 text-purple-500" /> <span className="font-medium">{t.venue}</span>
+                      <div className="flex items-center text-gray-700 bg-gray-50 p-3 rounded-2xl border border-gray-100 group-hover:bg-red-50 group-hover:border-red-100 transition-colors">
+                        <FiMapPin className="mr-3 text-red-500 h-5 w-5" /> 
+                        <span className="font-bold text-sm">{t.venue}</span>
                       </div>
                     </div>
                   </div>

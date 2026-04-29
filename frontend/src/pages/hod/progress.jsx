@@ -2,23 +2,31 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/Authcontext';
 import api from '../../services/api';
 import Loader from '../../components/common/loader';
-import { FiTrendingUp, FiRefreshCw, FiBook, FiCheckCircle } from 'react-icons/fi';
+import { FiTrendingUp, FiUser, FiBook, FiSearch, FiFilter } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 
-const LecturerProgress = () => {
+const HodProgress = () => {
   const { user } = useAuth();
   const [assignments, setAssignments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedYear, setSelectedYear] = useState('all');
 
   const fetchAssignments = async () => {
     setLoading(true);
     try {
-      const lecturerId = user?.id || user?._id;
-      const res = await api.get(`/api/lecturer-assignments/lecturer/${lecturerId}`);
+      const departmentKey = user?.department;
+      if (!departmentKey) {
+        toast.error('Department not found in your profile');
+        setLoading(false);
+        return;
+      }
+      
+      const res = await api.get(`/api/lecturer-assignments/department/${encodeURIComponent(departmentKey)}`);
       setAssignments(res.data.data || []);
     } catch (err) {
       console.error('Error fetching assignments', err);
-      toast.error('Failed to load your assignments');
+      toast.error('Failed to load teaching progress data');
     } finally {
       setLoading(false);
     }
@@ -28,30 +36,74 @@ const LecturerProgress = () => {
     if (user) fetchAssignments();
   }, [user]);
 
+  const filteredAssignments = assignments.filter(a => {
+    const matchesSearch = 
+      (a.subject?.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (a.lecturer?.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (a.subject?.code || '').toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesYear = selectedYear === 'all' || a.academicYear === selectedYear;
+    
+    return matchesSearch && matchesYear;
+  });
+
+  const academicYears = ['1st Year', '2nd Year', '3rd Year', '4th Year'];
+
   if (loading) return <Loader fullScreen />;
 
   return (
     <div className="p-6 bg-white min-h-screen">
       <div className="max-w-7xl mx-auto">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
-          <div>
-            <h1 className="text-3xl font-black text-slate-800 tracking-tighter uppercase mb-2">My Teaching Progress</h1>
-            <p className="text-slate-500 font-medium">Real-time syllabus coverage tracked via your attendance logs.</p>
-          </div>
-          <div className="bg-indigo-50 text-indigo-700 px-6 py-3 rounded-2xl border border-indigo-100 flex items-center gap-3 text-sm font-bold shadow-sm">
-            <FiRefreshCw className="animate-spin-slow" /> 
-            <span>Automated Sync Active</span>
+        <div className="mb-8">
+          <h1 className="text-3xl font-black text-slate-800 tracking-tighter uppercase mb-2">Department Teaching Progress</h1>
+          <p className="text-slate-500 font-medium italic">Monitoring syllabus coverage across all subjects in <span className="text-indigo-600 font-bold">{user?.department}</span></p>
+        </div>
+
+        {/* Filters */}
+        <div className="bg-white rounded-[2rem] border border-black p-6 mb-8 shadow-sm">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="relative">
+              <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Search lecturer or subject..."
+                className="pl-12 pr-6 py-3 bg-slate-50 border-none rounded-xl font-bold focus:ring-2 focus:ring-indigo-500 w-full transition-all"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            <div className="relative">
+              <FiFilter className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+              <select
+                className="pl-12 pr-6 py-3 bg-slate-50 border-none rounded-xl font-bold focus:ring-2 focus:ring-indigo-500 w-full transition-all appearance-none cursor-pointer"
+                value={selectedYear}
+                onChange={(e) => setSelectedYear(e.target.value)}
+              >
+                <option value="all">All Academic Years</option>
+                {academicYears.map(year => (
+                  <option key={year} value={year}>{year}</option>
+                ))}
+              </select>
+            </div>
+            <div className="flex items-center justify-end">
+               <button 
+                onClick={fetchAssignments}
+                className="px-6 py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition-all flex items-center gap-2"
+               >
+                 Refresh Data
+               </button>
+            </div>
           </div>
         </div>
 
-        {assignments.length === 0 ? (
+        {filteredAssignments.length === 0 ? (
           <div className="bg-white rounded-[2rem] border border-black p-20 text-center">
             <FiBook size={48} className="mx-auto text-slate-200 mb-4" />
-            <p className="text-slate-400 font-bold uppercase tracking-widest">No active teaching assignments found</p>
+            <p className="text-slate-400 font-bold uppercase tracking-widest">No active assignments found matching your criteria</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {assignments.map((a) => (
+            {filteredAssignments.map((a, idx) => (
               <div 
                 key={a._id} 
                 className="bg-white rounded-[2.5rem] border border-black p-8 shadow-sm hover:shadow-xl transition-all group relative overflow-hidden"
@@ -71,10 +123,20 @@ const LecturerProgress = () => {
                     </div>
                   </div>
 
+                  <div className="bg-slate-50 rounded-2xl p-5 mb-8 flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-full bg-white border border-black flex items-center justify-center text-slate-400">
+                      <FiUser />
+                    </div>
+                    <div>
+                      <p className="text-[9px] font-black uppercase text-slate-300 tracking-widest leading-none mb-1">Assigned Lecturer</p>
+                      <p className="font-bold text-slate-700">{a.lecturer?.name || 'Unknown'}</p>
+                    </div>
+                  </div>
+
                   <div className="space-y-6">
                     <div>
                       <div className="flex justify-between items-end mb-2">
-                        <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Syllabus Coverage</p>
+                        <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Overall Coverage</p>
                         <p className="text-2xl font-black text-slate-800 tracking-tighter">{a.curriculum?.progressPercentage || 0}%</p>
                       </div>
                       <div className="w-full bg-slate-100 rounded-full h-4 border border-slate-200 p-1 overflow-hidden">
@@ -114,10 +176,7 @@ const LecturerProgress = () => {
                     }`}>
                       {a.status}
                     </span>
-                    <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-400 italic">
-                      <FiCheckCircle className="text-emerald-500" />
-                      <span>Syllabus tracking automated</span>
-                    </div>
+                    <p className="text-[10px] font-bold text-slate-400 italic">Auto-updated via attendance logs</p>
                   </div>
                 </div>
               </div>
@@ -129,4 +188,4 @@ const LecturerProgress = () => {
   );
 };
 
-export default LecturerProgress;
+export default HodProgress;
