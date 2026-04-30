@@ -130,9 +130,11 @@ const ExamOfficerDashboard = () => {
             className="px-4 py-2 border border-black rounded-lg focus:ring-2 focus:ring-blue-500"
           >
             <option value="">All Departments</option>
-            <option value="Engineering">Engineering</option>
-            <option value="IT">Information Technology</option>
-            <option value="Business">Business Administration</option>
+            <option value="Languages and Communication Studies">Languages and Communication Studies</option>
+            <option value="Business and Management Studies">Business and Management Studies</option>
+            <option value="Computer Science">Computer Science</option>
+            <option value="Physical Science">Physical Science</option>
+            <option value="Unit of Siddha Medicine">Unit of Siddha Medicine</option>
           </select>
         </div>
 

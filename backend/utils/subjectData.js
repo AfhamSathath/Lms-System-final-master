@@ -1,215 +1,343 @@
-// Computer Science Department Subjects
+// Official Trincomalee Campus Institutional Curriculum Data
+// This file serves as the master record for academic modules across all faculties
+
+// 1. Computer Science Department Subjects
 const computerScienceSubjects = {
   '1st Year': {
     semester1: [
-      { code: 'CO1121', name: 'Basic Mathematics for Computing', credits: 3, category: 'Lecture' },
-      { code: 'CO1122', name: 'Basic Computer Programming', credits: 3, category: 'Lecture', hasPractical: true, practicalCode: 'CO1112' },
-      { code: 'CO1112', name: 'Practical work on CO1122', credits: 1, category: 'Practical' },
-      { code: 'CO1123', name: 'Formal Methods for Problem Solving', credits: 3, category: 'Lecture' },
-      { code: 'CO1124', name: 'Computer Systems & PC Applications', credits: 3, category: 'Lecture', hasPractical: true, practicalCode: 'CO1114' },
-      { code: 'CO1114', name: 'Practical work on CO1124', credits: 1, category: 'Practical' },
-      { code: 'CO1125', name: 'Statistics for Science and Technology', credits: 3, category: 'Lecture', hasPractical: true, practicalCode: 'CO1115' },
-      { code: 'CO1115', name: 'Practical work on CO1125', credits: 1, category: 'Practical' },
-      { code: 'CO1126', name: 'Management Information System', credits: 3, category: 'Management' },
-      { code: 'GEP-I', name: 'General English Proficiency - I', credits: 2, category: 'General' },
+      { name: 'Basic Mathematics for Computing', code: 'CO1121', credits: 2, category: 'Lecture' },
+      { name: 'Basic Computer Programming', code: 'CO1122', credits: 2, category: 'Lecture' },
+      { name: 'Practical work on CO1122', code: 'CO1112', credits: 1, category: 'Practical' },
+      { name: 'Formal Methods for Problem Solving', code: 'CO1123', credits: 2, category: 'Lecture' },
+      { name: 'Computer Systems & PC Applications', code: 'CO1124', credits: 2, category: 'Lecture' },
+      { name: 'Practical work on CO1124', code: 'CO1114', credits: 1, category: 'Practical' },
+      { name: 'Statistics for Science and Technology', code: 'CO1125', credits: 2, category: 'Lecture' },
+      { name: 'Practical work on CO1125', code: 'CO1115', credits: 1, category: 'Practical' },
+      { name: 'Management Information System', code: 'CO1126', credits: 2, category: 'Lecture' },
+      { name: 'General English Proficiency - I', code: 'GEP1', credits: 0, category: 'General' },
     ],
     semester2: [
-      { code: 'CO1221', name: 'Systems Analysis & Design', credits: 3, category: 'Lecture' },
-      { code: 'CO1222', name: 'Data Structures & Algorithms', credits: 3, category: 'Lecture', hasPractical: true, practicalCode: 'CO1212' },
-      { code: 'CO1212', name: 'Practical work on CO1222', credits: 1, category: 'Practical' },
-      { code: 'CO1223', name: 'Data Base Management Systems', credits: 3, category: 'Lecture', hasPractical: true, practicalCode: 'CO1213' },
-      { code: 'CO1213', name: 'Practical work on CO1223', credits: 1, category: 'Practical' },
-      { code: 'CO1224', name: 'MultiMedia & HyperMedia Development', credits: 3, category: 'Lecture', hasPractical: true, practicalCode: 'CO1214' },
-      { code: 'CO1214', name: 'Practical work on CO1224', credits: 1, category: 'Practical' },
-      { code: 'CO1225', name: 'Computer Architecture', credits: 3, category: 'Lecture' },
-      { code: 'CO1226', name: 'Social Harmony', credits: 2, category: 'General' },
+      { name: 'Systems Analysis & Design', code: 'CO1221', credits: 2, category: 'Lecture' },
+      { name: 'Data Structures & Algorithms', code: 'CO1222', credits: 2, category: 'Lecture' },
+      { name: 'Practical work on CO1222', code: 'CO1212', credits: 1, category: 'Practical' },
+      { name: 'Data Base Management Systems', code: 'CO1223', credits: 2, category: 'Lecture' },
+      { name: 'Practical work on CO1223', code: 'CO1213', credits: 1, category: 'Practical' },
+      { name: 'MultiMedia & HyperMedia Development', code: 'CO1224', credits: 2, category: 'Lecture' },
+      { name: 'Practical work on CO1224', code: 'CO1214', credits: 1, category: 'Practical' },
+      { name: 'Computer Architecture', code: 'CO1225', credits: 2, category: 'Lecture' },
+      { name: 'Social Harmony', code: 'CO1226', credits: 2, category: 'General' },
     ]
   },
   '2nd Year': {
     semester1: [
-      { code: 'CO2121', name: 'Advanced Mathematics for Computing', credits: 3, category: 'Lecture' },
-      { code: 'CO2122', name: 'Operating Systems', credits: 3, category: 'Lecture', hasPractical: true, practicalCode: 'CO2112' },
-      { code: 'CO2112', name: 'Practical work on CO2122', credits: 1, category: 'Practical' },
-      { code: 'CO2123', name: 'Software Engineering', credits: 3, category: 'Lecture' },
-      { code: 'CO2124', name: 'Internet and Web Design', credits: 3, category: 'Lecture', hasPractical: true, practicalCode: 'CO2114' },
-      { code: 'CO2114', name: 'Practical work on CO2124', credits: 1, category: 'Practical' },
-      { code: 'CO2125', name: 'Object Oriented Programming', credits: 3, category: 'Lecture', hasPractical: true, practicalCode: 'CO2115' },
-      { code: 'CO2115', name: 'Practical work on CO2125', credits: 1, category: 'Practical' },
-      { code: 'CO2126', name: 'Sri Lankan Studies', credits: 2, category: 'General' },
-      { code: 'GEP-III', name: 'General English Proficiency - III', credits: 2, category: 'General' },
+      { name: 'Advanced Mathematics for Computing', code: 'CO2121', credits: 2, category: 'Lecture' },
+      { name: 'Operating Systems', code: 'CO2122', credits: 2, category: 'Lecture' },
+      { name: 'Practical work on CO2122', code: 'CO2112', credits: 1, category: 'Practical' },
+      { name: 'Software Engineering', code: 'CO2123', credits: 2, category: 'Lecture' },
+      { name: 'Internet and Web Design', code: 'CO2124', credits: 2, category: 'Lecture' },
+      { name: 'Practical work on CO2124', code: 'CO2114', credits: 1, category: 'Practical' },
+      { name: 'Object Oriented Programming', code: 'CO2125', credits: 2, category: 'Lecture' },
+      { name: 'Practical work on CO2125', code: 'CO2115', credits: 1, category: 'Practical' },
+      { name: 'Sri Lankan Studies', code: 'CO2126', credits: 2, category: 'General' },
+      { name: 'General English Proficiency - III', code: 'GEP3', credits: 0, category: 'General' },
     ],
     semester2: [
-      { code: 'CO2221', name: 'Data Communication Systems', credits: 3, category: 'Lecture' },
-      { code: 'CO2222', name: 'Visual System Development Tools', credits: 3, category: 'Lecture', hasPractical: true, practicalCode: 'CO2212' },
-      { code: 'CO2212', name: 'Practical work on CO2222', credits: 1, category: 'Practical' },
-      { code: 'CO2223', name: 'Computer Graphics', credits: 3, category: 'Lecture', hasPractical: true, practicalCode: 'CO2213' },
-      { code: 'CO2213', name: 'Practical work on CO2223', credits: 1, category: 'Practical' },
-      { code: 'CO2224', name: 'Human Computer Interaction', credits: 3, category: 'Lecture', hasPractical: true, practicalCode: 'CO2214' },
-      { code: 'CO2214', name: 'Practical work on CO2224', credits: 1, category: 'Practical' },
-      { code: 'CO2225', name: 'Software Management Techniques', credits: 3, category: 'Management' },
-      { code: 'CO2226', name: 'Automata Theory', credits: 3, category: 'Lecture' },
+      { name: 'Data Communication Systems', code: 'CO2221', credits: 2, category: 'Lecture' },
+      { name: 'Visual System Development Tools', code: 'CO2222', credits: 2, category: 'Lecture' },
+      { name: 'Practical work on CO2222', code: 'CO2212', credits: 1, category: 'Practical' },
+      { name: 'Computer Graphics', code: 'CO2223', credits: 2, category: 'Lecture' },
+      { name: 'Practical work on CO2223', code: 'CO2213', credits: 1, category: 'Practical' },
+      { name: 'Human Computer Interaction', code: 'CO2224', credits: 2, category: 'Lecture' },
+      { name: 'Practical work on CO2224', code: 'CO2214', credits: 1, category: 'Practical' },
+      { name: 'Software Management Techniques', code: 'CO2225', credits: 2, category: 'Lecture' },
+      { name: 'Automata Theory', code: 'CO2226', credits: 2, category: 'Lecture' },
     ]
   },
   '3rd Year': {
     semester1: [
-      { code: 'CS3121', name: 'Logic Programming & Expert Systems', credits: 3, category: 'Lecture', hasPractical: true, practicalCode: 'CS3111' },
-      { code: 'CS3111', name: 'Practical work on CS3121', credits: 1, category: 'Practical' },
-      { code: 'CS3122', name: 'Advanced Database Management Systems', credits: 3, category: 'Lecture', hasPractical: true, practicalCode: 'CS3112' },
-      { code: 'CS3112', name: 'Practical work on CS3122', credits: 1, category: 'Practical' },
-      { code: 'CS3123', name: 'Systems & Network Administration', credits: 3, category: 'Lecture', hasPractical: true, practicalCode: 'CS3113' },
-      { code: 'CS3113', name: 'Practical work on CS3123', credits: 1, category: 'Practical' },
-      { code: 'CS3124', name: 'Data Security', credits: 3, category: 'Lecture', hasPractical: true, practicalCode: 'CS3114' },
-      { code: 'CS3114', name: 'Practical work on CS3124', credits: 1, category: 'Practical' },
-      { code: 'CS3135', name: 'Theory of Computing', credits: 3, category: 'Lecture' },
-      { code: 'EC3101', name: 'Foundations of Management', credits: 3, category: 'Management' },
-    ],
-    semester2: [
-      { code: 'CS3221', name: 'Assembly Programming', credits: 3, category: 'Lecture', hasPractical: true, practicalCode: 'CS3211' },
-      { code: 'CS3211', name: 'Practical work on CS3221', credits: 1, category: 'Practical' },
-      { code: 'CS3222', name: 'Software Quality Assurance', credits: 3, category: 'Lecture', hasPractical: true, practicalCode: 'CS3212' },
-      { code: 'CS3212', name: 'Practical work on CS3222', credits: 1, category: 'Practical' },
-      { code: 'CS3233', name: 'Professional Issues in IT', credits: 3, category: 'Lecture' },
-      { code: 'CS3224', name: 'Computer Networks', credits: 3, category: 'Lecture', hasPractical: true, practicalCode: 'CS3214' },
-      { code: 'CS3214', name: 'Practical work on CS3222', credits: 1, category: 'Practical' },
-      { code: 'CS3235', name: 'Industrial Training/Project', credits: 6, category: 'Project' },
-    ]
-  },
-  '4th Year': {
-    semester1: [
-      { code: 'CS4121', name: 'Advanced Computer Architecture', credits: 3, category: 'Lecture' },
-      { code: 'CS4122', name: 'Machine Learning', credits: 3, category: 'Lecture', hasPractical: true, practicalCode: 'CS4112' },
-      { code: 'CS4112', name: 'Practical work on CS4122', credits: 1, category: 'Practical' },
-      { code: 'CS4123', name: 'Distributed Systems', credits: 3, category: 'Lecture' },
-      { code: 'CS4124', name: 'Research Methodology', credits: 3, category: 'Lecture' },
-      { code: 'CS41P1', name: 'Research Project - Part I', credits: 3, category: 'Project' },
-    ],
-    semester2: [
-      { code: 'CS4221', name: 'Advanced Networking', credits: 3, category: 'Lecture' },
-      { code: 'CS4222', name: 'Cloud Computing', credits: 3, category: 'Lecture' },
-      { code: 'CS4223', name: 'Ethical Hacking', credits: 3, category: 'Lecture', hasPractical: true, practicalCode: 'CS4213' },
-      { code: 'CS4213', name: 'Practical work on CS4223', credits: 1, category: 'Practical' },
-      { code: 'CS42P2', name: 'Research Project - Part II', credits: 6, category: 'Project' },
+      { name: 'Logic Programming & Expert Systems', code: 'CS3121', credits: 2, category: 'Lecture' },
+      { name: 'Practical work on CS3121', code: 'CS3111', credits: 1, category: 'Practical' },
+      { name: 'Advanced Database Management Systems', code: 'CS3122', credits: 2, category: 'Lecture' },
+      { name: 'Practical work on CS3122', code: 'CS3112', credits: 1, category: 'Practical' },
+      { name: 'Systems & Network Administration', code: 'CS3123', credits: 2, category: 'Lecture' },
+      { name: 'Practical work on CS3123', code: 'CS3113', credits: 1, category: 'Practical' },
+      { name: 'Data Security', code: 'CS3124', credits: 2, category: 'Lecture' },
+      { name: 'Practical work on CS3124', code: 'CS3114', credits: 1, category: 'Practical' },
+      { name: 'Theory of Computing', code: 'CS3135', credits: 3, category: 'Lecture' },
+      { name: 'Foundations of Management', code: 'EC3101', credits: 0, category: 'Management' },
     ]
   }
 };
 
-// Software Engineering Department Subjects
-const softwareEngineeringSubjects = {
+// 2. Physical Science Department Subjects
+const physicalScienceSubjects = {
   '1st Year': {
     semester1: [
-      { code: 'SE1101', name: 'Fundamentals of Programming', credits: 3, category: 'Lecture', hasPractical: true, practicalCode: 'SE1101P' },
-      { code: 'SE1101P', name: 'Programming Lab', credits: 1, category: 'Practical' },
-      { code: 'SE1102', name: 'Mathematics for Computing', credits: 3, category: 'Lecture' },
-      { code: 'SE1103', name: 'Digital Logic Design', credits: 3, category: 'Lecture' },
-      { code: 'SE1104', name: 'Communication Skills', credits: 2, category: 'General' },
-      { code: 'SE1105', name: 'Introduction to Software Engineering', credits: 3, category: 'Lecture' },
+      { name: 'Calculus I', code: 'DPS1113', credits: 3, category: 'Lecture' },
+      { name: 'General Physics', code: 'DPS1123', credits: 3, category: 'Lecture' },
+      { name: 'Inorganic Chemistry', code: 'DPS1133', credits: 3, category: 'Lecture' },
     ],
     semester2: [
-      { code: 'SE1201', name: 'Object Oriented Programming', credits: 3, category: 'Lecture', hasPractical: true, practicalCode: 'SE1201P' },
-      { code: 'SE1201P', name: 'OOP Lab', credits: 1, category: 'Practical' },
-      { code: 'SE1202', name: 'Data Structures', credits: 3, category: 'Lecture', hasPractical: true, practicalCode: 'SE1202P' },
-      { code: 'SE1202P', name: 'Data Structures Lab', credits: 1, category: 'Practical' },
-      { code: 'SE1203', name: 'Database Systems', credits: 3, category: 'Lecture' },
-      { code: 'SE1204', name: 'Web Development Basics', credits: 3, category: 'Lecture' },
+      { name: 'Linear Algebra', code: 'DPS1213', credits: 3, category: 'Lecture' },
+      { name: 'Organic Chemistry', code: 'DPS1223', credits: 3, category: 'Lecture' },
     ]
   },
   '2nd Year': {
     semester1: [
-      { code: 'SE2101', name: 'Software Requirements Engineering', credits: 3, category: 'Lecture' },
-      { code: 'SE2102', name: 'Algorithms Analysis', credits: 3, category: 'Lecture' },
-      { code: 'SE2103', name: 'UI/UX Design', credits: 3, category: 'Lecture', hasPractical: true, practicalCode: 'SE2103P' },
-      { code: 'SE2103P', name: 'UI/UX Lab', credits: 1, category: 'Practical' },
-      { code: 'SE2104', name: 'Professional Development', credits: 2, category: 'General' },
+      { name: 'Mechanics', code: 'DPS2113', credits: 3, category: 'Lecture' },
     ],
     semester2: [
-      { code: 'SE2201', name: 'Software Design and Architecture', credits: 3, category: 'Lecture' },
-      { code: 'SE2202', name: 'Mobile App Development', credits: 3, category: 'Lecture', hasPractical: true, practicalCode: 'SE2202P' },
-      { code: 'SE2202P', name: 'Mobile Dev Lab', credits: 1, category: 'Practical' },
-      { code: 'SE2203', name: 'Quality Assurance', credits: 3, category: 'Lecture' },
-      { code: 'SE2204', name: 'Operating Systems', credits: 3, category: 'Lecture' },
-    ]
-  },
-  '3rd Year': {
-    semester1: [
-      { code: 'SE3101', name: 'Software Project Management', credits: 3, category: 'Management' },
-      { code: 'SE3102', name: 'Enterprise Architecture', credits: 3, category: 'Lecture' },
-      { code: 'SE3103', name: 'Cloud Applications Development', credits: 3, category: 'Lecture' },
-      { code: 'SE3104', name: 'Software Testing', credits: 3, category: 'Lecture', hasPractical: true, practicalCode: 'SE3104P' },
-      { code: 'SE3104P', name: 'Testing Lab', credits: 1, category: 'Practical' },
-    ],
-    semester2: [
-      { code: 'SE3201', name: 'DevOps Practices', credits: 3, category: 'Lecture' },
-      { code: 'SE3202', name: 'Advanced Web Development', credits: 3, category: 'Lecture' },
-      { code: 'SE3203', name: 'Ethics in Computing', credits: 2, category: 'General' },
-      { code: 'SE32P1', name: 'Group Project', credits: 4, category: 'Project' },
-    ]
-  },
-  '4th Year': {
-    semester1: [
-      { code: 'SE4101', name: 'Software Evolution', credits: 3, category: 'Lecture' },
-      { code: 'SE4102', name: 'IT Governance', credits: 3, category: 'Management' },
-      { code: 'SE41P1', name: 'Capstone Project - Part I', credits: 4, category: 'Project' },
-    ],
-    semester2: [
-      { code: 'SE4201', name: 'Software Entrepreneurship', credits: 3, category: 'Management' },
-      { code: 'SE42P2', name: 'Capstone Project - Part II', credits: 6, category: 'Project' },
-      { code: 'SE4202', name: 'Industrial Internship', credits: 4, category: 'Project' },
+      { name: 'Electronics', code: 'DPS2213', credits: 3, category: 'Lecture' },
     ]
   }
 };
 
-// Information Technology Department Subjects
-const informationTechnologySubjects = {
+// 3. Business and Management Studies Subjects
+const businessManagementSubjects = {
   '1st Year': {
     semester1: [
-      { code: 'IT1101', name: 'Introduction to IT', credits: 3, category: 'Lecture' },
-      { code: 'IT1102', name: 'Programming Fundamentals', credits: 3, category: 'Lecture', hasPractical: true, practicalCode: 'IT1102P' },
-      { code: 'IT1102P', name: 'Programming Lab', credits: 1, category: 'Practical' },
-      { code: 'IT1103', name: 'Mathematics for IT', credits: 3, category: 'Lecture' },
-      { code: 'IT1104', name: 'Digital Literacy', credits: 2, category: 'General' },
+      { name: 'Principles of Management', code: 'BMT1013', credits: 3, category: 'Management' },
+      { name: 'Introduction to Information Technology', code: 'BMT1023', credits: 3, category: 'Management' },
+      { name: 'Business Mathematics', code: 'BMT1033', credits: 3, category: 'Management' },
+      { name: 'Business English I', code: 'BMT1043', credits: 3, category: 'General' },
+      { name: 'Microeconomics', code: 'BMT1053', credits: 3, category: 'Management' },
+      { name: 'Basic Tamil I', code: 'NCC1010', credits: 0, category: 'General' },
+      { name: 'Basic Sinhala I', code: 'NCC1020', credits: 0, category: 'General' },
     ],
     semester2: [
-      { code: 'IT1201', name: 'Web Technologies', credits: 3, category: 'Lecture', hasPractical: true, practicalCode: 'IT1201P' },
-      { code: 'IT1201P', name: 'Web Lab', credits: 1, category: 'Practical' },
-      { code: 'IT1202', name: 'Database Management', credits: 3, category: 'Lecture' },
-      { code: 'IT1203', name: 'Computer Networks Basics', credits: 3, category: 'Lecture' },
+      { name: 'Human Resource Management', code: 'HRM1013', credits: 3, category: 'Management' },
+      { name: 'Financial Accounting', code: 'AFM1013', credits: 3, category: 'Management' },
+      { name: 'Business Statistics', code: 'BMT1063', credits: 3, category: 'Management' },
+      { name: 'Business English II', code: 'BMT1073', credits: 3, category: 'General' },
+      { name: 'Marketing Management', code: 'MKT1013', credits: 3, category: 'Management' },
+      { name: 'Basic Tamil II', code: 'NCC1030', credits: 0, category: 'General' },
+      { name: 'Basic Sinhala II', code: 'NCC1040', credits: 0, category: 'General' },
     ]
   },
   '2nd Year': {
     semester1: [
-      { code: 'IT2101', name: 'System Administration', credits: 3, category: 'Lecture', hasPractical: true, practicalCode: 'IT2101P' },
-      { code: 'IT2101P', name: 'SysAdmin Lab', credits: 1, category: 'Practical' },
-      { code: 'IT2102', name: 'Information Security', credits: 3, category: 'Lecture' },
-      { code: 'IT2103', name: 'Business Analysis', credits: 3, category: 'Management' },
+      { name: 'Macroeconomics', code: 'BMT2013', credits: 3, category: 'Management' },
+      { name: 'Cost and Management Accounting', code: 'AFM2013', credits: 3, category: 'Management' },
+      { name: 'Management Information System', code: 'BMT2023', credits: 3, category: 'Management' },
+      { name: 'Business Skills I', code: 'BMT2033', credits: 3, category: 'Management' },
+      { name: 'Business Law', code: 'BMT2043', credits: 3, category: 'Management' },
+      { name: 'Career Guidance', code: 'NCC2010', credits: 0, category: 'General' },
     ],
     semester2: [
-      { code: 'IT2201', name: 'Network Security', credits: 3, category: 'Lecture' },
-      { code: 'IT2202', name: 'Cloud Infrastructure', credits: 3, category: 'Lecture' },
-      { code: 'IT2203', name: 'IT Support Services', credits: 3, category: 'Lecture' },
+      { name: 'Operations Management', code: 'BMT2053', credits: 3, category: 'Management' },
+      { name: 'Financial Management', code: 'AFM2023', credits: 3, category: 'Management' },
+      { name: 'Business Skills II', code: 'BMT2063', credits: 3, category: 'Management' },
+      { name: 'Entrepreneurship and Innovation', code: 'BMT2073', credits: 3, category: 'Management' },
+      { name: 'Fundamental Sociology and Psychology', code: 'BMT2082', credits: 2, category: 'Management' },
+      { name: 'Peace and Social Harmony', code: 'BMT2091', credits: 1, category: 'General' },
+      { name: 'Basic Science', code: 'NCC2020', credits: 0, category: 'General' },
     ]
   },
   '3rd Year': {
     semester1: [
-      { code: 'IT3101', name: 'Enterprise Networks', credits: 3, category: 'Lecture' },
-      { code: 'IT3102', name: 'Cyber Security', credits: 3, category: 'Lecture', hasPractical: true, practicalCode: 'IT3102P' },
-      { code: 'IT3102P', name: 'Security Lab', credits: 1, category: 'Practical' },
-      { code: 'IT3103', name: 'IT Project Management', credits: 3, category: 'Management' },
-    ],
-    semester2: [
-      { code: 'IT3201', name: 'Data Center Management', credits: 3, category: 'Lecture' },
-      { code: 'IT3202', name: 'IT Service Management', credits: 3, category: 'Management' },
-      { code: 'IT32P1', name: 'Industrial Placement', credits: 6, category: 'Project' },
+      { name: 'Organizational Behavior', code: 'BMT3013', credits: 3, category: 'Management' },
+      { name: 'Operational Research', code: 'BMT3023', credits: 3, category: 'Management' },
+      { name: 'Total Quality Management', code: 'BMT3033', credits: 3, category: 'Management' },
+      { name: 'Organizational Development', code: 'BMT3043', credits: 3, category: 'Management' },
+      { name: 'Labor Law and Relations', code: 'BMT3123', credits: 3, category: 'Management' },
+      { name: 'Micro Finance', code: 'BMT3053', credits: 3, category: 'Management' },
     ]
   },
   '4th Year': {
     semester1: [
-      { code: 'IT4101', name: 'Emerging Technologies', credits: 3, category: 'Lecture' },
-      { code: 'IT4102', name: 'IT Strategy', credits: 3, category: 'Management' },
-      { code: 'IT41P1', name: 'Final Year Project - Part I', credits: 4, category: 'Project' },
+      { name: 'Computer Based Data Analysis', code: 'BMT4013', credits: 3, category: 'Management' },
+      { name: 'Development Economics', code: 'BMT4023', credits: 3, category: 'Management' },
+      { name: 'Service Management', code: 'BMT4033', credits: 3, category: 'Management' },
+      { name: 'International Business', code: 'BMT4043', credits: 3, category: 'Management' },
+      { name: 'E-Commerce', code: 'BMT4053', credits: 3, category: 'Management' },
     ],
     semester2: [
-      { code: 'IT4201', name: 'Digital Transformation', credits: 3, category: 'Lecture' },
-      { code: 'IT42P2', name: 'Final Year Project - Part II', credits: 6, category: 'Project' },
+      { name: 'Independent Research in Business Management', code: 'BMT4076', credits: 6, category: 'Project' },
+      { name: 'Internship in Business Management', code: 'BMT4083', credits: 3, category: 'Practical' },
+    ]
+  }
+};
+
+// 4. Languages and Communication Studies Subjects
+const languagesCommunicationSubjects = {
+  '1st Year': {
+    semester1: [
+      { name: 'Basic Tamil', code: 'LANG1013', credits: 3, category: 'General' },
+      { name: 'Basic Sinhala', code: 'LANG1023', credits: 3, category: 'General' },
+      { name: 'Basic Reading & Grammar (General English I)', code: 'LANG1033', credits: 3, category: 'General' },
+      { name: 'Sri Lankan Studies', code: 'GENR1013', credits: 3, category: 'General' },
+      { name: 'Introduction to Communication Studies', code: 'COMM1013', credits: 3, category: 'General' },
+      { name: 'Computer Literacy & Application', code: 'ITEC1013', credits: 3, category: 'General' },
+    ],
+    semester2: [
+      { name: 'Basic Writing & Speech (General English II)', code: 'LANG1043', credits: 3, category: 'General' },
+      { name: 'Introduction to Literature', code: 'LANG1053', credits: 3, category: 'General' },
+      { name: 'Communication & Persuasion', code: 'COMM1023', credits: 3, category: 'General' },
+      { name: 'Introduction to Language & Linguistics', code: 'LANG1063', credits: 3, category: 'General' },
+      { name: 'Basic Mathematics', code: 'GENR1023', credits: 3, category: 'General' },
+    ]
+  },
+  '2nd Year': {
+    semester1: [
+      { name: 'Introduction to Interpersonal Communication', code: 'COMM2053', credits: 3, category: 'General' },
+      { name: 'Introduction to Organizational Communication', code: 'COMM2063', credits: 3, category: 'General' },
+      { name: 'General English III', code: 'LANG2063', credits: 3, category: 'General' },
+      { name: 'Mass Communication and Society', code: 'COMM2033', credits: 3, category: 'General' },
+      { name: 'Communication Theories and Media Literacy', code: 'COMM2043', credits: 3, category: 'General' },
+      { name: 'Introductory Phonetics', code: 'LANG2073', credits: 3, category: 'General' },
+      { name: 'Advanced Reading and Grammar', code: 'LANG2083', credits: 3, category: 'General' },
+      { name: 'Advanced Writing and Speech', code: 'LANG2093', credits: 3, category: 'General' },
+      { name: 'Introduction to Poetry', code: 'LANG2103', credits: 3, category: 'General' },
+    ],
+    semester2: [
+      { name: 'Instructional Media', code: 'COMM2083', credits: 3, category: 'General' },
+      { name: 'Development Communication', code: 'COMM2093', credits: 3, category: 'General' },
+      { name: 'Communication, Gender and Society', code: 'COMM2103', credits: 3, category: 'General' },
+      { name: 'General English IV', code: 'LANG2113', credits: 3, category: 'General' },
+      { name: 'Writing for Media', code: 'COMM2073', credits: 3, category: 'General' },
+      { name: 'Sri Lankan Literature', code: 'LANG2123', credits: 3, category: 'General' },
+      { name: 'Introduction to Fiction', code: 'LANG2133', credits: 3, category: 'General' },
+      { name: 'Introduction to Western Culture', code: 'LANG2143', credits: 3, category: 'General' },
+      { name: 'Creative Writing', code: 'LANG2153', credits: 3, category: 'General' },
+      { name: 'Computer Programming (LCS)', code: 'ITEC2023', credits: 3, category: 'General' },
+    ]
+  },
+  '3rd Year': {
+    semester1: [
+      { name: 'Culture and Communication', code: 'COMM3113', credits: 3, category: 'General' },
+      { name: 'Communication and Conflict Management', code: 'COMM3123', credits: 3, category: 'General' },
+      { name: 'Commonwealth Literature', code: 'LANG3163', credits: 3, category: 'General' },
+      { name: 'Modern Drama', code: 'LANG3173', credits: 3, category: 'General' },
+      { name: 'Practical Criticism', code: 'LANG3183', credits: 3, category: 'General' },
+      { name: 'Linguistics Principles of Translation', code: 'LING3113', credits: 3, category: 'General' },
+      { name: 'Film and Television', code: 'COMM3133', credits: 3, category: 'General' },
+      { name: 'Introduction to Folk Media', code: 'COMM3143', credits: 3, category: 'General' },
+      { name: 'Desktop Publishing (Theory)', code: 'ITEC3033T', credits: 2, category: 'General' },
+      { name: 'Desktop Publishing (Practical)', code: 'ITEC3033P', credits: 1, category: 'General' },
+      { name: 'General Psychology (LCS)', code: 'GENR3033', credits: 3, category: 'General' },
+    ],
+    semester2: [
+      { name: 'Media Law and Ethics', code: 'COMM3213', credits: 3, category: 'General' },
+      { name: 'Research Methods in Communication', code: 'COMM3223', credits: 3, category: 'General' },
+      { name: 'Shakespeare', code: 'LANG3223', credits: 3, category: 'General' },
+      { name: 'American Literature', code: 'LANG3233', credits: 3, category: 'General' },
+      { name: 'Translation Methods', code: 'LANG3243', credits: 3, category: 'General' },
+      { name: 'Photojournalism', code: 'COMM3233', credits: 3, category: 'General' },
+      { name: 'Public Relation and Advertising', code: 'COMM3243', credits: 3, category: 'General' },
+      { name: 'Statistical Packages for Social Sciences', code: 'ITEC3043', credits: 3, category: 'General' },
+      { name: 'Human Rights and Social Justice', code: 'GENR3043', credits: 3, category: 'General' },
+    ]
+  },
+  '4th Year': {
+    semester1: [
+      { name: 'Communication for Development', code: 'COMM4013', credits: 3, category: 'General' },
+      { name: 'Specialized Journalism', code: 'COMM4023', credits: 3, category: 'General' },
+      { name: 'New Media and Society', code: 'COMM4033', credits: 3, category: 'General' },
+      { name: 'Corporate Communication', code: 'COMM4043', credits: 3, category: 'General' },
+      { name: 'Documentary Production', code: 'COMM4053', credits: 3, category: 'General' },
+      { name: 'Post-colonial Literature', code: 'LANG4013', credits: 3, category: 'General' },
+      { name: 'Literary Theory and Criticism', code: 'LANG4023', credits: 3, category: 'General' },
+      { name: 'Language Teaching Methodology', code: 'LANG4033', credits: 3, category: 'General' },
+      { name: 'Discourse Analysis', code: 'LANG4043', credits: 3, category: 'General' },
+      { name: 'Women\'s Writing', code: 'LANG4053', credits: 3, category: 'General' },
+    ],
+    semester2: [
+      { name: 'Dissertation in Communication Studies', code: 'COMM4066', credits: 6, category: 'Project' },
+      { name: 'Internship in Communication Studies', code: 'COMM4073', credits: 3, category: 'Practical' },
+      { name: 'Dissertation in Languages', code: 'LANG4066', credits: 6, category: 'Project' },
+      { name: 'Internship in Languages', code: 'LANG4073', credits: 3, category: 'Practical' },
+    ]
+  }
+};
+
+// 5. Unit of Siddha Medicine Subjects
+const siddhaMedicineSubjects = {
+  '1st Year': {
+    semester1: [
+      { name: 'Basic Principles of Siddha Medicine and History -I', code: 'SAT1013', credits: 3, category: 'Lecture' },
+      { name: 'Siddha Pharmacology – I Herbs', code: 'GNA1013', credits: 3, category: 'Lecture' },
+      { name: 'Anatomy - I', code: 'UDK1012', credits: 2, category: 'Lecture' },
+      { name: 'Physiology & Biochemistry I', code: 'UDT1012', credits: 2, category: 'Lecture' },
+      { name: 'Yoga - I', code: 'ADY1012', credits: 2, category: 'Lecture' },
+      { name: 'English for Communication - I', code: 'ENG1012', credits: 2, category: 'General' },
+      { name: 'Basic Tamil - I / Basic Sinhala – I', code: 'TAM1011', credits: 1, category: 'General' },
+    ],
+    semester2: [
+      { name: 'Basic Principles of Siddha Medicine and History -II', code: 'SAT1023', credits: 3, category: 'Lecture' },
+      { name: 'Siddha Pharmacology – II Herbs', code: 'GNA1023', credits: 3, category: 'Lecture' },
+      { name: 'Anatomy -II', code: 'UDK1022', credits: 2, category: 'Lecture' },
+      { name: 'Physiology & Biochemistry II', code: 'UDT1022', credits: 2, category: 'Lecture' },
+      { name: 'Yoga - II', code: 'ADY1022', credits: 2, category: 'Lecture' },
+      { name: 'English for communication - II', code: 'ENG1022', credits: 2, category: 'General' },
+      { name: 'Tamil - II / Sinhala – II', code: 'TAM1021', credits: 1, category: 'General' },
+    ]
+  },
+  '2nd Year': {
+    semester1: [
+      { name: 'Siddha Literature - I', code: 'SEK2031', credits: 1, category: 'Lecture' },
+      { name: 'Siddha Pharmacology - III Metal, Minerals, and Animal kingdom', code: 'GNA2033', credits: 3, category: 'Lecture' },
+      { name: 'Anatomy -III', code: 'UDK2032', credits: 2, category: 'Lecture' },
+      { name: 'Physiology & Biochemistry III', code: 'UDT2033', credits: 3, category: 'Lecture' },
+      { name: 'Information Technology - I', code: 'INT2032', credits: 2, category: 'General' },
+      { name: 'Medical Ethics and Professionalism - I', code: 'MEP2032', credits: 2, category: 'Lecture' },
+      { name: 'Research Methodology', code: 'RMS2032', credits: 2, category: 'Lecture' },
+    ],
+    semester2: [
+      { name: 'Siddha Literature - II', code: 'SEK2041', credits: 1, category: 'Lecture' },
+      { name: 'Siddha Pharmacology- IV - Metal, Minerals, and Animal kingdom', code: 'GNA2044', credits: 4, category: 'Lecture' },
+      { name: 'Anatomy - IV', code: 'UDK2043', credits: 3, category: 'Lecture' },
+      { name: 'Physiology & Biochemistry – IV', code: 'UDT2043', credits: 3, category: 'Lecture' },
+      { name: 'Information Technology - II', code: 'INT2042', credits: 2, category: 'General' },
+      { name: 'Medical ethics and professionalism - II', code: 'MEP2042', credits: 2, category: 'Lecture' },
+    ]
+  },
+  '3rd Year': {
+    semester1: [
+      { name: 'Pathology - I', code: 'NNL3054', credits: 4, category: 'Lecture' },
+      { name: 'Fundamentals of Therapeutics in Siddha - I', code: 'CHA3051', credits: 1, category: 'Lecture' },
+      { name: 'Siddha Pharmacology – V Pharmaceutical Sciences', code: 'GNA3054', credits: 4, category: 'Lecture' },
+      { name: 'Community Medicine - I', code: 'SNM3053', credits: 3, category: 'Lecture' },
+      { name: 'Forensic Medicine & Toxicology - I', code: 'NSM3053', credits: 3, category: 'Lecture' },
+    ],
+    semester2: [
+      { name: 'Pathology-II', code: 'NNL3064', credits: 4, category: 'Lecture' },
+      { name: 'Fundamentals of Therapeutics in Siddha –II', code: 'CHA3061', credits: 1, category: 'Lecture' },
+      { name: 'Siddha Pharmacology – VI Pharmaceutical sciences', code: 'GNA3064', credits: 4, category: 'Lecture' },
+      { name: 'Community Medicine – II', code: 'SNM3063', credits: 3, category: 'Lecture' },
+      { name: 'Forensic medicine & Toxicology – II', code: 'NSM3063', credits: 3, category: 'Lecture' },
+    ]
+  },
+  '4th Year': {
+    semester1: [
+      { name: 'Medicine – General - I', code: 'SMP4073', credits: 3, category: 'Clinical' },
+      { name: 'Medicine – Special - I (Kayakarpam, Yoga & Psychiatric)', code: 'SMS4073', credits: 3, category: 'Clinical' },
+      { name: 'Paediatrics - I', code: 'KUM4073', credits: 3, category: 'Clinical' },
+      { name: 'ENT- I', code: 'SRM4073', credits: 3, category: 'Clinical' },
+      { name: 'Traditional Medicine - I', code: 'PPM4071', credits: 1, category: 'Clinical' },
+      { name: 'Research Project I', code: 'RPT4072', credits: 2, category: 'Project' },
+    ],
+    semester2: [
+      { name: 'Medicine -General - II', code: 'SMP4083', credits: 3, category: 'Clinical' },
+      { name: 'Medicine-Special - II (External therapy & Varmam)', code: 'SMS4083', credits: 3, category: 'Clinical' },
+      { name: 'Paediatrics - II', code: 'KUM4083', credits: 3, category: 'Clinical' },
+      { name: 'ENT - II', code: 'SRM4083', credits: 3, category: 'Clinical' },
+      { name: 'Traditional Medicine - II', code: 'PPM4081', credits: 1, category: 'Clinical' },
+      { name: 'Research Project II', code: 'RPT4082', credits: 2, category: 'Project' },
+    ]
+  },
+  '5th Year': {
+    semester1: [
+      { name: 'Medicine - General - III', code: 'SMP4094', credits: 4, category: 'Clinical' },
+      { name: 'Medicine - Special - III (Skin)', code: 'SMS4093', credits: 3, category: 'Clinical' },
+      { name: 'Surgery - I', code: 'ARM4093', credits: 3, category: 'Clinical' },
+      { name: 'Gynaecology & Obstetrics - I', code: 'MMS4093', credits: 3, category: 'Clinical' },
+      { name: 'Research Project III', code: 'RPT4092', credits: 2, category: 'Project' },
+    ],
+    semester2: [
+      { name: 'Medicine-General - IV', code: 'SMP4104', credits: 4, category: 'Clinical' },
+      { name: 'Medicine – Special - IV', code: 'SMS4103', credits: 3, category: 'Clinical' },
+      { name: 'Surgery - II', code: 'ARM4104', credits: 4, category: 'Clinical' },
+      { name: 'Gynaecology & Obstetrics II', code: 'MMS4104', credits: 4, category: 'Clinical' },
     ]
   }
 };
@@ -219,10 +347,14 @@ const getDepartmentSubjects = (department) => {
   switch (department) {
     case 'Computer Science':
       return computerScienceSubjects;
-    case 'Software Engineering':
-      return softwareEngineeringSubjects;
-    case 'Information Technology':
-      return informationTechnologySubjects;
+    case 'Physical Science':
+      return physicalScienceSubjects;
+    case 'Business and Management Studies':
+      return businessManagementSubjects;
+    case 'Languages and Communication Studies':
+      return languagesCommunicationSubjects;
+    case 'Unit of Siddha Medicine':
+      return siddhaMedicineSubjects;
     default:
       return computerScienceSubjects;
   }
@@ -231,7 +363,13 @@ const getDepartmentSubjects = (department) => {
 // Helper function to get all subjects for seeding
 const getAllSubjectsForSeeding = () => {
   const allSubjects = [];
-  const departments = ['Computer Science', 'Software Engineering', 'Information Technology'];
+  const departments = [
+    'Computer Science', 
+    'Physical Science', 
+    'Business and Management Studies', 
+    'Languages and Communication Studies', 
+    'Unit of Siddha Medicine'
+  ];
 
   departments.forEach(dept => {
     const deptSubjects = getDepartmentSubjects(dept);

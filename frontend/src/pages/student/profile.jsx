@@ -25,6 +25,7 @@ const StudentProfile = () => {
     name: user?.name || '',
     phone: user?.phone || '',
     address: user?.address || '',
+    competitions: user?.competitions || []
   });
 
   const handleChange = (e) => {
@@ -240,44 +241,111 @@ const StudentProfile = () => {
           </div>
         </div>
 
+        {/* Competitions Section */}
+        <div className="bg-white rounded-2xl shadow-xl overflow-hidden mt-8 border border-black p-8">
+          <div className="flex justify-between items-center mb-6">
+            <div>
+              <h2 className="text-xl font-black text-slate-800 uppercase tracking-tight">Competitions & Event Participation</h2>
+              <p className="text-sm text-gray-500">Record your achievements and event roles</p>
+            </div>
+            <button 
+              onClick={() => {
+                const name = prompt('Competition/Event Name:');
+                const role = prompt('Your Role (e.g. Participant, Lead, Organizer):');
+                const achievement = prompt('Achievement (optional):');
+                if (name && role) {
+                  const newComp = { name, role, achievement, date: new Date() };
+                  const updatedComps = [...(formData.competitions || []), newComp];
+                  setFormData({ ...formData, competitions: updatedComps });
+                  // Trigger a silent update or wait for profile save
+                  toast.success('Added to list. Click "Save Profile" to finalize.');
+                }
+              }}
+              className="px-4 py-2 bg-indigo-600 text-white rounded-xl font-bold uppercase text-[10px] tracking-widest hover:bg-indigo-700 transition-all"
+            >
+              + Add Participation
+            </button>
+          </div>
+
+          <div className="space-y-4">
+            {formData.competitions?.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {formData.competitions.map((comp, idx) => (
+                  <div key={idx} className="p-4 bg-slate-50 border border-black rounded-2xl relative group">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <p className="font-black text-slate-800 uppercase text-sm tracking-tight">{comp.name}</p>
+                        <p className="text-xs text-indigo-600 font-bold mt-1">{comp.role}</p>
+                        {comp.achievement && (
+                          <p className="text-[10px] bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded w-fit mt-2 font-black uppercase">
+                            🏆 {comp.achievement}
+                          </p>
+                        )}
+                      </div>
+                      <div className="text-right">
+                        <p className="text-[10px] font-bold text-slate-400">
+                          {new Date(comp.date).toLocaleDateString()}
+                        </p>
+                        <button 
+                          onClick={() => {
+                            const updated = formData.competitions.filter((_, i) => i !== idx);
+                            setFormData({ ...formData, competitions: updated });
+                          }}
+                          className="text-rose-600 opacity-0 group-hover:opacity-100 transition-all mt-2"
+                        >
+                          <FiX size={14} />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 border-2 border-dashed border-slate-200 rounded-3xl">
+                <p className="text-slate-400 font-bold uppercase text-[10px] tracking-widest">No competition records found</p>
+              </div>
+            )}
+          </div>
+        </div>
+
         {/* Additional Info Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-          <div className="bg-white rounded-xl shadow-lg p-6">
-            <div className="flex items-center mb-3">
-              <div className="p-2 bg-white border border-black rounded-lg">
-                <FiBook className="h-5 w-5 text-blue-600" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8 pb-12">
+          <div className="bg-white rounded-xl shadow-lg p-6 border border-black">
+            <div className="flex items-center mb-4">
+              <div className="p-2 bg-indigo-50 border border-indigo-100 rounded-lg">
+                <FiBook className="h-5 w-5 text-indigo-600" />
               </div>
-              <h3 className="ml-3 font-semibold text-gray-800">Academic Info</h3>
+              <h3 className="ml-3 font-black text-slate-800 uppercase text-xs tracking-widest">Extra Activities</h3>
             </div>
-            <div className="space-y-2 text-sm">
-              <p><span className="text-gray-500">Department:</span> <span className="font-medium">{user?.department}</span></p>
-              <p><span className="text-gray-500">Semester:</span> <span className="font-medium">{user?.semester}</span></p>
-              <p><span className="text-gray-500">Student ID:</span> <span className="font-medium">{user?.studentId}</span></p>
+            <div className="flex flex-wrap gap-2">
+              {user?.extraActivities?.length > 0 ? user.extraActivities.map((act, i) => (
+                <span key={i} className="px-3 py-1 bg-slate-100 text-slate-600 rounded-full text-[10px] font-black uppercase tracking-tighter">
+                  {act}
+                </span>
+              )) : <p className="text-slate-400 italic text-xs">No activities recorded during registration</p>}
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-lg p-6">
-            <div className="flex items-center mb-3">
-              <div className="p-2 bg-white border border-black rounded-lg">
-                <FiPhone className="h-5 w-5 text-green-600" />
+          <div className="bg-white rounded-xl shadow-lg p-6 border border-black">
+            <div className="flex items-center mb-4">
+              <div className="p-2 bg-emerald-50 border border-emerald-100 rounded-lg">
+                <FiUser className="h-5 w-5 text-emerald-600" />
               </div>
-              <h3 className="ml-3 font-semibold text-gray-800">Contact Info</h3>
+              <h3 className="ml-3 font-black text-slate-800 uppercase text-xs tracking-widest">Account Status</h3>
             </div>
-            <div className="space-y-2 text-sm">
-              <p><span className="text-gray-500">Email:</span> <span className="font-medium">{user?.email}</span></p>
-              <p><span className="text-gray-500">Phone:</span> <span className="font-medium">{user?.phone || 'Not provided'}</span></p>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-lg p-6">
-            <div className="flex items-center mb-3">
-              <div className="p-2 bg-white border border-black rounded-lg">
-                <FiMapPin className="h-5 w-5 text-purple-600" />
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Eligibility</span>
+                <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase ${user?.competitionEligibility ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>
+                  {user?.competitionEligibility ? 'Tournament Ready' : 'Restricted'}
+                </span>
               </div>
-              <h3 className="ml-3 font-semibold text-gray-800">Address</h3>
-            </div>
-            <div className="space-y-2 text-sm">
-              <p className="text-gray-600">{user?.address || 'No address provided'}</p>
+              <div className="flex justify-between items-center">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Standing</span>
+                <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase ${!user?.hasRepeats ? 'bg-indigo-100 text-indigo-700' : 'bg-amber-100 text-amber-700'}`}>
+                  {!user?.hasRepeats ? 'Clear Standing' : 'Repeat Subjects'}
+                </span>
+              </div>
             </div>
           </div>
         </div>

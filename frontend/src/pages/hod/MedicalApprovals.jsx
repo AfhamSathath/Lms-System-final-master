@@ -45,6 +45,36 @@ const HodMedicalApprovals = () => {
     }
   };
 
+  const handleDownload = async (fileUrl, fileName) => {
+    if (!fileUrl) return;
+    try {
+      const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+      
+      // Normalize slashes and strip absolute server paths aggressively
+      const normalizedPath = fileUrl.replace(/\\/g, '/');
+      const cleanUrl = normalizedPath.replace(/^.*\/uploads\//i, '/uploads/');
+        
+      const fullUrl = cleanUrl.startsWith('http') ? cleanUrl : `${baseUrl}${cleanUrl.startsWith('/') ? '' : '/'}${cleanUrl}`;
+      
+      const response = await axios.get(fullUrl, {
+        responseType: 'blob',
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      });
+      
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', fileName || 'medical-document.pdf');
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Download error:', error);
+      toast.error('Failed to download file');
+    }
+  };
+
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
@@ -98,9 +128,12 @@ const HodMedicalApprovals = () => {
                   </div>
                   <div>
                      <p className="text-xs text-gray-500 uppercase tracking-wider font-semibold mb-2">Medical Document</p>
-                     <a href={`http://localhost:5001${medical.documentUrl}`} target="_blank" rel="noreferrer" className="inline-flex items-center text-sm text-blue-600 hover:text-slate-800 font-medium">
+                     <button 
+                       onClick={() => handleDownload(medical.documentUrl, `Medical_${medical.registrationNumber}.pdf`)}
+                       className="inline-flex items-center text-sm text-blue-600 hover:text-slate-800 font-medium"
+                     >
                        <FiFileText className="mr-2" /> View Certificate
-                     </a>
+                     </button>
                   </div>
                 </div>
 

@@ -49,6 +49,35 @@ const AdminMedicalApprovals = () => {
     }
   };
 
+  const handleDownload = async (fileUrl, fileName) => {
+    if (!fileUrl) return;
+    try {
+      const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+      
+      // Normalize slashes and strip absolute server paths aggressively
+      const normalizedPath = fileUrl.replace(/\\/g, '/');
+      const cleanUrl = normalizedPath.replace(/^.*\/uploads\//i, '/uploads/');
+        
+      const fullUrl = cleanUrl.startsWith('http') ? cleanUrl : `${baseUrl}${cleanUrl.startsWith('/') ? '' : '/'}${cleanUrl}`;
+      
+      const response = await fetch(fullUrl, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      });
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', fileName || 'medical-document.pdf');
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Download error:', error);
+      toast.error('Failed to download file');
+    }
+  };
+
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
@@ -87,7 +116,7 @@ const AdminMedicalApprovals = () => {
                   <td className="p-4">
                     <div className="font-medium text-slate-800">{req.illness}</div>
                     <div className="text-sm text-slate-500">{req.mcNumber} • {req.doctorName}</div>
-                    <div className="text-xs text-blue-600 mt-1 cursor-pointer" onClick={() => window.open(`http://localhost:5001${req.documentUrl}`, '_blank')}>View Document</div>
+                    <div className="text-xs text-blue-600 mt-1 cursor-pointer hover:underline" onClick={() => handleDownload(req.documentUrl, `Medical_${req.registrationNumber}.pdf`)}>View Document</div>
                   </td>
                   <td className="p-4">
                     <div className="text-sm text-slate-800">{new Date(req.startDate).toLocaleDateString()} to {new Date(req.endDate).toLocaleDateString()}</div>

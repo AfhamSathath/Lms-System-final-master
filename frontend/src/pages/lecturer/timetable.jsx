@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../services/api';
+import { useAuth } from '../../context/Authcontext';
 import Loader from '../../components/common/loader';
 import { FiCalendar, FiClock, FiMapPin } from 'react-icons/fi';
 import { format } from 'date-fns';
 
 const LecturerTimetable = () => {
+  const { user } = useAuth();
   const [allTimetables, setAllTimetables] = useState([]);
   const [timetables, setTimetables] = useState([]);
   const [loading, setLoading] = useState(true);

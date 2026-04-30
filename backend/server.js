@@ -40,6 +40,8 @@ const mahapolaRoutes = require('./routes/mahapolaRoutes');
 const assessmentRoutes = require('./routes/assessmentRoutes');
 const attendanceSessionRoutes = require('./routes/attendanceSessionRoutes');
 const claimRoutes = require('./routes/claimRoutes');
+const examPaperRoutes = require('./routes/examPaperRoutes');
+const moderatorAssignmentRoutes = require('./routes/moderatorAssignmentRoutes');
 
 const app = express();
 
@@ -116,6 +118,8 @@ app.use('/api/mahapola', mahapolaRoutes);
 app.use('/api/assessments', assessmentRoutes);
 app.use('/api/attendance-sessions', attendanceSessionRoutes);
 app.use('/api/claims', claimRoutes);
+app.use('/api/exam-papers', examPaperRoutes);
+app.use('/api/moderator-assignments', moderatorAssignmentRoutes);
 
 // Error handler
 const errorHandler = require('./middleware/error');

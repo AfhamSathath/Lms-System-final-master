@@ -34,10 +34,13 @@ const SubjectAttendanceSessions = () => {
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    fetchCourseAndSessions();
+    if (id && id !== 'undefined') {
+      fetchCourseAndSessions();
+    }
   }, [id]);
 
   const fetchCourseAndSessions = async () => {
+    if (!id || id === 'undefined') return;
     try {
       setLoading(true);
       const courseRes = await api.get(`/api/subjects/${id}`);

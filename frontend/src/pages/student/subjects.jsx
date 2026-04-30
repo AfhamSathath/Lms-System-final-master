@@ -72,9 +72,38 @@ const StudentSubjects = () => {
     navigate(`/student/files?subject=${subjectId}`);
   };
 
-  const handleSyllabusClick = (syllabusUrl) => {
+  const handleDownload = async (fileUrl, fileName) => {
+    if (!fileUrl) return;
+    try {
+      const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+      
+      // Normalize slashes and strip absolute server paths aggressively
+      const normalizedPath = fileUrl.replace(/\\/g, '/');
+      const cleanUrl = normalizedPath.replace(/^.*\/uploads\//i, '/uploads/');
+        
+      const fullUrl = cleanUrl.startsWith('http') ? cleanUrl : `${baseUrl}${cleanUrl.startsWith('/') ? '' : '/'}${cleanUrl}`;
+      
+      const response = await api.get(fullUrl, {
+        responseType: 'blob',
+      });
+      
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', fileName || 'syllabus.pdf');
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Download error:', error);
+      toast.error('Failed to download syllabus');
+    }
+  };
+
+  const handleSyllabusClick = (syllabusUrl, subjectName) => {
     if (syllabusUrl) {
-      window.open(syllabusUrl, '_blank');
+      handleDownload(syllabusUrl, `${subjectName}_Syllabus.pdf`);
     } else {
       toast.error('Syllabus not available for this subject');
     }
@@ -245,7 +274,7 @@ const StudentSubjects = () => {
                         </button>
                         
                         <button 
-                          onClick={() => handleSyllabusClick(subject.syllabus)}
+                          onClick={() => handleSyllabusClick(subject.syllabus, subject.name)}
                           className="w-full bg-white border-2 border-black text-slate-600 py-4 px-6 rounded-2xl font-bold text-sm flex items-center justify-center hover:border-indigo-100 hover:bg-indigo-50/30 hover:text-indigo-600 transition-all"
                         >
                           <FiBook className="mr-2" />

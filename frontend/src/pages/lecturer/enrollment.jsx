@@ -112,7 +112,7 @@ const LecturerEnrollment = () => {
     setLoading(true);
     try {
       const res = await api.post('/api/enrollments/enroll-batch', {
-        courseId: selectedSubject.subject._id,
+        courseId: selectedSubject.subject?._id || selectedSubject.subject,
         academicYear: selectedSubject.academicYear,
         semester: selectedSubject.semester
       });

@@ -126,7 +126,7 @@ const RegistrarDashboard = () => {
   };
 
   const userDistributionData = {
-    labels: ['Students', 'Lecturers', 'HODs', 'Deans', 'Registrars'],
+    labels: ['Students', 'Lecturers', 'HODs', 'Deans', 'Admins'],
     datasets: [{
       data: [
         stats.users.students,
@@ -149,7 +149,7 @@ const RegistrarDashboard = () => {
       {/* Welcome Section */}
       <div className="bg-white border border-black rounded-2xl shadow-xl p-8 mb-8 text-slate-900">
         <h1 className="text-3xl font-bold">
-          Welcome back, Registrar {user?.name?.split(' ')[0] || ''} 👋
+          Welcome back, Admin {user?.name?.split(' ')[0] || ''} 👋
         </h1>
         <p className="text-slate-500 mt-2">Overseeing the University Registry and Academic Operations</p>
       </div>
@@ -248,7 +248,7 @@ const RegistrarDashboard = () => {
               color="red"
             />
             <QuickStat
-              label="Registrars"
+              label="Admins"
               value={stats.users.admins}
               icon={<FiUsers />}
               color="purple"
@@ -416,7 +416,7 @@ const RoleBadge = ({ role }) => {
 
   return (
     <span className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${colors[role] || 'bg-white border border-black text-gray-800'}`}>
-      {role === 'admin' ? 'Registrar' : role}
+      {role === 'admin' ? 'Admin' : role}
     </span>
   );
 };

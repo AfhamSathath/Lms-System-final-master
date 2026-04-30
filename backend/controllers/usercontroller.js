@@ -19,12 +19,12 @@ exports.registerUser = async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
 
-    const { email, password, name, role, studentId, lecturerId, gender, dateOfBirth, department, semester, yearOfStudy, phone, address, emergencyContact, emergencyContactPhone, qualifications, specialization, batch } = req.body;
+    const { email, password, name, role, studentId, lecturerId, gender, dateOfBirth, department, semester, yearOfStudy, phone, address, emergencyContact, emergencyContactPhone, qualifications, specialization, batch, extraActivities } = req.body;
 
     const existingUser = await User.findOne({ email });
     if (existingUser) return res.status(400).json({ message: 'User already exists' });
 
-    const userData = { name, email, password, role, gender, dateOfBirth, department, semester, yearOfStudy, batch, phone, address, emergencyContact, emergencyContactPhone, qualifications, specialization, isActive: true };
+    const userData = { name, email, password, role, gender, dateOfBirth, department, semester, yearOfStudy, batch, phone, address, emergencyContact, emergencyContactPhone, qualifications, specialization, extraActivities, isActive: true };
 
     if (role === 'student' && studentId && studentId.trim() !== '') userData.studentId = studentId;
     if (['lecturer', 'hod', 'dean'].includes(role) && lecturerId && lecturerId.trim() !== '') userData.lecturerId = lecturerId;

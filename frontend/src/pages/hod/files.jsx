@@ -72,6 +72,35 @@ const HodFiles = () => {
     }
   };
 
+  const handleDownload = async (fileUrl, fileName) => {
+    if (!fileUrl) return;
+    try {
+      const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+      
+      // Normalize slashes and strip absolute server paths aggressively
+      const normalizedPath = fileUrl.replace(/\\/g, '/');
+      const cleanUrl = normalizedPath.replace(/^.*\/uploads\//i, '/uploads/');
+        
+      const fullUrl = cleanUrl.startsWith('http') ? cleanUrl : `${baseUrl}${cleanUrl.startsWith('/') ? '' : '/'}${cleanUrl}`;
+      
+      const response = await api.get(fullUrl, {
+        responseType: 'blob',
+      });
+      
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', fileName || 'document.pdf');
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Download error:', error);
+      toast.error('Failed to download file');
+    }
+  };
+
   if (loading) return <Loader fullScreen />;
 
   return (
@@ -138,14 +167,12 @@ const HodFiles = () => {
                   <td className="px-4 py-3">{file.uploadedBy?.name || file.uploadedBy || '-'}</td>
                   <td className="px-4 py-3">{new Date(file.createdAt).toLocaleDateString()}</td>
                   <td className="px-4 py-3">
-                    <a
-                      href={`/api/subject-files/download/${file._id}`}
+                    <button
+                      onClick={() => handleDownload(`/api/subject-files/download/${file._id}`, `${file.title}.pdf`)}
                       className="text-purple-600 hover:text-slate-800"
-                      target="_blank"
-                      rel="noreferrer"
                     >
                       Download
-                    </a>
+                    </button>
                   </td>
                 </tr>
               ))

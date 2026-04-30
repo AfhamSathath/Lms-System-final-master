@@ -15,7 +15,7 @@ const {
 } = require('../controllers/medicalController');
 
 // Ensure directory exists
-const uploadDir = path.join(__dirname, '../uploads/medicals');
+const uploadDir = 'uploads/medicals';
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }

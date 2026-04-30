@@ -6,9 +6,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../context/Authcontext';
 
 const facultyData = {
-  'Technological Studies': ['Computer Science', 'Software Engineering', 'Information Technology'],
-  'Applied Science': ['Physical Science', 'Computer Science', 'Mathematics', 'Physics', 'Chemistry', 'Biology'],
-  'Business Administration': ['Finance', 'Accounting', 'Management', 'Marketing']
+  'Faculty of Communication and Business Studies': ['Languages and Communication Studies', 'Business and Management Studies'],
+  'Faculty of Applied Science': ['Computer Science', 'Physical Science'],
+  'Faculty of Siddha Medicine': ['Unit of Siddha Medicine']
 };
 
 const DeanHods = () => {
@@ -320,24 +320,16 @@ const AppointHODModal = ({ isOpen, onClose, onSuccess, editingHod, user }) => {
                 </optgroup>
               ) : (
                 <>
-                  <optgroup label="Technological Studies">
-                    <option value="Computer Science">Computer Science</option>
-                    <option value="Software Engineering">Software Engineering</option>
-                    <option value="Information Technology">Information Technology</option>
+                  <optgroup label="Faculty of Communication and Business Studies">
+                    <option value="Languages and Communication Studies">Languages and Communication Studies</option>
+                    <option value="Business and Management Studies">Business and Management Studies</option>
                   </optgroup>
-                  <optgroup label="Applied Science">
+                  <optgroup label="Faculty of Applied Science">
+                    <option value="Computer Science">Computer Science</option>
                     <option value="Physical Science">Physical Science</option>
-                    <option value="Computer Science">Computer Science</option>
-                    <option value="Mathematics">Mathematics</option>
-                    <option value="Physics">Physics</option>
-                    <option value="Chemistry">Chemistry</option>
-                    <option value="Biology">Biology</option>
                   </optgroup>
-                  <optgroup label="Business Administration">
-                    <option value="Finance">Finance</option>
-                    <option value="Accounting">Accounting</option>
-                    <option value="Management">Management</option>
-                    <option value="Marketing">Marketing</option>
+                  <optgroup label="Faculty of Siddha Medicine">
+                    <option value="Unit of Siddha Medicine">Unit of Siddha Medicine</option>
                   </optgroup>
                 </>
               )}

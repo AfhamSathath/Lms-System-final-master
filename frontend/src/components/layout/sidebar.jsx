@@ -56,15 +56,17 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
     switch (user.role) {
       case 'lecturer':
         // Dynamically build "My Modules" category
-        const dynamicSubjects = lecturerSubjects.map(subject => ({
-          name: subject.courseCode || subject.code || 'Module',
-          icon: FiBook,
-          isAccordion: true,
-          subItems: [
-            { name: 'Assessments', path: `subject/${subject._id}/assessments`, icon: FiClipboard },
-            { name: 'Attendance', path: `subject/${subject._id}/attendance`, icon: FiCheckSquare }
-          ]
-        }));
+        const dynamicSubjects = (lecturerSubjects || [])
+          .filter(subject => subject && (subject._id || subject.id))
+          .map(subject => ({
+            name: subject.courseCode || subject.code || 'Module',
+            icon: FiBook,
+            isAccordion: true,
+            subItems: [
+              { name: 'Assessments', path: `subject/${subject._id || subject.id}/assessments`, icon: FiClipboard },
+              { name: 'Attendance', path: `subject/${subject._id || subject.id}/attendance`, icon: FiCheckSquare }
+            ]
+          }));
 
         return [
           { category: 'Main', items: common },
@@ -93,9 +95,14 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           {
             category: 'Approvals & Admin',
             items: [
-              { name: 'Repeat Approvals', path: 'repeats', icon: FiRefreshCw },
-              { name: 'Notifications', path: 'notifications', icon: FiBell },
               { name: 'My Profile', path: 'profile', icon: FiUser }
+            ]
+          },
+          {
+            category: 'Exam Moderation',
+            items: [
+              { name: 'My Papers', path: 'exam-papers', icon: FiFileText },
+              { name: 'Moderation Tasks', path: 'moderation-tasks', icon: FiCheckSquare }
             ]
           }
         ];
@@ -208,15 +215,17 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           }
         ];
       case 'hod':
-        const hodDynamicSubjects = lecturerSubjects.map(subject => ({
-          name: subject.courseCode || subject.code || 'Module',
-          icon: FiBook,
-          isAccordion: true,
-          subItems: [
-            { name: 'Assessments', path: `subject/${subject._id}/assessments`, icon: FiClipboard },
-            { name: 'Attendance', path: `subject/${subject._id}/attendance`, icon: FiCheckSquare }
-          ]
-        }));
+        const hodDynamicSubjects = (lecturerSubjects || [])
+          .filter(subject => subject && (subject._id || subject.id))
+          .map(subject => ({
+            name: subject.courseCode || subject.code || 'Module',
+            icon: FiBook,
+            isAccordion: true,
+            subItems: [
+              { name: 'Assessments', path: `subject/${subject._id || subject.id}/assessments`, icon: FiClipboard },
+              { name: 'Attendance', path: `subject/${subject._id || subject.id}/attendance`, icon: FiCheckSquare }
+            ]
+          }));
 
         return [
           { category: 'Main', items: common },
@@ -242,6 +251,14 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
               ...(hodDynamicSubjects.length > 0 ? hodDynamicSubjects : []),
               { name: 'Course Enrollment', path: 'enrollment', icon: FiPlus },
               { name: 'Lecture materials', path: 'files', icon: FiUpload },
+              { name: 'My Papers', path: 'exam-papers', icon: FiFileText },
+              { name: 'Moderation Tasks', path: 'moderation-tasks', icon: FiCheckSquare }
+            ]
+          },
+          {
+            category: 'HOD Exam Desk', items: [
+              { name: 'Assign Moderators', path: 'moderator-assignments', icon: FiUsers },
+              { name: 'Final Exam Approvals', path: 'exam-approvals', icon: FiAward },
             ]
           },
           {
@@ -283,6 +300,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       case 'exam_officer':
         return [...common,
         { name: 'Result Processing', path: 'results', icon: FiAward },
+        { name: 'Final Exam Submissions', path: 'exam-tasks', icon: FiFileText },
         { name: 'Timetables', path: 'timetables', icon: FiCalendar },
         { name: 'Repeat Approvals', path: 'repeats', icon: FiRefreshCw },
         { name: 'Verify Payments', path: 'verify-payments', icon: FiCheckSquare },
@@ -409,7 +427,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           {isOpen && (
             <div className="ml-3 flex flex-col">
               <span className="font-bold text-white text-[15px] leading-tight">EUSL Portal</span>
-              <span className="text-xs text-red-200 font-medium capitalize tracking-wide">{['admin', 'registrar'].includes(user.role) ? 'Registrar' : user.role}</span>
+              <span className="text-xs text-red-200 font-medium capitalize tracking-wide">{['admin', 'registrar'].includes(user.role) ? 'Admin' : user.role}</span>
             </div>
           )}
         </div>

@@ -45,9 +45,9 @@ const RegistrarUsers = () => {
 
   // Define faculties and departments
   const facultyData = {
-    'Technological Studies': ['Computer Science', 'Software Engineering', 'Information Technology'],
-    'Applied Science': ['Physical Science', 'Computer Science', 'Mathematics', 'Physics', 'Chemistry', 'Biology'],
-    'Business Administration': ['Finance', 'Accounting', 'Management', 'Marketing']
+    'Faculty of Communication and Business Studies': ['Languages and Communication Studies', 'Business and Management Studies'],
+    'Faculty of Applied Science': ['Computer Science', 'Physical Science'],
+    'Faculty of Siddha Medicine': ['Unit of Siddha Medicine']
   };
 
   const faculties = Object.keys(facultyData);
@@ -110,7 +110,7 @@ const RegistrarUsers = () => {
     { value: 'bursar', label: 'Bursar', icon: '💰', color: 'bg-white border border-black text-slate-800' },
     { value: 'exam_officer', label: 'Exam Officer', icon: '🧾', color: 'bg-white border border-black text-slate-800' },
     { value: 'librarian', label: 'Librarian', icon: '📚', color: 'bg-white border border-black text-slate-800' },
-    { value: 'admin', label: 'Registrar', icon: '👨‍💻', color: 'bg-white border border-black text-slate-800' }
+    { value: 'admin', label: 'Admin', icon: '👨‍💻', color: 'bg-white border border-black text-slate-800' }
   ];
   const genders = ['male', 'female', 'other'];
 
@@ -347,9 +347,9 @@ const RegistrarUsers = () => {
       fetchUsers();
     } catch (error) {
       console.error('Add user error:', error);
-      const errorMessage = error.response?.data?.message || 
-                          (error.response?.data?.errors && error.response.data.errors[0]?.msg) || 
-                          'Failed to add user';
+      const errorMessage = error.response?.data?.message ||
+        (error.response?.data?.errors && error.response.data.errors[0]?.msg) ||
+        'Failed to add user';
       toast.error(errorMessage);
     }
   };
@@ -404,9 +404,9 @@ const RegistrarUsers = () => {
       fetchUsers();
     } catch (error) {
       console.error('Edit user error:', error);
-      const errorMessage = error.response?.data?.message || 
-                          (error.response?.data?.errors && error.response.data.errors[0]?.msg) || 
-                          'Update failed';
+      const errorMessage = error.response?.data?.message ||
+        (error.response?.data?.errors && error.response.data.errors[0]?.msg) ||
+        'Update failed';
       toast.error(errorMessage);
     }
   };
@@ -543,8 +543,8 @@ const RegistrarUsers = () => {
       "John Doe,john@example.com,password123,student,STU001,,Computer Science,1,1,0771234567,Colombo\n" +
       "Jane Smith,jane@example.com,password123,lecturer,,LEC001,Computer Science,,,,Kandy\n" +
       "HOD User,hod@example.com,password123,hod,,HOD002,Computer Science,,,,Kandy\n" +
-      "Dean User,dean@example.com,password123,dean,,DEAN001,Business Administration,,,,Colombo\n" +
-      "Registrar User,registrar@example.com,password123,registrar,,REG001,Information Technology,,,,Trincomalee\n" +
+      "Dean User,dean@example.com,password123,dean,,DEAN001,Faculty of Communication and Business Studies,,,,Colombo\n" +
+      "Admin User,admin@example.com,password123,admin,,ADM001,Information Technology,,,,Trincomalee\n" +
       "Bursar User,bursar@example.com,password123,bursar,,BUR001,Finance,,,,Trincomalee\n" +
       "Exam Officer User,exam_officer@example.com,password123,exam_officer,,EXO001,Computer Science,,,,Trincomalee\n" +
       "Librarian User,librarian@example.com,password123,librarian,,LIB001,Library,,,,Trincomalee\n" +
@@ -609,7 +609,7 @@ const RegistrarUsers = () => {
       <div className="bg-white border border-black rounded-2xl shadow-sm p-6 mb-8 text-slate-900">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div className="flex-1">
-            <h1 className="text-2xl md:text-3xl font-bold">Registrar Management</h1>
+            <h1 className="text-2xl md:text-3xl font-bold">Admin Management</h1>
             <p className="text-slate-500 mt-1">
               Manage students, lecturers, HODs, deans, and university personnel
             </p>
@@ -1414,45 +1414,45 @@ const UserForm = ({
                 </div>
               </>
             )}
-            
-            {!['registrar', 'bursar', 'exam_officer', 'librarian'].includes(formData.role) && (
+
+            {!['admin', 'registrar', 'bursar', 'exam_officer', 'librarian'].includes(formData.role) && (
               <>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Faculty <span className="text-red-500">*</span>
-              </label>
-              <select
-                name="faculty"
-                value={formData.faculty}
-                onChange={handleInputChange}
-                required
-                className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-              >
-                <option value="">Select Faculty</option>
-                {faculties.map(f => (
-                  <option key={f} value={f}>{f}</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Department <span className="text-red-500">*</span>
-              </label>
-              <select
-                name="department"
-                value={formData.department}
-                onChange={handleInputChange}
-                required
-                disabled={!formData.faculty}
-                className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:bg-white border border-black"
-              >
-                <option value="">{formData.faculty ? 'Select Department' : 'Select Faculty First'}</option>
-                {availableDepartments.map(dept => (
-                  <option key={dept} value={dept}>{dept}</option>
-                ))}
-              </select>
-            </div>
-            </>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Faculty <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    name="faculty"
+                    value={formData.faculty}
+                    onChange={handleInputChange}
+                    required
+                    className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  >
+                    <option value="">Select Faculty</option>
+                    {faculties.map(f => (
+                      <option key={f} value={f}>{f}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Department <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    name="department"
+                    value={formData.department}
+                    onChange={handleInputChange}
+                    required
+                    disabled={!formData.faculty}
+                    className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:bg-white border border-black"
+                  >
+                    <option value="">{formData.faculty ? 'Select Department' : 'Select Faculty First'}</option>
+                    {availableDepartments.map(dept => (
+                      <option key={dept} value={dept}>{dept}</option>
+                    ))}
+                  </select>
+                </div>
+              </>
             )}
           </div>
         </div>

@@ -114,7 +114,37 @@ const userSchema = new mongoose.Schema({
     branchName: { type: String, trim: true },
     accountHolderName: { type: String, trim: true },
     accountNumber: { type: String, trim: true }
-  }
+  },
+  // Academic Performance (Student specific)
+  gpa: { type: Number, default: 0 },
+  hasRepeats: { type: Boolean, default: false },
+  performanceStatus: { type: String, enum: ['Excellent', 'Good', 'Average', 'Poor', 'Probation'], default: 'Average' },
+  academicHistory: [{
+    semester: Number,
+    year: Number,
+    isCleared: { type: Boolean, default: true },
+    remarks: String
+  }],
+  // Disciplinary & Extra (Student specific)
+  blackMarks: [{
+    reason: String,
+    date: { type: Date, default: Date.now },
+    severity: { type: String, enum: ['Low', 'Medium', 'High'], default: 'Low' }
+  }],
+  outOfBounds: {
+    isActive: { type: Boolean, default: false },
+    startDate: Date,
+    durationDays: Number,
+    reason: String
+  },
+  competitionEligibility: { type: Boolean, default: true },
+  extraActivities: [String],
+  competitions: [{
+    name: String,
+    date: Date,
+    achievement: String,
+    role: String
+  }]
 }, {
   timestamps: true
 });

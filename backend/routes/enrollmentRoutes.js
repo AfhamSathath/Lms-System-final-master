@@ -52,24 +52,6 @@ router.put(
   bulkUpdateAttendance
 );
 
-// Get all enrollments
-router.get('/', getEnrollments);
-
-// Get single enrollment (KEEP LAST)
-router.get('/:id', getEnrollment);
-
-/* =====================================
-   Protected routes
-===================================== */
-
-// Create enrollment
-router.post(
-  '/',
-  authorize('admin', 'registrar', 'hod', 'lecturer'),
-  validateEnrollment,
-  createEnrollment
-);
-
 // Bulk enroll
 router.post(
   '/bulk',
@@ -89,6 +71,24 @@ router.post(
   '/register',
   authorize('student', 'admin'),
   registerCourse
+);
+
+// Get all enrollments
+router.get('/', getEnrollments);
+
+// Get single enrollment (KEEP LAST)
+router.get('/:id', getEnrollment);
+
+/* =====================================
+   Protected routes
+===================================== */
+
+// Create enrollment
+router.post(
+  '/',
+  authorize('admin', 'registrar', 'hod', 'lecturer'),
+  validateEnrollment,
+  createEnrollment
 );
 
 // Update enrollment

@@ -634,7 +634,7 @@ exports.enrollBatchStudents = async (req, res, next) => {
     });
 
     if (batchStudents.length === 0) {
-      return res.status(404).json({ success: false, message: 'No students found matching this subject\'s batch criteria' });
+      return res.status(400).json({ success: false, message: 'No students found matching this subject\'s batch criteria' });
     }
 
     const results = { successful: [], failed: [] };

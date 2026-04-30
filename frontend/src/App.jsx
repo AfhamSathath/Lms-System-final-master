@@ -66,6 +66,8 @@ import LecturerRepeatApprovals from './pages/lecturer/repeatApprovals';
 import LecturerEnrollment from './pages/lecturer/enrollment';
 import SubjectAssessments from './pages/lecturer/subjectAssessments';
 import SubjectAttendanceSessions from './pages/lecturer/subjectAttendanceSessions';
+import ExamPapers from './pages/lecturer/ExamPapers';
+import ModerationTasks from './pages/lecturer/ModerationTasks';
 
 // Registrar Pages
 import RegistrarDashboard from './pages/registrar/dashboard';
@@ -94,6 +96,8 @@ import HodTimetable from './pages/hod/timetable';
 import HodRepeatApprovals from './pages/hod/repeatApprovals';
 import HODAttendanceReview from './pages/hod/attendanceReview';
 import HodProgress from './pages/hod/progress';
+import ModeratorAssignments from './pages/hod/ModeratorAssignments';
+import ExamApprovals from './pages/hod/ExamApprovals';
 
 // Dean Pages
 import DeanDashboard from './pages/dean/dashboard';
@@ -109,6 +113,7 @@ import ExamOfficerCertification from './pages/examOfficer/certification';
 import ComingSoon from './pages/common/ComingSoon';
 import ExamOfficerRepeatApprovals from './pages/examOfficer/repeatApprovals';
 import ExamOfficerVerifyPayments from './pages/examOfficer/verifyPayments';
+import ExamTasks from './pages/examOfficer/ExamTasks';
 
 // Bursar Pages
 import BursarDashboard from './pages/bursar/dashboard';
@@ -227,6 +232,8 @@ function MainRoutes() {
         <Route path="repeats" element={<LecturerRepeatApprovals />} />
         <Route path="subject/:id/assessments" element={<SubjectAssessments />} />
         <Route path="subject/:id/attendance" element={<SubjectAttendanceSessions />} />
+        <Route path="exam-papers" element={<ExamPapers />} />
+        <Route path="moderation-tasks" element={<ModerationTasks />} />
       </Route>
 
 
@@ -264,6 +271,8 @@ function MainRoutes() {
         <Route path="progress" element={<HodProgress />} />
         <Route path="medical" element={<HodMedicalApprovals />} />
         <Route path="profile" element={<HodProfile />} />
+        <Route path="moderator-assignments" element={<ModeratorAssignments />} />
+        <Route path="exam-approvals" element={<ExamApprovals />} />
       </Route>
 
       {/* Dean Routes */}
@@ -293,6 +302,7 @@ function MainRoutes() {
       <Route path="exam_officer" element={<PrivateRoute role="exam_officer" />}>
         <Route path="dashboard" element={<ExamOfficerDashboard />} />
         <Route path="certification" element={<ExamOfficerCertification />} />
+        <Route path="exam-tasks" element={<ExamTasks />} />
         <Route path="repeats" element={<ExamOfficerRepeatApprovals />} />
         <Route path="verify-payments" element={<ExamOfficerVerifyPayments />} />
         <Route path="timetables" element={<RegistrarTimetables />} />

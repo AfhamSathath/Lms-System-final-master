@@ -22,7 +22,7 @@ createUploadDirs();
 // Profile picture storage
 const profileStorage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, path.join(__dirname, '../uploads/profiles'));
+    cb(null, 'uploads/profiles');
   },
   filename: function (req, file, cb) {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
@@ -34,7 +34,7 @@ const profileStorage = multer.diskStorage({
 // Document storage
 const documentStorage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, path.join(__dirname, '../uploads/documents'));
+    cb(null, 'uploads/documents');
   },
   filename: function (req, file, cb) {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
@@ -46,7 +46,7 @@ const documentStorage = multer.diskStorage({
 // Assignment storage
 const assignmentStorage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, path.join(__dirname, '../uploads/assignments'));
+    cb(null, 'uploads/assignments');
   },
   filename: function (req, file, cb) {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);

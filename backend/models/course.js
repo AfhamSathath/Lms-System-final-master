@@ -16,13 +16,13 @@ const subjectSchema = new mongoose.Schema({
   credits: {
     type: Number,
     required: [true, 'Credits are required'],
-    min: [1, 'Credits must be at least 1'],
+    min: [0, 'Credits must be at least 0'],
     max: [8, 'Credits cannot exceed 8'],
   },
   year: {
     type: String,
     required: [true, 'Academic year is required'],
-    enum: ['1st Year', '2nd Year', '3rd Year', '4th Year'],
+    enum: ['1st Year', '2nd Year', '3rd Year', '4th Year', '5th Year'],
   },
   semester: {
     type: Number,
@@ -33,11 +33,17 @@ const subjectSchema = new mongoose.Schema({
   department: {
     type: String,
     required: [true, 'Department is required'],
-    enum: ['Computer Science', 'Software Engineering', 'Information Technology'],
+    enum: [
+      'Languages and Communication Studies',
+      'Business and Management Studies',
+      'Computer Science',
+      'Physical Science',
+      'Unit of Siddha Medicine'
+    ],
   },
   category: {
     type: String,
-    enum: ['Lecture', 'Practical', 'General', 'Management', 'Project'],
+    enum: ['Lecture', 'Practical', 'General', 'Management', 'Project', 'Clinical'],
     default: 'Lecture',
   },
   hasPractical: {

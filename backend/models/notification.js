@@ -41,7 +41,8 @@ const notificationSchema = new mongoose.Schema(
         'MEDICAL_SUBMITTED',
         'MEDICAL_REVIEWED',
         'assessment_approval',
-        'attendance_approval'
+        'attendance_approval',
+        'exam_paper'
       ],
       default: 'GENERAL',
     },

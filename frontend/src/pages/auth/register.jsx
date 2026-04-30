@@ -88,7 +88,7 @@ const Register = () => {
       return;
     }
 
-    if (formData.role !== 'admin' && !formData.department) {
+    if (!['admin', 'exam_officer', 'registrar', 'bursar', 'librarian'].includes(formData.role) && !formData.department) {
       alert('Please select department');
       return;
     }
@@ -105,16 +105,22 @@ const Register = () => {
     }
   };
 
-  const departments = [
-    'Computer Science',
-    'Information Technology',
-    'Engineering',
-    'Business Administration',
-    'Mathematics',
-    'Physics',
-    'Chemistry',
-    'Biology',
-  ];
+  const campusData = {
+    'Faculty of Communication and Business Studies': [
+      'Languages and Communication Studies',
+      'Business and Management Studies'
+    ],
+    'Faculty of Applied Science': [
+      'Computer Science',
+      'Physical Science'
+    ],
+    'Faculty of Siddha Medicine': [
+      'Unit of Siddha Medicine'
+    ]
+  };
+
+  const faculties = Object.keys(campusData);
+  const departments = formData.faculty ? campusData[formData.faculty] : [];
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 py-12 px-4 sm:px-6 lg:px-8">
@@ -331,7 +337,7 @@ const Register = () => {
                         className="block w-full px-4 py-3 border border-white border-opacity-20 rounded-lg bg-white bg-opacity-10 text-white focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent"
                       >
                         <option value="" className="bg-gray-800">Select Semester</option>
-                        {[1,2,3,4,5,6,7,8].map(sem => (
+                        {[1, 2, 3, 4, 5, 6, 7, 8].map(sem => (
                           <option key={sem} value={sem} className="bg-gray-800">
                             Semester {sem}
                           </option>
@@ -353,12 +359,49 @@ const Register = () => {
                         className="block w-full px-4 py-3 border border-white border-opacity-20 rounded-lg bg-white bg-opacity-10 text-white focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent"
                       >
                         <option value="" className="bg-gray-800">Select Year</option>
-                        {[1,2,3,4,5].map(year => (
+                        {[1, 2, 3, 4, 5].map(year => (
                           <option key={year} value={year} className="bg-gray-800">
                             Year {year}
                           </option>
                         ))}
                       </select>
+                    </div>
+
+                    <div>
+                      <label htmlFor="reg-batch" className="block text-sm font-medium text-white mb-2">
+                        Batch
+                      </label>
+                      <input
+                        id="reg-batch"
+                        name="batch"
+                        type="text"
+                        required
+                        value={formData.batch}
+                        onChange={handleChange}
+                        className="block w-full px-4 py-3 border border-white border-opacity-20 rounded-lg bg-white bg-opacity-10 text-white placeholder-white placeholder-opacity-60 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent"
+                        placeholder="e.g. 2024.1"
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="reg-activities" className="block text-sm font-medium text-white mb-2">
+                        Extra Activities
+                      </label>
+                      <textarea
+                        id="reg-activities"
+                        name="extraActivities"
+                        rows="2"
+                        value={formData.extraActivities}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setFormData({
+                            ...formData,
+                            extraActivities: val.split(',').map(s => s.trim())
+                          });
+                        }}
+                        className="block w-full px-4 py-3 border border-white border-opacity-20 rounded-lg bg-white bg-opacity-10 text-white placeholder-white placeholder-opacity-60 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent"
+                        placeholder="e.g. Football, Music, Chess (comma separated)"
+                      />
                     </div>
                   </>
                 )}
@@ -424,64 +467,53 @@ const Register = () => {
                   </>
                 )}
 
-                <div>
-                  <label htmlFor="reg-faculty" className="block text-sm font-medium text-white mb-2">
-                    Faculty
-                  </label>
-                  <select
-                    id="reg-faculty"
-                    name="faculty"
-                    autoComplete="off"
-                    value={formData.faculty}
-                    onChange={handleChange}
-                    required={formData.role !== 'admin'}
-                    className="block w-full px-4 py-3 border border-white border-opacity-20 rounded-lg bg-white bg-opacity-10 text-white focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent"
-                  >
-                    <option value="" className="bg-gray-800">Select Faculty</option>
-                    {['Computing', 'Engineering', 'Business', 'Science', 'Humanities'].map(f => (
-                      <option key={f} value={f} className="bg-gray-800">{f}</option>
-                    ))}
-                  </select>
-                </div>
+                {!['admin', 'exam_officer', 'registrar', 'bursar', 'librarian'].includes(formData.role) && (
+                  <>
+                    <div>
+                      <label htmlFor="reg-faculty" className="block text-sm font-medium text-white mb-2">
+                        Faculty
+                      </label>
+                      <select
+                        id="reg-faculty"
+                        name="faculty"
+                        autoComplete="off"
+                        value={formData.faculty}
+                        onChange={handleChange}
+                        required
+                        className="block w-full px-4 py-3 border border-white border-opacity-20 rounded-lg bg-white bg-opacity-10 text-white focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent"
+                      >
+                        <option value="" className="bg-gray-800">Select Faculty</option>
+                        {faculties.map(f => (
+                          <option key={f} value={f} className="bg-gray-800">{f}</option>
+                        ))}
+                      </select>
+                    </div>
 
-                <div>
-                  <label htmlFor="reg-department" className="block text-sm font-medium text-white mb-2">
-                    Department
-                  </label>
-                  <select
-                    id="reg-department"
-                    name="department"
-                    autoComplete="off"
-                    value={formData.department}
-                    onChange={handleChange}
-                    required={formData.role !== 'admin'}
-                    className="block w-full px-4 py-3 border border-white border-opacity-20 rounded-lg bg-white bg-opacity-10 text-white focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent"
-                  >
-                    <option value="" className="bg-gray-800">Select Department</option>
-                    {departments.map(dept => (
-                      <option key={dept} value={dept} className="bg-gray-800">
-                        {dept}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {formData.role === 'student' && (
-                  <div>
-                    <label htmlFor="reg-batch" className="block text-sm font-medium text-white mb-2">
-                      Batch
-                    </label>
-                    <input
-                      id="reg-batch"
-                      name="batch"
-                      type="text"
-                      required
-                      value={formData.batch}
-                      onChange={handleChange}
-                      className="block w-full px-4 py-3 border border-white border-opacity-20 rounded-lg bg-white bg-opacity-10 text-white placeholder-white placeholder-opacity-60 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent"
-                      placeholder="e.g. 2024.1"
-                    />
-                  </div>
+                    <div>
+                      <label htmlFor="reg-department" className="block text-sm font-medium text-white mb-2">
+                        Department
+                      </label>
+                      <select
+                        id="reg-department"
+                        name="department"
+                        autoComplete="off"
+                        value={formData.department}
+                        onChange={handleChange}
+                        required
+                        disabled={!formData.faculty}
+                        className="block w-full px-4 py-3 border border-white border-opacity-20 rounded-lg bg-white bg-opacity-10 text-white focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent disabled:opacity-50"
+                      >
+                        <option value="" className="bg-gray-800">
+                          {!formData.faculty ? 'Select Faculty First' : 'Select Department'}
+                        </option>
+                        {departments.map(dept => (
+                          <option key={dept} value={dept} className="bg-gray-800">
+                            {dept}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </>
                 )}
               </div>
             )}

@@ -327,7 +327,7 @@ const SubjectMaterials = ({ sidebarOpen }) => {
                   <div>
                     <h3 className="text-lg font-bold text-gray-900">{file.title}</h3>
                     <p className="text-sm text-gray-500">
-                      {file.subject?.code} - {file.subject?.name}
+                      {file.subject?.code} • {file.academicYear} • SEM {file.semester}
                     </p>
                   </div>
                 </div>
