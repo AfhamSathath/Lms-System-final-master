@@ -16,7 +16,7 @@ const timetableSchema = new mongoose.Schema({
   },
   examType: {
     type: String,
-    enum: ['midterm', 'final', 'quiz', 'supplementary', 'special', 'practical', 'viva'],
+    enum: ['final'],
     default: 'final'
   },
   department: { type: String, required: true },
@@ -38,7 +38,8 @@ const timetableSchema = new mongoose.Schema({
   examOfficerSignature: String,
   approvedAtDean: Date,
   approvedAtHOD: Date,
-  publishedAt: Date
+  publishedAt: Date,
+  batch: String
 }, { timestamps: true });
 
 // Autofill year & semester from subject
@@ -49,6 +50,28 @@ timetableSchema.pre('save', async function(next) {
     if (subject) {
       this.year = this.year || subject.year;
       this.semester = this.semester || subject.semester;
+    }
+  }
+
+  // Autofill batch from student records if not provided
+  if (!this.batch && this.year && this.department) {
+    try {
+      const User = mongoose.model('User');
+      const yearMap = { '1st Year': 1, '2nd Year': 2, '3rd Year': 3, '4th Year': 4, '5th Year': 5 };
+      const studyYear = yearMap[this.year];
+      
+      // Find a student in this department and year to get their batch
+      const student = await User.findOne({ 
+        role: 'student', 
+        department: this.department,
+        yearOfStudy: studyYear
+      }).select('batch');
+      
+      if (student && student.batch) {
+        this.batch = student.batch;
+      }
+    } catch (err) {
+      console.error('Batch autofill error:', err);
     }
   }
   next();

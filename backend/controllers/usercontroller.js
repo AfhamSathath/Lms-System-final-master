@@ -418,8 +418,16 @@ exports.adminResetPassword = async (req, res, next) => {
 // controllers/usercontroller.js
 exports.getUserByRole = async (req, res, next) => {
   try {
-    const { role } = req.query; // e.g., /?role=student
-    const users = role ? await User.find({ role }) : await User.find();
+    const { role } = req.query;
+    let users;
+    const selectFields = req.user.role === 'admin' ? '' : 'name role signature department faculty lecturerId';
+    
+    if (role) {
+      users = await User.find({ role }).select(selectFields);
+    } else {
+      users = await User.find().select(selectFields);
+    }
+    
     res.json({ success: true, count: users.length, users });
   } catch (error) {
     next(error);

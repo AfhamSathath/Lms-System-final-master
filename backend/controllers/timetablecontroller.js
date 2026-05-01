@@ -228,7 +228,13 @@ exports.updateTimetable = async (req, res, next) => {
       return res.status(403).json({ success: false, message: 'Not authorized to update timetables' });
     }
 
-    const fieldsToUpdate = ['subject', 'examType', 'department', 'year', 'semester', 'date', 'startTime', 'endTime', 'venue', 'status', 'supervisors'];
+    let fieldsToUpdate = ['subject', 'examType', 'department', 'year', 'semester', 'date', 'startTime', 'endTime', 'venue', 'status', 'supervisors', 'batch'];
+    
+    // Strict restriction for HOD role
+    if (req.user.role === 'hod') {
+      fieldsToUpdate = ['batch', 'status', 'supervisors'];
+    }
+
     fieldsToUpdate.forEach(field => {
       if (req.body[field] !== undefined) timetable[field] = req.body[field];
     });
@@ -336,33 +342,42 @@ exports.bulkCreateTimetables = async (req, res, next) => {
 // @access  Private
 exports.bulkUpdateTimetableStatus = async (req, res, next) => {
   try {
-    const { timetableIds, status } = req.body;
+    const { timetableIds, status, batch } = req.body;
     
-    if (!timetableIds || !Array.isArray(timetableIds) || timetableIds.length === 0) {
-      return res.status(400).json({ success: false, message: 'No timetables selected' });
+    if (!timetableIds || !Array.isArray(timetableIds)) {
+      return res.status(400).json({ success: false, message: 'Invalid timetable IDs' });
     }
 
-    if (!['draft', 'pending_dean', 'pending_hod', 'published'].includes(status)) {
-      return res.status(400).json({ success: false, message: 'Invalid status' });
+    const updateData = {};
+    if (status) {
+      if (!['draft', 'pending_dean', 'pending_hod', 'published'].includes(status)) {
+        return res.status(400).json({ success: false, message: 'Invalid status' });
+      }
+      updateData.status = status;
+    }
+    
+    if (batch) {
+      updateData.batch = batch;
     }
 
-    // Role-based status transition validation
+    // Role-based status transition validation (only if status is changing)
     const role = req.user.role;
-    if (status === 'pending_dean' && !['exam_officer', 'registrar', 'admin', 'hod'].includes(role)) {
-       return res.status(403).json({ success: false, message: 'Only Exam Officers can send for Dean approval' });
-    }
-    if (status === 'pending_hod' && !['dean', 'admin'].includes(role)) {
-       return res.status(403).json({ success: false, message: 'Only Deans can approve and send to HOD' });
-    }
-    if (status === 'published' && !['hod', 'admin'].includes(role)) {
-       return res.status(403).json({ success: false, message: 'Only HODs can publish timetables' });
-    }
-    if (status === 'draft' && !['dean', 'exam_officer', 'registrar', 'admin'].includes(role)) {
-       return res.status(403).json({ success: false, message: 'Unauthorized to revert to draft' });
+    if (status) {
+      if (status === 'pending_dean' && !['exam_officer', 'registrar', 'admin', 'hod'].includes(role)) {
+         return res.status(403).json({ success: false, message: 'Only Exam Officers/HODs can send for Dean approval' });
+      }
+      if (status === 'pending_hod' && !['dean', 'admin'].includes(role)) {
+         return res.status(403).json({ success: false, message: 'Only Deans can approve and send to HOD' });
+      }
+      if (status === 'published' && !['hod', 'admin'].includes(role)) {
+         return res.status(403).json({ success: false, message: 'Only HODs can publish timetables' });
+      }
+      if (status === 'draft' && !['dean', 'exam_officer', 'registrar', 'admin'].includes(role)) {
+         return res.status(403).json({ success: false, message: 'Unauthorized to revert to draft' });
+      }
     }
 
     // Perform update
-    const updateData = { status };
     const now = Date.now();
     const signature = req.user.signature;
 
@@ -518,7 +533,9 @@ exports.bulkUpdateTimetableStatus = async (req, res, next) => {
 
     res.json({
       success: true,
-      message: `Successfully updated ${timetableIds.length} timetables to ${status.replace('_', ' ').toUpperCase()}`
+      message: status 
+        ? `Successfully updated ${timetableIds.length} timetables to ${status.replace('_', ' ').toUpperCase()}`
+        : `Successfully updated ${timetableIds.length} timetables`
     });
   } catch (error) {
     next(error);
@@ -764,6 +781,68 @@ exports.generateTimetable = async (req, res, next) => {
       timetables: generatedEntries,
       unscheduledCount: remainingSubjects.length
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Export Timetable PDF
+// @route   GET /api/timetables/export
+// @access  Private
+exports.exportTimetablePDF = async (req, res, next) => {
+  try {
+    const { department, year, semester, batch } = req.query;
+    let query = {};
+    if (department && department !== 'all') query.department = department;
+    if (year && year !== 'all') query.year = year;
+    if (semester && semester !== 'all') query.semester = semester;
+
+    // Role-based filtering
+    const role = req.user.role;
+    if (role === 'student') {
+      query.status = 'published';
+      if (req.user.department) query.department = req.user.department;
+    } else if (role === 'hod') {
+      if (req.user.department) query.department = req.user.department;
+    }
+
+    const timetablesRaw = await Timetable.find(query)
+      .populate({
+        path: 'subject',
+        select: 'name code year semester department lecturer category',
+        populate: { path: 'lecturer', select: 'name' }
+      })
+      .sort({ date: 1, startTime: 1 })
+      .lean();
+
+    // Attach moderator names
+    const subjectIds = timetablesRaw.map(t => t.subject?._id).filter(Boolean);
+    const moderators = await ModeratorAssignment.find({ subject: { $in: subjectIds } })
+      .populate('moderator', 'name')
+      .lean();
+
+    const timetables = timetablesRaw.map(t => {
+      const modAssign = moderators.find(m => m.subject.toString() === t.subject?._id.toString());
+      return {
+        ...t,
+        moderatorName: modAssign?.moderator?.name || 'Not Assigned'
+      };
+    });
+
+    if (timetables.length === 0) {
+      return res.status(404).json({ success: false, message: 'No timetables found for the selected criteria' });
+    }
+
+    const metadata = { department, year, semester, batch };
+    const pdfBuffer = await emailService.generateTimetablePDF(timetables, metadata);
+
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `attachment; filename=timetable_${department || 'campus'}.pdf`,
+      'Content-Length': pdfBuffer.length
+    });
+
+    res.send(pdfBuffer);
   } catch (error) {
     next(error);
   }

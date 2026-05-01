@@ -11,6 +11,7 @@ router.route('/')
   .post(protect, timetableController.createTimetable);
 
 // Named routes MUST come before /:id to avoid 'upcoming' being cast as ObjectId
+router.get('/export', protect, timetableController.exportTimetablePDF);
 router.get('/upcoming', protect, timetableController.getUpcomingTimetables);
 router.post('/bulk', protect, timetableController.bulkCreateTimetables);
 router.post('/generate', protect, timetableController.generateTimetable);

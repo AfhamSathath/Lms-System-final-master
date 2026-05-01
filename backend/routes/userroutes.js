@@ -129,7 +129,8 @@ router.post('/profile/picture', protect, uploadProfile.single('profilePicture'),
 router.delete('/profile/picture', protect, userController.deleteProfilePicture);
 router.post('/profile/signature', protect, uploadSignature.single('signature'), userController.updateSignature);
 router.delete('/profile/signature', protect, userController.deleteSignature);
-router.get('/', protect, authorize('admin', 'dean', 'hod', 'registrar', 'exam_officer'), userController.getUserByRole);
+router.get('/role', protect, authorize('admin', 'dean', 'hod', 'registrar', 'exam_officer', 'lecturer', 'student'), userController.getUserByRole);
+router.get('/', protect, authorize('admin', 'dean', 'hod', 'registrar', 'exam_officer', 'lecturer', 'student'), userController.getUserByRole);
 
 // Parameter Routes
 router.delete('/:id', protect, authorize('admin'), userController.deleteUser);

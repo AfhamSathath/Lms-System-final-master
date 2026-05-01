@@ -23,7 +23,7 @@ const LecturerManagement = () => {
 
   const [filters, setFilters] = useState({
     search: '',
-    department: 'all',
+    department: user?.role === 'hod' ? user.department : 'all',
     semester: 'all',
     academicYear: 'all',
     status: 'all'
@@ -300,11 +300,12 @@ const LecturerManagement = () => {
           <select
             value={filters.department}
             onChange={(e) => setFilters(p => ({ ...p, department: e.target.value }))}
-            className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+            disabled={user?.role === 'hod'}
+            className={`px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${user?.role === 'hod' ? 'bg-gray-50 text-gray-500 cursor-not-allowed' : ''}`}
           >
             <option value="all">All Departments</option>
             {state.departments.map(d => (
-              <option key={d._id} value={d._id}>{d.name}</option>
+              <option key={d._id} value={d.name}>{d.name}</option>
             ))}
           </select>
 

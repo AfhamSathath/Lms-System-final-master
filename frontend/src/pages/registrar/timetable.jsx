@@ -33,17 +33,34 @@ const RegistrarTimetables = () => {
   const [showGenerateModal, setShowGenerateModal] = useState(false);
   const [selectedTimetable, setSelectedTimetable] = useState(null);
   const [viewType, setViewType] = useState('card');
+  const [eoSignature, setEoSignature] = useState(null);
   const [formData, setFormData] = useState({
     subject: '', year: '', semester: '', examType: 'final',
-    date: '', startTime: '', endTime: '', venue: '', department: ''
+    date: '', startTime: '', endTime: '', venue: '', department: '', batch: ''
   });
+  const [manualBatch, setManualBatch] = useState('');
 
   const academicYears = ['1st Year', '2nd Year', '3rd Year', '4th Year', '5th Year'];
   const semesters = [1, 2];
-  const examTypes = ['midterm', 'final', 'quiz', 'supplementary', 'special', 'practical', 'viva'];
+  const examTypes = ['final'];
 
   useEffect(() => { fetchData(); }, []);
   useEffect(() => { filterTimetables(); }, [searchTerm, selectedYear, selectedSemester, selectedExamType, selectedDepartment, timetables]);
+
+  // Auto-select HOD department
+  useEffect(() => {
+    if (user?.role === 'hod' && user?.department) {
+      setSelectedDepartment(user.department);
+      setFormData(prev => ({ ...prev, department: user.department }));
+    }
+  }, [user]);
+
+  // Sync manualBatch with selected year
+  useEffect(() => {
+    if (selectedYear !== 'all') {
+      setManualBatch(getBatch(selectedYear));
+    }
+  }, [selectedYear, timetables]);
 
   const fetchData = async () => {
     try {
@@ -60,6 +77,14 @@ const RegistrarTimetables = () => {
       const sortedTimetables = (tRes.data.timetables || []).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
       setTimetables(sortedTimetables);
       setFilteredTimetables(sortedTimetables);
+
+      // Fetch Exam Officer Signature for preview
+      const usersRes = await api.get('/api/users/role?role=exam_officer');
+      if (usersRes.data.users && usersRes.data.users.length > 0) {
+        setEoSignature(usersRes.data.users[0].signature);
+      } else if (user?.role === 'exam_officer') {
+        setEoSignature(user.signature);
+      }
     } catch (err) {
       console.error(err);
       toast.error('Failed to fetch data');
@@ -194,7 +219,14 @@ const RegistrarTimetables = () => {
     }));
   };
 
-  const resetForm = () => setFormData({ subject: '', year: '', semester: '', examType: 'final', date: '', startTime: '', endTime: '', venue: '', department: '' });
+  const resetForm = () => {
+    if (user?.role === 'hod') {
+      // HOD can only reset batch, other fields are locked
+      setFormData(prev => ({ ...prev, batch: '' }));
+    } else {
+      setFormData({ subject: '', year: '', semester: '', examType: 'final', date: '', startTime: '', endTime: '', venue: '', department: '', batch: '' });
+    }
+  };
 
 
   // Edit timetable
@@ -241,6 +273,32 @@ const RegistrarTimetables = () => {
     }
   };
 
+  const handleBulkBatchUpdate = async () => {
+    if (!manualBatch) return;
+    if (filteredTimetables.length === 0) {
+      toast.error('No timetables found in current filter');
+      return;
+    }
+    
+    if (!window.confirm(`Bulk Update: Are you sure you want to change the batch to "${manualBatch}" for all ${filteredTimetables.length} filtered timetables?`)) return;
+    
+    try {
+      setLoading(true);
+      const timetableIds = filteredTimetables.map(t => t._id);
+      await api.put('/api/timetables/bulk-status', { 
+        timetableIds, 
+        batch: manualBatch 
+      });
+      toast.success(`Successfully updated batch to ${manualBatch}`);
+      fetchData();
+    } catch (err) {
+      console.error(err);
+      toast.error('Bulk batch update failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const getFacultyName = (dept) => {
     const CS_DEPTS = ['Computer Science', 'Physical Science', 'Applied Data Science'];
     const BIZ_DEPTS = ['Languages', 'Business Management', 'Business and Management Studies', 'Languages and Communication Studies'];
@@ -262,6 +320,19 @@ const RegistrarTimetables = () => {
     return map[sem?.toString()] || (sem ? `SEMESTER ${sem}` : 'ALL SEMESTERS');
   };
 
+  const getBatch = (year) => {
+    // Prefer batch from database if available in filtered results
+    const firstWithBatch = filteredTimetables.find(t => t.batch && (year === 'all' || t.year === year));
+    if (firstWithBatch) return firstWithBatch.batch;
+
+    if (!year || year === 'all') return 'ALL BATCHES';
+    const currentY = new Date().getFullYear();
+    const yearMap = { '1st Year': 1, '2nd Year': 2, '3rd Year': 3, '4th Year': 4, '5th Year': 5 };
+    const studyYear = yearMap[year] || 1;
+    const batchStart = currentY - (studyYear - 1);
+    return `${batchStart}/${batchStart + 1}`;
+  };
+
   const getSubjectDisplay = (t) => {
     if (!t.subject) return '-';
     let base = `${t.subject.code} ${t.subject.name}`;
@@ -274,76 +345,36 @@ const RegistrarTimetables = () => {
     return `${base} (T)`;
   };
 
-  const exportToPDF = () => {
+  const exportToPDF = async () => {
     if (filteredTimetables.length === 0) return toast.error('No data to export');
 
-    const doc = new jsPDF();
-    const pageWidth = doc.internal.pageSize.width;
-    const currentYearCycle = new Date().getFullYear();
-    const academicCycle = `${currentYearCycle}/${currentYearCycle + 1}`;
+    try {
+      setLoading(true);
+      const response = await api.get('/api/timetables/export', {
+        params: {
+          department: selectedDepartment,
+          year: selectedYear,
+          semester: selectedSemester,
+          batch: manualBatch
+        },
+        responseType: 'blob'
+      });
 
-    // Header
-    doc.setFontSize(10);
-    doc.setFont('helvetica', 'bold');
-    doc.text('TRINCOMALEE CAMPUS, EASTERN UNIVERSITY, SRI LANKA', pageWidth / 2, 15, { align: 'center' });
-    
-    const faculty = getFacultyName(selectedDepartment);
-    doc.text(faculty, pageWidth / 2, 22, { align: 'center' });
-    
-    doc.setFontSize(9);
-    doc.setFont('helvetica', 'normal');
-    doc.text(`Examination: FINAL EXAMINATION`, pageWidth / 2, 29, { align: 'center' });
-    
-    const examYear = selectedYear !== 'all' ? getRomanYear(selectedYear) : 'ALL YEARS';
-    const examSem = selectedSemester !== 'all' ? getRomanSemester(selectedSemester) : 'ALL SEMESTERS';
-    doc.text(`${examYear} ${examSem} - ${academicCycle}`, pageWidth / 2, 35, { align: 'center' });
-
-    const dept = selectedDepartment !== 'all' ? selectedDepartment.toUpperCase() : 'ALL DEPARTMENTS';
-    doc.text(`Department: ${dept}`, pageWidth / 2, 41, { align: 'center' });
-
-    // Table
-    const sortedForExport = [...filteredTimetables].sort((a, b) => new Date(a.date) - new Date(b.date));
-    const tableData = sortedForExport.map(t => [
-      t.date ? format(new Date(t.date), 'dd.MM.yyyy') : '-',
-      `${t.startTime || '-'} - ${t.endTime || '-'}`,
-      getSubjectDisplay(t),
-      t.venue || '-'
-    ]);
-
-    autoTable(doc, {
-      startY: 50,
-      head: [['DATE', 'TIME', 'SUBJECT NAME', 'VENUE']],
-      body: tableData,
-      theme: 'grid',
-      headStyles: { fillColor: [255, 255, 255], textColor: [0, 0, 0], lineWidth: 0.1, fontStyle: 'bold', fontSize: 8 },
-      styles: { textColor: [0, 0, 0], fontSize: 8, cellPadding: 3, halign: 'left' },
-      columnStyles: {
-        0: { cellWidth: 25 },
-        1: { cellWidth: 35 },
-        2: { cellWidth: 'auto' },
-        3: { cellWidth: 30 }
-      }
-    });
-
-    // Signature
-    const finalY = (doc).lastAutoTable.finalY + 30;
-    doc.setFontSize(8);
-    doc.setFont('helvetica', 'bold');
-    
-    // Assistant Registrar Block (Left)
-    doc.text('.........................................', 15, finalY);
-    doc.text('Prepared By:', 15, finalY + 5);
-    doc.text('Assistant Registrar', 15, finalY + 10);
-    doc.text('Academic Affairs', 15, finalY + 15);
-
-    // Dean Block (Right)
-    doc.text('.........................................', pageWidth - 15, finalY, { align: 'right' });
-    doc.text('Approved By:', pageWidth - 15, finalY + 5, { align: 'right' });
-    doc.text('Dean of Faculty', pageWidth - 15, finalY + 10, { align: 'right' });
-    doc.text('Date: .......................', pageWidth - 15, finalY + 15, { align: 'right' });
-
-    doc.save(`Exam_Timetable_${dept.replace(/\s+/g, '_')}_${academicCycle.replace('/', '-')}.pdf`);
-    toast.success('Professional PDF Generated Successfully');
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `Exam_Timetable_${selectedDepartment !== 'all' ? selectedDepartment : 'Campus'}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+      toast.success('Official Timetable PDF generated successfully');
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to generate official PDF');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleDeleteTimetable = async id => {
@@ -369,7 +400,8 @@ const RegistrarTimetables = () => {
       startTime: t.startTime || '',
       endTime: t.endTime || '',
       venue: t.venue || '',
-      department: t.department || ''
+      department: t.department || '',
+      batch: t.batch || ''
     });
     setShowEditModal(true);
   };
@@ -385,9 +417,10 @@ const RegistrarTimetables = () => {
     }
   };
 
-  const canEdit = ['exam_officer', 'registrar', 'admin'].includes(user?.role);
+  const canEdit = ['exam_officer', 'registrar', 'admin', 'hod'].includes(user?.role);
   const canApproveDean = user?.role === 'dean';
   const canApproveHod = user?.role === 'hod';
+  const isAdminOrOfficer = ['exam_officer', 'registrar', 'admin'].includes(user?.role);
 
   // For HODs, preferably show lecturers in their department first or filter them
   const availableLecturers = user?.role === 'hod' && user?.department
@@ -428,7 +461,7 @@ const RegistrarTimetables = () => {
           </button>
 
             <div className="flex gap-2">
-              {canEdit && filteredTimetables.some(t => !t.status || t.status === 'draft') && (
+              {isAdminOrOfficer && filteredTimetables.some(t => !t.status || t.status === 'draft') && (
                 <button 
                   onClick={() => handleBulkStatusChange('pending_dean')} 
                   className="bg-white border-2 border-purple-600 text-purple-600 px-6 py-3 rounded-lg hover:bg-purple-50 transition-colors flex items-center shadow-md font-black uppercase text-xs tracking-widest"
@@ -452,7 +485,7 @@ const RegistrarTimetables = () => {
                   <FiSend className="mr-2" /> Publish All Timetables
                 </button>
               )}
-              {canEdit && (
+              {isAdminOrOfficer && (
                 <button 
                   onClick={() => setShowGenerateModal(true)} 
                   className="bg-emerald-600 text-white px-6 py-3 rounded-lg hover:bg-emerald-700 transition-colors flex items-center shadow-lg font-bold"
@@ -494,20 +527,40 @@ const RegistrarTimetables = () => {
             <FiChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" />
           </div>
           <div className="relative">
-            <FiClock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-            <select value={selectedExamType} onChange={e => setSelectedExamType(e.target.value)} className="w-full pl-10 pr-4 py-3 border border-black rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none appearance-none">
-              <option value="all">All Exam Types</option>
-              {examTypes.map(t => <option key={t} value={t}>{t.charAt(0).toUpperCase() + t.slice(1)}</option>)}
-            </select>
-            <FiChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" />
-          </div>
-          <div className="relative">
             <FiUsers className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-            <select value={selectedDepartment} onChange={e => setSelectedDepartment(e.target.value)} className="w-full pl-10 pr-4 py-3 border border-black rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none appearance-none">
+            <select 
+              value={selectedDepartment} 
+              onChange={e => setSelectedDepartment(e.target.value)} 
+              disabled={user?.role === 'hod'}
+              className={`w-full pl-10 pr-4 py-3 border border-black rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none appearance-none ${user?.role === 'hod' ? 'bg-gray-50 text-gray-500 cursor-not-allowed' : ''}`}
+            >
               <option value="all">All Departments</option>
               {departments.map(d => <option key={d} value={d}>{d}</option>)}
             </select>
             <FiChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" />
+          </div>
+          <div className="relative">
+            <div className="flex flex-col justify-center px-4 py-1 border border-black rounded-lg bg-slate-50 h-full relative group">
+               <span className="text-[9px] font-black text-purple-600 uppercase tracking-widest leading-tight">Current Batch</span>
+               <div className="flex items-center gap-2">
+                 <input 
+                  type="text"
+                  value={manualBatch}
+                  onChange={e => setManualBatch(e.target.value)}
+                  className="bg-transparent text-sm font-black text-slate-900 border-none p-0 focus:ring-0 w-24"
+                 />
+                 {manualBatch !== getBatch(selectedYear) && (
+                   <button 
+                    onClick={handleBulkBatchUpdate}
+                    title="Update all filtered to this batch"
+                    className="p-1 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-all shadow-lg animate-in fade-in zoom-in duration-300"
+                   >
+                     <FiCheck size={12} />
+                   </button>
+                 )}
+               </div>
+               <div className="absolute -top-2 -right-2 hidden group-hover:block bg-black text-white text-[8px] px-2 py-1 rounded-md z-10">Edit & Save All</div>
+            </div>
           </div>
         </div>
         <div className="mt-4 flex justify-end">
@@ -530,7 +583,7 @@ const RegistrarTimetables = () => {
           <div className="space-y-12">
             {Object.entries(
               filteredTimetables.reduce((acc, t) => {
-                const key = `${t.year} - Semester ${t.semester}`;
+                const key = `${t.year} - Semester ${t.semester}${t.batch ? ` (${t.batch})` : ''}`;
                 if (!acc[key]) acc[key] = [];
                 acc[key].push(t);
                 return acc;
@@ -582,11 +635,13 @@ const RegistrarTimetables = () => {
                         <div className="flex justify-end gap-2 mt-4 pt-4 border-t border-slate-100">
                           {canEdit && (
                             <>
-                              {(!t.status || t.status === 'draft') && (
+                              {isAdminOrOfficer && (!t.status || t.status === 'draft') && (
                                 <button onClick={() => handleStatusChange(t._id, 'pending_dean')} className="px-4 py-2 bg-purple-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-purple-700 transition-all shadow-md mr-auto">Send to Dean</button>
                               )}
                               <button onClick={() => openEditModal(t)} className="p-2.5 text-blue-600 hover:bg-blue-50 rounded-xl transition-colors border border-transparent hover:border-blue-100" title="Edit"><FiEdit2 size={16} /></button>
-                              <button onClick={() => handleDeleteTimetable(t._id)} className="p-2.5 text-red-600 hover:bg-red-50 rounded-xl transition-colors border border-transparent hover:border-red-100" title="Delete"><FiTrash2 size={16} /></button>
+                              {isAdminOrOfficer && (
+                                <button onClick={() => handleDeleteTimetable(t._id)} className="p-2.5 text-red-600 hover:bg-red-50 rounded-xl transition-colors border border-transparent hover:border-red-100" title="Delete"><FiTrash2 size={16} /></button>
+                              )}
                             </>
                           )}
 
@@ -624,7 +679,7 @@ const RegistrarTimetables = () => {
               <h4 className="text-2xl md:text-3xl font-black mt-8 border-b-2 border-black inline-block px-8">Time Table</h4>
 
               <div className="flex flex-col md:flex-row justify-between mt-12 text-[10px] md:text-xs font-black uppercase tracking-widest gap-4">
-                <span className="text-left">Examination : {selectedYear !== 'all' ? getRomanYear(selectedYear) : 'ALL YEARS'} {selectedSemester !== 'all' ? getRomanSemester(selectedSemester) : 'ALL SEMESTERS'}</span>
+                <span className="text-left">Examination : {selectedYear !== 'all' ? getRomanYear(selectedYear) : 'ALL YEARS'} {selectedSemester !== 'all' ? getRomanSemester(selectedSemester) : 'ALL SEMESTERS'} - {getBatch(selectedYear)}</span>
                 <span className="text-right">Venue: {[...new Set(filteredTimetables.map(t => t.venue))].join(', ')}</span>
               </div>
             </div>
@@ -674,7 +729,14 @@ const RegistrarTimetables = () => {
               <div className="text-[9px] font-black text-slate-300 uppercase vertical-text">
                 Generated by Exam Management System • {format(new Date(), 'dd/MM/yyyy HH:mm')}
               </div>
-              <div className="text-center">
+              <div className="text-center flex flex-col items-center">
+                {eoSignature && (
+                   <img 
+                      src={`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}${eoSignature}`} 
+                      alt="AR Signature" 
+                      className="h-10 md:h-12 object-contain mb-1" 
+                   />
+                )}
                 <div className="w-64 border-b-2 border-black mb-3"></div>
                 <div className="text-[10px] md:text-xs font-black uppercase tracking-widest">Assistant Registrar</div>
                 <div className="text-[9px] md:text-[10px] font-bold text-slate-500 uppercase">{getFacultyName(selectedDepartment)}</div>
@@ -708,6 +770,7 @@ const RegistrarTimetables = () => {
           departments={departments}
           submitText="Update Schedule"
           resetForm={resetForm}
+          user={user}
         />
       </Modal>
 
@@ -726,6 +789,8 @@ const RegistrarTimetables = () => {
             semester: selectedSemester,
             department: selectedDepartment
           }}
+          user={user}
+          getBatch={getBatch}
         />
       </Modal>
 
@@ -759,7 +824,7 @@ const RegistrarTimetables = () => {
 };
 
 // Timetable Form Component
-const TimetableForm = ({ formData, handleInputChange, handleSubjectChange, handleSubmit, subjects, academicYears, semesters, examTypes, departments, submitText, resetForm }) => {
+const TimetableForm = ({ formData, handleInputChange, handleSubjectChange, handleSubmit, subjects, academicYears, semesters, examTypes, departments, submitText, resetForm, user }) => {
   const filteredSubjects = subjects.filter(s => {
     if (formData.year && s.year !== formData.year) return false;
     if (formData.semester && s.semester?.toString() !== formData.semester?.toString()) return false;
@@ -767,58 +832,81 @@ const TimetableForm = ({ formData, handleInputChange, handleSubjectChange, handl
     return true;
   });
 
+  const isHod = user?.role === 'hod';
+  const getFieldClass = (disabled) => `w-full border px-4 py-2 rounded-lg focus:ring-2 focus:ring-purple-500 ${disabled ? 'bg-gray-50 text-gray-500 cursor-not-allowed border-gray-200' : 'border-black'}`;
+
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className="block mb-1 font-medium">Year</label>
-          <select name="year" value={formData.year} onChange={handleInputChange} className="w-full border px-4 py-2 rounded-lg focus:ring-2 focus:ring-purple-500">
+          <select name="year" value={formData.year} onChange={handleInputChange} disabled={isHod} className={getFieldClass(isHod)}>
             <option value="">Select Year</option>
             {academicYears.map(y => <option key={y} value={y}>{y}</option>)}
           </select>
         </div>
         <div>
           <label className="block mb-1 font-medium">Semester</label>
-          <select name="semester" value={formData.semester} onChange={handleInputChange} className="w-full border px-4 py-2 rounded-lg focus:ring-2 focus:ring-purple-500">
+          <select name="semester" value={formData.semester} onChange={handleInputChange} disabled={isHod} className={getFieldClass(isHod)}>
             <option value="">Select Semester</option>
             {semesters.map(s => <option key={s} value={s}>{s}</option>)}
           </select>
         </div>
         <div>
           <label className="block mb-1 font-medium">Department</label>
-          <select name="department" value={formData.department} onChange={handleInputChange} className="w-full border px-4 py-2 rounded-lg focus:ring-2 focus:ring-purple-500">
+          <select 
+            name="department" 
+            value={formData.department} 
+            onChange={handleInputChange} 
+            disabled={isHod}
+            className={getFieldClass(isHod)}
+          >
             <option value="">Select Department</option>
             {departments.map(d => <option key={d} value={d}>{d}</option>)}
           </select>
         </div>
         <div>
           <label className="block mb-1 font-medium">Subject</label>
-          <select name="subject" value={formData.subject} onChange={handleSubjectChange} className="w-full border px-4 py-2 rounded-lg focus:ring-2 focus:ring-purple-500">
+          <select name="subject" value={formData.subject} onChange={handleSubjectChange} disabled={isHod} className={getFieldClass(isHod)}>
             <option value="">Select Subject</option>
             {filteredSubjects.map(s => <option key={s._id} value={s._id}>{s.name} ({s.code})</option>)}
           </select>
         </div>
         <div>
           <label className="block mb-1 font-medium">Exam Type</label>
-          <select name="examType" value={formData.examType} onChange={handleInputChange} className="w-full border px-4 py-2 rounded-lg focus:ring-2 focus:ring-purple-500">
-            {examTypes.map(e => <option key={e} value={e}>{e.charAt(0).toUpperCase() + e.slice(1)}</option>)}
-          </select>
+          <input 
+            type="text" 
+            value="Final" 
+            disabled 
+            className={getFieldClass(true)} 
+          />
         </div>
         <div>
           <label className="block mb-1 font-medium">Venue</label>
-          <input type="text" name="venue" value={formData.venue} onChange={handleInputChange} className="w-full border px-4 py-2 rounded-lg focus:ring-2 focus:ring-purple-500" />
+          <input type="text" name="venue" value={formData.venue} onChange={handleInputChange} disabled={isHod} className={getFieldClass(isHod)} />
         </div>
         <div>
           <label className="block mb-1 font-medium">Date</label>
-          <input type="date" name="date" value={formData.date} onChange={handleInputChange} className="w-full border px-4 py-2 rounded-lg focus:ring-2 focus:ring-purple-500" />
+          <input type="date" name="date" value={formData.date} onChange={handleInputChange} disabled={isHod} className={getFieldClass(isHod)} />
         </div>
         <div>
           <label className="block mb-1 font-medium">Start Time</label>
-          <input type="time" name="startTime" value={formData.startTime} onChange={handleInputChange} className="w-full border px-4 py-2 rounded-lg focus:ring-2 focus:ring-purple-500" />
+          <input type="time" name="startTime" value={formData.startTime} onChange={handleInputChange} disabled={isHod} className={getFieldClass(isHod)} />
         </div>
         <div>
           <label className="block mb-1 font-medium">End Time</label>
-          <input type="time" name="endTime" value={formData.endTime} onChange={handleInputChange} className="w-full border px-4 py-2 rounded-lg focus:ring-2 focus:ring-purple-500" />
+          <input type="time" name="endTime" value={formData.endTime} onChange={handleInputChange} disabled={isHod} className={getFieldClass(isHod)} />
+        </div>
+        <div>
+          <label className="block mb-1 font-medium text-purple-700 font-bold">Batch (HOD Editable)</label>
+          <input 
+            type="text" 
+            name="batch" 
+            value={formData.batch} 
+            onChange={handleInputChange} 
+            placeholder="e.g. 2026/2027"
+            className="w-full border border-purple-600 px-4 py-2 rounded-lg focus:ring-2 focus:ring-purple-500 bg-purple-50 font-bold" 
+          />
         </div>
       </div>
       <div className="flex justify-end space-x-2 mt-4">
@@ -832,7 +920,7 @@ const TimetableForm = ({ formData, handleInputChange, handleSubjectChange, handl
 
 
 // Auto-Generate Timetable Form Component
-const GenerateTimetableForm = ({ departments, academicYears, semesters, onGenerate, onSave, onClose, initialFilters }) => {
+const GenerateTimetableForm = ({ departments, academicYears, semesters, onGenerate, onSave, onClose, initialFilters, user, getBatch }) => {
   const [step, setStep] = useState(1); // 1: Setup, 2: Preview
   const [genData, setGenData] = useState({
     startDate: '',
@@ -923,7 +1011,13 @@ const GenerateTimetableForm = ({ departments, academicYears, semesters, onGenera
             </div>
             <div>
               <label className="block text-[10px] font-black uppercase text-slate-500 mb-1">Department</label>
-              <select name="department" value={genData.department} onChange={handleInputChange} className="w-full border border-black p-2 rounded-xl focus:ring-2 focus:ring-purple-500 text-sm font-bold">
+              <select 
+                name="department" 
+                value={genData.department} 
+                onChange={handleInputChange} 
+                disabled={user?.role === 'hod'}
+                className={`w-full border border-black p-2 rounded-xl focus:ring-2 focus:ring-purple-500 text-sm font-bold ${user?.role === 'hod' ? 'bg-gray-50 text-gray-500 cursor-not-allowed' : ''}`}
+              >
                 <option value="all">All Departments</option>
                 {departments?.map(d => <option key={d} value={d}>{d}</option>)}
               </select>
@@ -934,11 +1028,18 @@ const GenerateTimetableForm = ({ departments, academicYears, semesters, onGenera
             </div>
             <div>
               <label className="block text-[10px] font-black uppercase text-slate-500 mb-1">Exam Type</label>
-              <select name="examType" value={genData.examType} onChange={handleInputChange} className="w-full border border-black p-2 rounded-xl focus:ring-2 focus:ring-purple-500 text-sm font-bold">
-                {['midterm', 'final', 'quiz', 'supplementary', 'special', 'practical', 'viva'].map(type => (
-                  <option key={type} value={type}>{type.charAt(0).toUpperCase() + type.slice(1)}</option>
-                ))}
-              </select>
+              <div className="flex gap-2">
+                <input 
+                  type="text" 
+                  value="Final" 
+                  disabled 
+                  className="flex-1 border border-black p-2 rounded-xl bg-gray-50 text-gray-500 text-sm font-bold cursor-not-allowed" 
+                />
+                <div className="flex-1 bg-purple-50 border border-purple-200 p-2 rounded-xl">
+                  <span className="block text-[8px] font-black uppercase text-purple-400">Current Batch</span>
+                  <span className="text-sm font-black text-purple-700">{getBatch(genData.year)}</span>
+                </div>
+              </div>
             </div>
           </div>
 

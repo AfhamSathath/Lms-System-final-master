@@ -2293,50 +2293,86 @@ class EmailService {
     return 'TRINCOMALEE CAMPUS';
   }
 
+  getFacultyAbbr(dept) {
+    const faculty = this.getFacultyName(dept);
+    if (faculty === 'FACULTY OF APPLIED SCIENCE') return 'FAS';
+    if (faculty === 'FACULTY OF COMMUNICATION & BUSINESS STUDIES') return 'FCBS';
+    if (faculty === 'FACULTY OF SIDDHA MEDICINE') return 'FSM';
+    return 'TC';
+  }
+
+  getDeptAbbr(dept) {
+    if (dept?.includes('Computer Science')) return 'DCS';
+    if (dept?.includes('Physical Science')) return 'DPS';
+    if (dept?.includes('Languages')) return 'DLCS';
+    if (dept?.includes('Business')) return 'DBMS';
+    if (dept?.includes('Siddha')) return 'USM';
+    return 'DEPT';
+  }
+
   /**
    * Generate a formal PDF for a group of timetable entries
    */
   async generateTimetablePDF(timetables, metadata) {
     const PDFDocument = require('pdfkit');
 
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       try {
-        const doc = new PDFDocument({ margin: 40, size: 'A4' });
+        const doc = new PDFDocument({ margin: 30, size: 'A4' });
+        const User = require('../models/user');
         const chunks = [];
         doc.on('data', chunk => chunks.push(chunk));
         doc.on('end', () => resolve(Buffer.concat(chunks)));
         doc.on('error', err => reject(err));
 
+        const firstT = timetables[0] || {};
         const faculty = this.getFacultyName(metadata.department);
         const yearRom = this.getRomanYear(metadata.year);
         const semRom = this.getRomanSemester(metadata.semester);
-        const currentYearCycle = new Date().getFullYear();
-        const academicCycle = `${currentYearCycle}/${currentYearCycle + 1}`;
+        const currentYear = new Date().getFullYear();
+        const yearMap = { '1st Year': 1, '2nd Year': 2, '3rd Year': 3, '4th Year': 4, '5th Year': 5 };
+        const studyYear = yearMap[metadata.year] || 1;
+        const batchStart = currentYear - (studyYear - 1);
+        const calculatedBatch = `${batchStart}/${batchStart + 1}`;
+        const academicCycle = metadata.batch || firstT.batch || calculatedBatch;
+        const refNo = `Ref No: TC/EUSL/EXAM/TT/${this.getDeptAbbr(metadata.department)}/${currentYear}`;
 
-        // Header
-        doc.fontSize(10).font('Helvetica-Bold').text('TRINCOMALEE CAMPUS, EASTERN UNIVERSITY, SRI LANKA', { align: 'center' });
-        doc.fontSize(10).text(faculty, { align: 'center' });
+        const fs = require('fs');
+        const path = require('path');
+
+        // Header with Color
         doc.moveDown(0.5);
-        doc.fontSize(9).font('Helvetica').text(`Examination: ${metadata.examType?.toUpperCase() || 'FINAL'} EXAMINATION`, { align: 'center' });
-        doc.text(`YEAR ${yearRom} SEMESTER ${semRom} - ${academicCycle}`, { align: 'center' });
+        doc.fillColor('#1e3a8a').fontSize(12).font('Helvetica-Bold').text('TRINCOMALEE CAMPUS', { align: 'center' });
+        doc.fontSize(10).text('EASTERN UNIVERSITY, SRI LANKA', { align: 'center' });
+        doc.fontSize(9).text(faculty, { align: 'center' });
+        
+        doc.fillColor('black').moveDown(0.3);
+        doc.moveTo(30, doc.y).lineTo(560, doc.y).stroke();
+        doc.moveDown(0.5);
+
+        doc.fontSize(7).font('Helvetica').text(refNo, 30, doc.y);
+        doc.moveDown(0.3);
+
+        doc.fontSize(9).font('Helvetica-Bold').text(`FINAL EXAMINATION TIMETABLE`, { align: 'center' });
+        doc.fontSize(8).text(`YEAR ${yearRom} SEMESTER ${semRom} - ${academicCycle}`, { align: 'center' });
         doc.text(`Department: ${metadata.department?.toUpperCase() || 'ALL DEPARTMENTS'}`, { align: 'center' });
-        doc.moveDown(1.5);
+        doc.moveDown(0.8);
 
         // Table Header
-        const startX = 40;
+        const startX = 30;
         let currentY = doc.y;
-        doc.fontSize(8).font('Helvetica-Bold');
-        doc.text('Date', startX + 5, currentY + 5);
-        doc.text('Time', startX + 85, currentY + 5);
-        doc.text('Subject', startX + 185, currentY + 5);
-        doc.text('Venue', startX + 455, currentY + 5);
+        doc.fontSize(7).font('Helvetica-Bold');
+        doc.text('Date', startX + 5, currentY + 3);
+        doc.text('Time', startX + 80, currentY + 3);
+        doc.text('Subject Details', startX + 175, currentY + 3);
+        doc.text('Venue', startX + 465, currentY + 3);
         
-        doc.moveTo(startX, currentY).lineTo(550, currentY).stroke();
-        doc.moveTo(startX, currentY + 20).lineTo(550, currentY + 20).stroke();
-        currentY += 20;
+        doc.moveTo(startX, currentY).lineTo(560, currentY).stroke();
+        doc.moveTo(startX, currentY + 15).lineTo(560, currentY + 15).stroke();
+        currentY += 15;
 
         // Table Rows
-        doc.font('Helvetica').fontSize(8);
+        doc.font('Helvetica').fontSize(7);
         timetables.forEach(t => {
           let dateStr = '-';
           if (t.date) {
@@ -2344,63 +2380,121 @@ class EmailService {
             dateStr = `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}.${d.getFullYear()}`;
           }
           const timeStr = `${t.startTime || '-'} - ${t.endTime || '-'}`;
-          const subjectStr = `${t.subject?.code || ''} ${t.subject?.name || ''} ${t.subject?.category === 'Practical' ? '(P)' : '(T)'}`;
+          const subjectCode = t.subject?.code || '-';
+          const subjectName = t.subject?.name || '-';
           
-          doc.text(dateStr, startX + 5, currentY + 5);
-          doc.text(timeStr, startX + 85, currentY + 5);
-          doc.text(subjectStr, startX + 185, currentY + 5, { width: 260 });
-          doc.text(t.venue || '-', startX + 455, currentY + 5);
+          // Robust detection: check both category and name for 'Practical'
+          const isPractical = (t.subject?.category === 'Practical') || 
+                              (t.subject?.name?.toLowerCase().includes('practical'));
+                              
+          const examCategory = isPractical ? '(Practical Examination)' : '(Theory Examination)';
+          const moderator = t.moderatorName && t.moderatorName !== 'Not Assigned' ? ` • Mod: ${t.moderatorName}` : '';
           
-          currentY += 25;
-          doc.moveTo(startX, currentY).lineTo(550, currentY).stroke();
+          doc.text(dateStr, startX + 5, currentY + 4);
+          doc.text(timeStr, startX + 80, currentY + 4);
+          
+          // Subject Block
+          doc.font('Helvetica-Bold').text(subjectCode, startX + 175, currentY + 4);
+          doc.font('Helvetica').text(`${subjectName} ${examCategory}${moderator}`, startX + 175, currentY + 12, { width: 280 });
+          
+          doc.text(t.venue || '-', startX + 465, currentY + 4);
+          
+          currentY += 22;
+          doc.moveTo(startX, currentY).lineTo(560, currentY).stroke();
         });
 
         // Footer / Signatures
-        currentY += 50;
-        if (currentY > 700) { doc.addPage(); currentY = 50; }
+        currentY += 25;
+        if (currentY > 750) { doc.addPage(); currentY = 40; }
         
-        const firstT = timetables[0] || {};
-        const fs = require('fs');
-        const path = require('path');
+        // Assistant Registrar (Exam Officer) Signature - Auto-update from Profile
+        const currentOfficer = await User.findOne({ role: 'exam_officer' }).select('signature');
+        const eoSig = currentOfficer?.signature || firstT.examOfficerSignature;
 
-        // Assistant Registrar (Exam Officer) Signature
-        if (firstT.examOfficerSignature) {
+        if (eoSig) {
           try {
-            const sigPath = path.join(__dirname, '..', firstT.examOfficerSignature);
+            const sigPath = path.join(__dirname, '..', eoSig);
             if (fs.existsSync(sigPath)) {
-              doc.image(sigPath, 40, currentY - 35, { height: 35 });
+              doc.image(sigPath, 35, currentY - 30, { height: 30 });
             }
           } catch (e) { console.error('EO Sig Error:', e); }
         }
 
-        // Dean Signature
-        if (firstT.deanSignature) {
+        // HOD Signature - Auto-update from Profile
+        const currentHOD = await User.findOne({ role: 'hod', department: metadata.department }).select('signature');
+        const hodSig = currentHOD?.signature || firstT.hodSignature;
+
+        if (hodSig) {
           try {
-            const sigPath = path.join(__dirname, '..', firstT.deanSignature);
+            const sigPath = path.join(__dirname, '..', hodSig);
             if (fs.existsSync(sigPath)) {
-              doc.image(sigPath, 350, currentY - 35, { height: 35 });
+              doc.image(sigPath, 200, currentY - 30, { height: 30 });
+            }
+          } catch (e) { console.error('HOD Sig Error:', e); }
+        }
+
+        // Dean Signature - Auto-update from Profile
+        const currentDean = await User.findOne({ role: 'dean', faculty: faculty }).select('signature');
+        const deanSig = currentDean?.signature || firstT.deanSignature;
+
+        if (deanSig) {
+          try {
+            const sigPath = path.join(__dirname, '..', deanSig);
+            if (fs.existsSync(sigPath)) {
+              doc.image(sigPath, 360, currentY - 30, { height: 30 });
             }
           } catch (e) { console.error('Dean Sig Error:', e); }
         }
         
-        doc.fontSize(8).font('Helvetica-Bold');
+        doc.fontSize(7).font('Helvetica-Bold');
         // Assistant Registrar Block (Left)
-        doc.text('.........................................', 40, currentY);
-        doc.text('Prepared By:', 40, currentY + 12);
-        doc.text('Assistant Registrar', 40, currentY + 24);
-        doc.text('Academic Affairs', 40, currentY + 36);
+        doc.text('.........................................', 35, currentY);
+        doc.text('Prepared By:', 35, currentY + 10);
+        doc.text('Assistant Registrar', 35, currentY + 20);
+        doc.text('Academic Affairs', 35, currentY + 30);
+
+        // HOD Block (Center)
+        doc.text('.........................................', 200, currentY);
+        doc.text('Checked By:', 200, currentY + 10);
+        doc.text('Head of Department', 200, currentY + 20);
+        doc.text(this.getDeptAbbr(metadata.department), 200, currentY + 30);
 
         // Dean Block (Right)
-        doc.text('.........................................', 350, currentY);
-        doc.text('Approved By:', 350, currentY + 12);
-        doc.text('Dean of Faculty', 350, currentY + 24);
+        doc.text('.........................................', 360, currentY);
+        doc.text('Approved By:', 360, currentY + 10);
+        doc.text('Dean of Faculty', 360, currentY + 20);
         
         const approvalDate = firstT.approvedAtDean ? new Date(firstT.approvedAtDean).toLocaleDateString('en-GB', {
           day: '2-digit',
           month: '2-digit',
           year: 'numeric'
         }).replace(/\//g, '.') : '.......................';
-        doc.text(`Date: ${approvalDate}`, 350, currentY + 36);
+        doc.text(`Date: ${approvalDate}`, 360, currentY + 30);
+
+        // Cc Section
+        currentY += 45;
+        if (currentY > 780) { doc.addPage(); currentY = 40; }
+        
+        doc.fontSize(7).font('Helvetica-Bold').text('Cc:', 35, currentY);
+        doc.font('Helvetica').fontSize(7);
+        
+        const facultyAbbr = this.getFacultyAbbr(metadata.department);
+        const deptAbbr = this.getDeptAbbr(metadata.department);
+        
+        const ccList = [
+          'Rector',
+          `Dean/ ${facultyAbbr} - Please display at Dean's office notice board.`,
+          `Head/ ${deptAbbr} - Please display at Department's notice board.`,
+          'Coordinator ICT Lab - Please ensure the facilities in the computer lab',
+          'SAR/General Administration',
+          'Works Engineer - Please ensure the supply of electricity & water supply.',
+          'Web Committee TC EUSL - Please make arrangement to upload this time table in the campus website.',
+          'AR/Students Affairs - Please display on the hostel notice board.'
+        ];
+
+        ccList.forEach((line, index) => {
+          doc.text(line, 40, currentY + 12 + (index * 12));
+        });
 
         doc.end();
       } catch (err) {
