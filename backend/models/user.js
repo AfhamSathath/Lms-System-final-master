@@ -100,6 +100,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: null
   },
+  signature: {
+    type: String,
+    default: null
+  },
   lastLogin: {
     type: Date
   },

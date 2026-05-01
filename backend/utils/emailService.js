@@ -88,6 +88,10 @@ class EmailService {
         `,
       };
 
+      if (options.attachments) {
+        mailOptions.attachments = options.attachments;
+      }
+
       const info = await this.transporter.sendMail(mailOptions);
       console.log('Branded email sent successfully:', info.messageId);
       return info;
@@ -2266,6 +2270,256 @@ class EmailService {
       }
     });
   }
+  // --- EXAM TIMETABLE ENHANCEMENTS ---
+
+  getRomanYear(year) {
+    const map = { "1": "I", "1st Year": "I", "2": "II", "2nd Year": "II", "3": "III", "3rd Year": "III", "4": "IV", "4th Year": "IV" };
+    return map[year] || year;
+  }
+
+  getRomanSemester(sem) {
+    const map = { "1": "I", "2": "II", "Semester 1": "I", "Semester 2": "II" };
+    return map[sem?.toString()] || sem;
+  }
+
+  getFacultyName(dept) {
+    const CS_DEPTS = ['Computer Science', 'Physical Science', 'Applied Data Science'];
+    const BIZ_DEPTS = ['Languages', 'Business Management', 'Business and Management Studies', 'Languages and Communication Studies'];
+    const SIDDHA_DEPTS = ['Unit of Siddha Medicine', 'Siddha Medicine'];
+    
+    if (CS_DEPTS.some(d => dept?.includes(d))) return 'FACULTY OF APPLIED SCIENCE';
+    if (BIZ_DEPTS.some(d => dept?.includes(d))) return 'FACULTY OF COMMUNICATION & BUSINESS STUDIES';
+    if (SIDDHA_DEPTS.some(d => dept?.includes(d))) return 'FACULTY OF SIDDHA MEDICINE';
+    return 'TRINCOMALEE CAMPUS';
+  }
+
+  /**
+   * Generate a formal PDF for a group of timetable entries
+   */
+  async generateTimetablePDF(timetables, metadata) {
+    const PDFDocument = require('pdfkit');
+
+    return new Promise((resolve, reject) => {
+      try {
+        const doc = new PDFDocument({ margin: 40, size: 'A4' });
+        const chunks = [];
+        doc.on('data', chunk => chunks.push(chunk));
+        doc.on('end', () => resolve(Buffer.concat(chunks)));
+        doc.on('error', err => reject(err));
+
+        const faculty = this.getFacultyName(metadata.department);
+        const yearRom = this.getRomanYear(metadata.year);
+        const semRom = this.getRomanSemester(metadata.semester);
+        const currentYearCycle = new Date().getFullYear();
+        const academicCycle = `${currentYearCycle}/${currentYearCycle + 1}`;
+
+        // Header
+        doc.fontSize(10).font('Helvetica-Bold').text('TRINCOMALEE CAMPUS, EASTERN UNIVERSITY, SRI LANKA', { align: 'center' });
+        doc.fontSize(10).text(faculty, { align: 'center' });
+        doc.moveDown(0.5);
+        doc.fontSize(9).font('Helvetica').text(`Examination: ${metadata.examType?.toUpperCase() || 'FINAL'} EXAMINATION`, { align: 'center' });
+        doc.text(`YEAR ${yearRom} SEMESTER ${semRom} - ${academicCycle}`, { align: 'center' });
+        doc.text(`Department: ${metadata.department?.toUpperCase() || 'ALL DEPARTMENTS'}`, { align: 'center' });
+        doc.moveDown(1.5);
+
+        // Table Header
+        const startX = 40;
+        let currentY = doc.y;
+        doc.fontSize(8).font('Helvetica-Bold');
+        doc.text('Date', startX + 5, currentY + 5);
+        doc.text('Time', startX + 85, currentY + 5);
+        doc.text('Subject', startX + 185, currentY + 5);
+        doc.text('Venue', startX + 455, currentY + 5);
+        
+        doc.moveTo(startX, currentY).lineTo(550, currentY).stroke();
+        doc.moveTo(startX, currentY + 20).lineTo(550, currentY + 20).stroke();
+        currentY += 20;
+
+        // Table Rows
+        doc.font('Helvetica').fontSize(8);
+        timetables.forEach(t => {
+          let dateStr = '-';
+          if (t.date) {
+            const d = new Date(t.date);
+            dateStr = `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}.${d.getFullYear()}`;
+          }
+          const timeStr = `${t.startTime || '-'} - ${t.endTime || '-'}`;
+          const subjectStr = `${t.subject?.code || ''} ${t.subject?.name || ''} ${t.subject?.category === 'Practical' ? '(P)' : '(T)'}`;
+          
+          doc.text(dateStr, startX + 5, currentY + 5);
+          doc.text(timeStr, startX + 85, currentY + 5);
+          doc.text(subjectStr, startX + 185, currentY + 5, { width: 260 });
+          doc.text(t.venue || '-', startX + 455, currentY + 5);
+          
+          currentY += 25;
+          doc.moveTo(startX, currentY).lineTo(550, currentY).stroke();
+        });
+
+        // Footer / Signatures
+        currentY += 50;
+        if (currentY > 700) { doc.addPage(); currentY = 50; }
+        
+        const firstT = timetables[0] || {};
+        const fs = require('fs');
+        const path = require('path');
+
+        // Assistant Registrar (Exam Officer) Signature
+        if (firstT.examOfficerSignature) {
+          try {
+            const sigPath = path.join(__dirname, '..', firstT.examOfficerSignature);
+            if (fs.existsSync(sigPath)) {
+              doc.image(sigPath, 40, currentY - 35, { height: 35 });
+            }
+          } catch (e) { console.error('EO Sig Error:', e); }
+        }
+
+        // Dean Signature
+        if (firstT.deanSignature) {
+          try {
+            const sigPath = path.join(__dirname, '..', firstT.deanSignature);
+            if (fs.existsSync(sigPath)) {
+              doc.image(sigPath, 350, currentY - 35, { height: 35 });
+            }
+          } catch (e) { console.error('Dean Sig Error:', e); }
+        }
+        
+        doc.fontSize(8).font('Helvetica-Bold');
+        // Assistant Registrar Block (Left)
+        doc.text('.........................................', 40, currentY);
+        doc.text('Prepared By:', 40, currentY + 12);
+        doc.text('Assistant Registrar', 40, currentY + 24);
+        doc.text('Academic Affairs', 40, currentY + 36);
+
+        // Dean Block (Right)
+        doc.text('.........................................', 350, currentY);
+        doc.text('Approved By:', 350, currentY + 12);
+        doc.text('Dean of Faculty', 350, currentY + 24);
+        
+        const approvalDate = firstT.approvedAtDean ? new Date(firstT.approvedAtDean).toLocaleDateString('en-GB', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric'
+        }).replace(/\//g, '.') : '.......................';
+        doc.text(`Date: ${approvalDate}`, 350, currentY + 36);
+
+        doc.end();
+      } catch (err) {
+        reject(err);
+      }
+    });
+  }
+
+  async sendTimetableGroupPendingDean(dean, timetables, metadata) {
+    try {
+      const pdfBuffer = await this.generateTimetablePDF(timetables, metadata);
+      const html = `
+        <h2 style="font-size: 20px; font-weight: 900; color: #1e3a8a; margin-top: 0;">Authorization Required: Exam Timetable Batch</h2>
+        <p>Dear Dean <strong>${dean.name}</strong>,</p>
+        <p>A new batch of exam timetables for <strong>${metadata.department} (Year ${metadata.year})</strong> has been submitted for your approval.</p>
+        <p>Attached is the formal PDF version of the proposed schedule for your review.</p>
+        <div style="background: #f1f5f9; border-left: 4px solid #1e3a8a; padding: 20px; margin: 20px 0; border-radius: 8px;">
+          <p style="margin: 0; font-weight: bold;">Summary:</p>
+          <p style="margin: 5px 0;">Total Subjects: ${timetables.length}</p>
+          <p style="margin: 5px 0;">Department: ${metadata.department}</p>
+          <p style="margin: 5px 0;">Semester: ${metadata.semester}</p>
+        </div>
+        <p>Please log in to the portal to approve or request revisions.</p>
+        <a href="${process.env.FRONTEND_URL}/dean/timetables" style="display: inline-block; background-color: #1e3a8a; color: white; padding: 14px 40px; text-decoration: none; border-radius: 8px; font-weight: 800; font-size: 14px; text-transform: uppercase;">Open Dean Portal</a>
+      `;
+
+      return await this.sendEmail({ 
+        email: dean.email, 
+        subject: `Action Required: Exam Timetable Batch - ${metadata.department}`, 
+        html,
+        attachments: [
+          {
+            filename: `Proposed_Timetable_${metadata.department.replace(/\s+/g, '_')}_Year${metadata.year}.pdf`,
+            content: pdfBuffer,
+            contentType: 'application/pdf'
+          }
+        ]
+      });
+    } catch (err) {
+      console.error('Failed to send group timetable email:', err);
+      // Fallback to basic email if PDF fails
+      return this.sendTimetablePendingDean(dean, timetables[0]);
+    }
+  }
+
+  async sendTimetableGroupPendingHOD(hod, timetables, metadata) {
+    try {
+      const pdfBuffer = await this.generateTimetablePDF(timetables, metadata);
+      const html = `
+        <h2 style="font-size: 20px; font-weight: 900; color: #1e3a8a; margin-top: 0;">Supervisor Assignment Required: Approved Timetable Batch</h2>
+        <p>Dear HOD <strong>${hod.name}</strong>,</p>
+        <p>The Dean has officially approved a batch of exam timetables for <strong>${metadata.department} (Year ${metadata.year})</strong>.</p>
+        <p>Please review the attached formal PDF schedule and log in to the portal to assign supervisors.</p>
+        <div style="background: #f1f5f9; border-left: 4px solid #1e3a8a; padding: 20px; margin: 20px 0; border-radius: 8px;">
+          <p style="margin: 0; font-weight: bold;">Batch Summary:</p>
+          <p style="margin: 5px 0;">Total Subjects: ${timetables.length}</p>
+          <p style="margin: 5px 0;">Department: ${metadata.department}</p>
+          <p style="margin: 5px 0;">Semester: ${metadata.semester}</p>
+        </div>
+        <a href="${process.env.FRONTEND_URL}/hod/timetable" style="display: inline-block; background-color: #1e3a8a; color: white; padding: 14px 40px; text-decoration: none; border-radius: 8px; font-weight: 800; font-size: 14px; text-transform: uppercase;">Assign Supervisors</a>
+      `;
+
+      return await this.sendEmail({ 
+        email: hod.email, 
+        subject: `Action Required: Assign Supervisors for Approved Timetables - ${metadata.department}`, 
+        html,
+        attachments: [
+          {
+            filename: `Approved_Timetable_${metadata.department.replace(/\s+/g, '_')}_Year${metadata.year}.pdf`,
+            content: pdfBuffer,
+            contentType: 'application/pdf'
+          }
+        ]
+      });
+    } catch (err) {
+      console.error('Failed to send group timetable email to HOD:', err);
+      // Fallback to basic email if PDF fails
+      return this.sendTimetablePendingHOD(hod, timetables[0]);
+    }
+  }
+
+  async sendTimetableGroupPublished(recipients, timetables, metadata) {
+    try {
+      const pdfBuffer = await this.generateTimetablePDF(timetables, metadata);
+      const html = `
+        <h2 style="font-size: 20px; font-weight: 900; color: #059669; margin-top: 0;">Official Exam Timetable Published</h2>
+        <p>The official, finalized exam schedule for your academic batch has been published.</p>
+        <div style="background: #f0fdf4; border: 1px solid #86efac; padding: 20px; border-radius: 12px; margin: 20px 0;">
+          <p style="margin: 0; font-weight: bold; color: #166534;">Batch Details:</p>
+          <p style="margin: 5px 0;"><strong>Department:</strong> ${metadata.department}</p>
+          <p style="margin: 5px 0;"><strong>Year:</strong> ${metadata.year}</p>
+          <p style="margin: 5px 0;"><strong>Semester:</strong> ${metadata.semester}</p>
+        </div>
+        <p>Please find your complete exam schedule attached as a PDF document. You can also view it directly in your student portal.</p>
+        <a href="${process.env.FRONTEND_URL}/student/timetable" style="display: inline-block; background-color: #059669; color: white; padding: 14px 40px; text-decoration: none; border-radius: 8px; font-weight: 800; font-size: 14px; text-transform: uppercase;">View in Portal</a>
+      `;
+
+      const results = await Promise.all(recipients.map(email => 
+        this.sendEmail({ 
+          email, 
+          subject: `Published: Official Exam Timetable - ${metadata.department} (Year ${metadata.year})`, 
+          html,
+          attachments: [
+            {
+              filename: `Official_Timetable_${metadata.department.replace(/\s+/g, '_')}_Year${metadata.year}.pdf`,
+              content: pdfBuffer,
+              contentType: 'application/pdf'
+            }
+          ]
+        })
+      ).filter(p => p));
+      return results;
+    } catch (err) {
+      console.error('Failed to send published group timetable email:', err);
+      // Fallback to basic email
+      return this.sendTimetablePublished(recipients, timetables[0]);
+    }
+  }
+
   // --- EXAM TIMETABLE NOTIFICATIONS ---
   async sendTimetablePendingDean(dean, timetable) {
     const html = `

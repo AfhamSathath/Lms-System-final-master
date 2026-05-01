@@ -8,7 +8,7 @@ const timetableSchema = new mongoose.Schema({
   },
   year: {
     type: String,
-    enum: ['1st Year', '2nd Year', '3rd Year', '4th Year']
+    enum: ['1st Year', '2nd Year', '3rd Year', '4th Year', '5th Year']
   },
   semester: {
     type: Number,
@@ -32,7 +32,13 @@ const timetableSchema = new mongoose.Schema({
   supervisors: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
-  }]
+  }],
+  deanSignature: String,
+  hodSignature: String,
+  examOfficerSignature: String,
+  approvedAtDean: Date,
+  approvedAtHOD: Date,
+  publishedAt: Date
 }, { timestamps: true });
 
 // Autofill year & semester from subject

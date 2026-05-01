@@ -188,6 +188,82 @@ exports.deleteProfilePicture = async (req, res, next) => {
   }
 };
 
+exports.updateSignature = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user.id);
+
+    if (req.file) {
+      // Delete old signature if exists
+      if (user.signature && !user.signature.startsWith('http')) {
+        const oldPath = path.join(__dirname, '..', user.signature);
+        if (fs.existsSync(oldPath)) {
+          fs.unlinkSync(oldPath);
+        }
+      }
+      const filePath = `/uploads/signatures/${req.file.filename}`;
+      user.signature = filePath;
+    } else if (req.body.signature) {
+      // Handle base64 signature from canvas
+      const base64Data = req.body.signature.replace(/^data:image\/\w+;base64,/, "");
+      const fileName = `signature-${user._id}-${Date.now()}.png`;
+      const filePath = path.join(__dirname, '..', 'uploads', 'signatures', fileName);
+      
+      // Create directory if not exists
+      const dir = path.join(__dirname, '..', 'uploads', 'signatures');
+      if (!fs.existsSync(dir)){
+          fs.mkdirSync(dir, { recursive: true });
+      }
+
+      fs.writeFileSync(filePath, base64Data, 'base64');
+      
+      // Delete old signature
+      if (user.signature && !user.signature.startsWith('http')) {
+        const oldPath = path.join(__dirname, '..', user.signature);
+        if (fs.existsSync(oldPath)) {
+          fs.unlinkSync(oldPath);
+        }
+      }
+
+      user.signature = `/uploads/signatures/${fileName}`;
+    } else {
+      return res.status(400).json({ message: 'Please provide a signature file or base64 data' });
+    }
+
+    await user.save({ validateBeforeSave: false });
+
+    res.json({
+      success: true,
+      signature: user.signature,
+      user
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.deleteSignature = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user.id);
+
+    if (user.signature && !user.signature.startsWith('http')) {
+      const oldPath = path.join(__dirname, '..', user.signature);
+      if (fs.existsSync(oldPath)) {
+        fs.unlinkSync(oldPath);
+      }
+    }
+
+    user.signature = null;
+    await user.save({ validateBeforeSave: false });
+
+    res.json({
+      success: true,
+      message: 'Signature removed'
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 exports.updatePassword = async (req, res, next) => {
   try {
     const user = await User.findById(req.user.id).select('+password');

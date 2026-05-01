@@ -981,7 +981,7 @@ exports.getStudentEnrollments = async (req, res, next) => {
           name: a.name,
           type: a.type,
           maxMarks: a.maxMarks,
-          marksObtained: studentMark ? studentMark.mark : 0,
+          marksObtained: studentMark ? (studentMark.mark !== undefined ? studentMark.mark : 0) : 0,
           graded: !!studentMark,
           gradedDate: a.updatedAt,
           submitted: true, // If it's published, consider it processed
@@ -1584,19 +1584,10 @@ exports.publishAttendanceByHOD = async (req, res, next) => {
     console.log(`[publishAttendanceByHOD] Found ${publishedCount} records to publish`);
 
     if (publishedCount === 0) {
-      return res.status(400).json({
-        success: false,
-        message: 'No new attendance records to publish',
-        debug: {
-          totalRecords: enrollment.attendance.length,
-          alreadyPublished: enrollment.attendance.filter(r => r.isPublished).length,
-          records: enrollment.attendance.map(r => ({
-            status: r.status,
-            isPublished: r.isPublished,
-            markedBy: r.markedBy,
-            date: r.date
-          }))
-        }
+      return res.status(200).json({
+        success: true,
+        message: 'All attendance records are already published',
+        publishedCount: 0
       });
     }
 

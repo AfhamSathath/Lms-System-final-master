@@ -91,6 +91,10 @@ exports.assignLecturerToSubject = async (req, res, next) => {
 
     await newAssignment.save();
 
+    // Ensure the Subject collection's lecturer field is updated to match
+    subject.lecturer = lecturer._id;
+    await subject.save();
+
     const emailService = require('../utils/emailService');
     emailService.sendLecturerCourseAssignmentEmail(lecturer, subject).catch(err => console.error('Lecturer Assignment Email Failed:', err));
 
@@ -141,6 +145,27 @@ exports.getLecturerSubjects = async (req, res, next) => {
       .populate('subject', 'name code credits semester year department category')
       .sort({ createdAt: -1 });
 
+    // 3.5 SELF-HEALING: Fix existing assignments that have totalAssignments < 3
+    let needsSave = false;
+    for (const a of assignments) {
+      if (!a.curriculum) a.curriculum = {};
+      if ((a.curriculum.totalAssignments || 0) < 3) {
+        a.curriculum.totalAssignments = Math.max(3, a.curriculum.assignmentsCompleted || 0);
+        
+        // Recalculate progress percentage
+        const totalItems = (a.curriculum.totalLectures || 0) +
+          (a.curriculum.totalPracticals || 0) +
+          (a.curriculum.totalAssignments || 0);
+        const completedItems = (a.curriculum.lecturesCompleted || 0) +
+          (a.curriculum.practicalsCompleted || 0) +
+          (a.curriculum.assignmentsCompleted || 0);
+
+        a.curriculum.progressPercentage = totalItems > 0 ? Math.min(Math.round((completedItems / totalItems) * 100), 100) : 0;
+        await a.save();
+        needsSave = true;
+      }
+    }
+
     // 4. SELF-HEALING: Check if any primary subjects are missing from tracking assignments
     const trackedSubjectIds = assignments.map(a => a.subject?._id?.toString() || a.subject?.toString());
     const missingSubjects = primarySubjects.filter(s => !trackedSubjectIds.includes(s._id.toString()));
@@ -160,7 +185,7 @@ exports.getLecturerSubjects = async (req, res, next) => {
             curriculum: {
               totalLectures: sub.credits ? sub.credits * 15 : 30,
               totalPracticals: sub.category === 'Practical' ? 15 : 0,
-              totalAssignments: 5
+              totalAssignments: 3
             },
             qualifications: {
               hasQualification: true

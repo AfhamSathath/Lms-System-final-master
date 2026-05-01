@@ -46,9 +46,15 @@ const ExamApprovals = () => {
       return;
     }
 
+    // Require signature for approval
+    if (reviewData.status === 'Approved' && !user?.signature) {
+      toast.error('Digital signature is required for approval. Please add it in your profile.');
+      return;
+    }
+
     try {
       await api.put(`/api/exam-papers/${selectedPaper._id}/hod-review`, reviewData);
-      toast.success(reviewData.status === 'Approved' ? 'Exam paper approved' : 'Changes requested');
+      toast.success(reviewData.status === 'Approved' ? 'Exam paper approved with digital signature' : 'Changes requested');
       setShowModal(false);
       setReviewData({ status: '', comment: '' });
       fetchData();
@@ -148,7 +154,7 @@ const ExamApprovals = () => {
                   <div className="mb-6 flex justify-between items-start">
                     <div>
                       <p className="text-[10px] font-black uppercase text-indigo-500 tracking-widest mb-1">
-                        {paper.subject.code} • {paper.academicYear} • SEM {paper.semester}
+                        {paper.moderator?.name || 'Moderator'} • {paper.subject.code} • {paper.academicYear} • SEM {paper.semester}
                       </p>
                       <h3 className="text-xl font-black text-slate-800 uppercase tracking-tighter line-clamp-1">{paper.subject.name}</h3>
                     </div>
@@ -216,7 +222,7 @@ const ExamApprovals = () => {
               <div className="p-8 border-b border-black bg-slate-50 flex justify-between items-center">
                 <div>
                   <h2 className="text-xl font-black text-slate-800 uppercase tracking-tighter">HOD Final Approval</h2>
-                  <p className="text-[10px] font-black uppercase text-indigo-600 tracking-widest mt-1">{selectedPaper.subject.code} • {selectedPaper.subject.name}</p>
+                  <p className="text-[10px] font-black uppercase text-indigo-600 tracking-widest mt-1">Moderator: {selectedPaper.moderator?.name} • {selectedPaper.subject.code} • {selectedPaper.subject.name}</p>
                 </div>
                 <button onClick={() => setShowModal(false)} className="w-10 h-10 rounded-xl border border-black flex items-center justify-center hover:bg-rose-50 hover:text-rose-600 transition-all">
                   <FiX />
@@ -330,7 +336,7 @@ const ExamApprovals = () => {
             <div className="p-8 border-b border-black bg-slate-50 flex justify-between items-center">
               <div>
                 <h2 className="text-xl font-black text-slate-800 uppercase tracking-tighter">Approval History</h2>
-                <p className="text-[10px] font-black uppercase text-indigo-600 tracking-widest mt-1">{selectedPaper.subject.code} • {selectedPaper.subject.name}</p>
+                <p className="text-[10px] font-black uppercase text-indigo-600 tracking-widest mt-1">Moderator: {selectedPaper.moderator?.name} • {selectedPaper.subject.code} • {selectedPaper.subject.name}</p>
               </div>
               <button onClick={() => setShowDetailModal(false)} className="w-10 h-10 rounded-xl border border-black flex items-center justify-center hover:bg-rose-50 hover:text-rose-600 transition-all">
                 <FiX />

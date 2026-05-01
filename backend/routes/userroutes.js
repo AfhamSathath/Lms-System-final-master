@@ -35,6 +35,30 @@ const uploadProfile = multer({
   }
 });
 
+const signatureStorage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/signatures/');
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, 'sig-' + uniqueSuffix + path.extname(file.originalname));
+  }
+});
+
+const uploadSignature = multer({
+  storage: signatureStorage,
+  limits: { fileSize: 2 * 1024 * 1024 }, // 2MB limit
+  fileFilter: (req, file, cb) => {
+    const filetypes = /jpeg|jpg|png/;
+    const mimetype = filetypes.test(file.mimetype);
+    const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+    if (mimetype && extname) {
+      return cb(null, true);
+    }
+    cb(new Error('Only image files (JPG, PNG) are allowed!'));
+  }
+});
+
 // ---------------- AUTH ROUTES ----------------
 
 // Register (public)
@@ -99,11 +123,13 @@ router.post(
 );
 
 // Static Routes first to avoid shadowing by /:id
-router.get('/users', protect, authorize('admin', 'dean', 'hod'), userController.getUsers);
+router.get('/users', protect, authorize('admin', 'dean', 'hod', 'exam_officer'), userController.getUsers);
 router.put('/profile', protect, userController.updateProfile);
 router.post('/profile/picture', protect, uploadProfile.single('profilePicture'), userController.updateProfilePicture);
 router.delete('/profile/picture', protect, userController.deleteProfilePicture);
-router.get('/', protect, authorize('admin', 'dean', 'hod', 'registrar'), userController.getUserByRole);
+router.post('/profile/signature', protect, uploadSignature.single('signature'), userController.updateSignature);
+router.delete('/profile/signature', protect, userController.deleteSignature);
+router.get('/', protect, authorize('admin', 'dean', 'hod', 'registrar', 'exam_officer'), userController.getUserByRole);
 
 // Parameter Routes
 router.delete('/:id', protect, authorize('admin'), userController.deleteUser);

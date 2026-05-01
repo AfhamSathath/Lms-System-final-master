@@ -4,6 +4,7 @@ import api from '../../services/api';
 import toast from 'react-hot-toast';
 import Loader from '../../components/common/loader';
 import ProfilePictureUpload from '../../components/common/ProfilePictureUpload';
+import SignatureUpload from '../../components/common/SignatureUpload';
 import {
   FiUser,
   FiMail,
@@ -123,8 +124,8 @@ const AdminProfile = () => {
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-800">Admin Profile</h1>
-          <p className="text-gray-600 mt-2">Manage your account information</p>
+          <h1 className="text-3xl font-bold text-gray-800 capitalize">{user?.role === 'admin' ? 'Admin' : user?.role.replace('_', ' ')} Profile</h1>
+          <p className="text-gray-600 mt-2">Manage your account information and digital signature</p>
         </div>
 
         {/* Profile Card */}
@@ -149,6 +150,26 @@ const AdminProfile = () => {
                 userName={user?.name}
                 onUpdate={handleProfilePictureUpdate}
               />
+            </div>
+
+            {/* Signature Section - Moved to bottom */}
+            <div className="mt-12 pt-8 border-t border-gray-100">
+              <div className="flex items-center mb-4">
+                <div className="p-2 bg-slate-100 rounded-lg mr-3">
+                  <FiEdit2 className="text-slate-600" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-800">Digital Signature for Official Tasks</h3>
+              </div>
+              <p className="text-gray-600 mb-6 text-sm">
+                As an {user?.role.replace('_', ' ')}, your digital signature is required for final paper acceptances and system-wide approvals. 
+                Please ensure you have a valid signature uploaded.
+              </p>
+              <div className="max-w-xs">
+                <SignatureUpload 
+                  currentSignature={user?.signature} 
+                  onUpdate={(sig) => updateUser({ ...user, signature: sig })} 
+                />
+              </div>
             </div>
 
             {/* Edit Toggle */}

@@ -35,9 +35,15 @@ const ExamTasks = () => {
   const displayPapers = activeTab === 'pending' ? pendingPapers : historyPapers;
 
   const handleAccept = async (id) => {
+    // Require signature for final acceptance
+    if (!user?.signature) {
+      toast.error('Digital signature is required for final acceptance. Please add it in your profile.');
+      return;
+    }
+
     try {
       await api.put(`/api/exam-papers/${id}/exam-officer-accept`);
-      toast.success('Exam paper accepted for final processing');
+      toast.success('Exam paper accepted with digital signature');
       fetchData();
     } catch (error) {
       toast.error('Failed to accept paper');

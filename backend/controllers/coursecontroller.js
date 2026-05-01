@@ -59,6 +59,21 @@ const attachEnrollmentCounts = async (subjects) => {
   }));
 };
 
+const getDepartmentsForFaculty = (facultyOrDept) => {
+  if (!facultyOrDept) return [];
+  const query = facultyOrDept.toUpperCase();
+  
+  const CS_DEPTS = ['Computer Science', 'Physical Science', 'Applied Data Science'];
+  const BIZ_DEPTS = ['Languages', 'Business Management', 'Business and Management Studies', 'Languages and Communication Studies'];
+  const SIDDHA_DEPTS = ['Unit of Siddha Medicine', 'Siddha Medicine'];
+
+  if (query.includes('APPLIED SCIENCE') || CS_DEPTS.some(d => d.toUpperCase() === query)) return CS_DEPTS;
+  if (query.includes('COMMUNICATION') || query.includes('BUSINESS') || BIZ_DEPTS.some(d => d.toUpperCase() === query)) return BIZ_DEPTS;
+  if (query.includes('SIDDHA') || SIDDHA_DEPTS.some(d => d.toUpperCase() === query)) return SIDDHA_DEPTS;
+  
+  return [facultyOrDept]; // Fallback to exact match
+};
+
 // Helper to build subject query based on user role
 const getRoleBasedQuery = async (req, baseQuery = {}) => {
   const query = { ...baseQuery, isActive: true };
@@ -77,8 +92,6 @@ const getRoleBasedQuery = async (req, baseQuery = {}) => {
     // Lecturers only see assigned subjects
     const assignedIds = await getAssignedSubjectIds(req.user.id);
 
-    // If there's already an $or in baseQuery, we need to be careful
-    // But usually there isn't. We'll use $and to combine with existing filters
     const assignmentFilter = {
       $or: [
         { lecturer: req.user.id },
@@ -87,7 +100,6 @@ const getRoleBasedQuery = async (req, baseQuery = {}) => {
     };
 
     if (query.$or) {
-      // Rare case: merge multiple $ors
       return { $and: [query, assignmentFilter] };
     } else {
       Object.assign(query, assignmentFilter);
@@ -95,8 +107,13 @@ const getRoleBasedQuery = async (req, baseQuery = {}) => {
   } else if (req.user.role === 'hod') {
     // HOD see all subjects in their department
     query.department = req.user.department;
+  } else if (req.user.role === 'dean') {
+    // Deans see all subjects in their faculty
+    if (req.user.faculty || req.user.department) {
+      query.department = { $in: getDepartmentsForFaculty(req.user.faculty || req.user.department) };
+    }
   }
-  // Admins, Deans, etc. see everything in the baseQuery
+  // Admins, Registrars, Exam Officers see everything in the baseQuery
 
   return query;
 };

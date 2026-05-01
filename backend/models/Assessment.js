@@ -45,7 +45,12 @@ const assessmentSchema = new mongoose.Schema({
     },
     mark: {
       type: Number,
-      required: true
+      required: false
+    },
+    attendance: {
+      type: String,
+      enum: ['present', 'absent', 'late', 'excused'],
+      default: 'present'
     },
     remarks: String
   }],

@@ -550,7 +550,7 @@ const getExamOfficerStats = async () => {
     Result.countDocuments(),
     Enrollment.countDocuments({ grade: { $exists: true }, enrollmentStatus: 'completed' }), // simplified logic
     Result.aggregate([{ $unwind: '$results' }, { $group: { _id: '$results.grade', count: { $sum: 1 } } }]),
-    Timetable.countDocuments({ type: 'exam' })
+    Timetable.countDocuments({})
   ]);
 
   return {

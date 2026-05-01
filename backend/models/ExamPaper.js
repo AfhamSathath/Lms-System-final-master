@@ -62,7 +62,11 @@ const examPaperSchema = new mongoose.Schema({
   semester: Number,
   submittedAt: Date,
   moderatedAt: Date,
-  approvedAt: Date
+  approvedAt: Date,
+  moderatorSignature: String,
+  hodSignature: String,
+  examOfficerSignature: String,
+  acceptedAtExamOfficer: Date
 }, {
   timestamps: true
 });

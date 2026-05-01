@@ -72,7 +72,7 @@ const ExamPapers = () => {
     
     if (academicYear) formData.append('academicYear', academicYear);
     if (semester) formData.append('semester', semester);
-    formData.append('fileType', 'assignment'); // Exam papers are categorized as assignments/docs
+    formData.append('fileType', 'exam_paper'); // Hidden from student's study materials
 
     setUploading(true);
     try {
@@ -221,7 +221,7 @@ const ExamPapers = () => {
                 <div className="relative z-10">
                   <div className="mb-6">
                     <p className="text-[10px] font-black uppercase text-indigo-500 tracking-[0.2em] mb-1">
-                      {task.subject.code} • {task.academicYear} • SEM {task.semester}
+                      {task.moderator?.name} • {task.subject.code} • {task.academicYear} • SEM {task.semester}
                     </p>
                     <h3 className="text-xl font-black text-slate-800 uppercase tracking-tighter line-clamp-2">{task.subject.name}</h3>
                   </div>

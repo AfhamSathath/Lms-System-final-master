@@ -4,6 +4,7 @@ import api from '../../services/api';
 import toast from 'react-hot-toast';
 import Loader from '../../components/common/loader';
 import ProfilePictureUpload from '../../components/common/ProfilePictureUpload';
+import SignatureUpload from '../../components/common/SignatureUpload';
 import { FiEdit2, FiSave, FiX, FiLock } from 'react-icons/fi';
 
 const HodProfile = () => {
@@ -72,8 +73,8 @@ const HodProfile = () => {
       <div className="bg-white rounded-2xl shadow-lg p-8">
         <div className="flex justify-between items-center mb-6">
           <div>
-            <h1 className="text-2xl font-bold">HOD Profile</h1>
-            <p className="text-gray-600">Manage your personal information</p>
+            <h1 className="text-2xl font-bold">{user?.role === 'dean' ? 'Dean Profile' : 'HOD Profile'}</h1>
+            <p className="text-gray-600">Manage your personal and professional information</p>
           </div>
           <button
             onClick={() => setIsEditing(!isEditing)}
@@ -89,6 +90,24 @@ const HodProfile = () => {
             userName={user?.name}
             onUpdate={(url) => updateUser({ ...user, profilePicture: url })}
           />
+        </div>
+
+        {/* Signature Section - Moved to separate card */}
+        <div className="mt-8 pt-8 border-t border-gray-100">
+          <h2 className="text-xl font-bold mb-4 flex items-center">
+            <FiEdit2 className="mr-2 text-purple-600" />
+            Digital Signature for Approvals
+          </h2>
+          <p className="text-gray-600 mb-6">
+            Your digital signature is required for official exam paper approvals and timetable publishing. 
+            Please upload a clear image of your signature (transparent PNG recommended).
+          </p>
+          <div className="max-w-xs">
+            <SignatureUpload 
+              currentSignature={user?.signature} 
+              onUpdate={(sig) => updateUser({ ...user, signature: sig })} 
+            />
+          </div>
         </div>
 
         {!isEditing ? (

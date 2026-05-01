@@ -46,9 +46,15 @@ const ModerationTasks = () => {
       return;
     }
 
+    // Require signature for accepting
+    if (reviewData.status === 'Moderated' && !user?.signature) {
+      toast.error('Digital signature is required to moderate/accept papers. Please add it in your profile.');
+      return;
+    }
+
     try {
       await api.put(`/api/exam-papers/${selectedPaper._id}/moderate`, reviewData);
-      toast.success(reviewData.status === 'Moderated' ? 'Paper accepted' : 'Changes requested');
+      toast.success(reviewData.status === 'Moderated' ? 'Paper accepted with digital signature' : 'Changes requested');
       setShowReviewModal(false);
       setReviewData({ status: '', comment: '' });
       fetchData();

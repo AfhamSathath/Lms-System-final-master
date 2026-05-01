@@ -50,7 +50,7 @@ const lecturerAssignmentSchema = new mongoose.Schema({
     },
     totalAssignments: {
       type: Number,
-      default: 0
+      default: 3
     },
     lecturesCompleted: {
       type: Number,

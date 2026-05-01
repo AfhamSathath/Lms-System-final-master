@@ -16,6 +16,7 @@ import {
   FiCamera
 } from 'react-icons/fi';
 import ProfilePictureUpload from '../../components/common/ProfilePictureUpload';
+import SignatureUpload from '../../components/common/SignatureUpload';
 
 const LecturerProfile = () => {
   const { user, updateUser } = useAuth();
@@ -86,6 +87,26 @@ const LecturerProfile = () => {
                 userName={user?.name}
                 onUpdate={handleProfilePictureUpdate}
               />
+            </div>
+
+            {/* Signature Section - Moved to bottom section */}
+            <div className="mt-12 pt-8 border-t border-gray-100">
+              <div className="flex items-center mb-4">
+                <div className="p-2 bg-green-50 rounded-lg mr-3">
+                  <FiEdit2 className="text-green-600" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-800">Moderator Digital Signature</h3>
+              </div>
+              <p className="text-gray-600 mb-6 text-sm">
+                When acting as a moderator, your digital signature is required to accept or request changes to exam papers. 
+                Please upload your official signature image below.
+              </p>
+              <div className="max-w-xs">
+                <SignatureUpload 
+                  currentSignature={user?.signature} 
+                  onUpdate={(sig) => updateUser({ ...user, signature: sig })} 
+                />
+              </div>
             </div>
 
             {/* Edit Toggle */}

@@ -130,12 +130,15 @@ const SubjectAssessments = () => {
     if (assessment.marks && assessment.marks.length > 0) {
       assessment.marks.forEach(m => {
         const sId = m.student?._id || m.student;
-        if (sId) mData[sId] = m.mark;
+        if (sId) mData[sId] = {
+          mark: m.mark !== undefined ? m.mark : '',
+          attendance: m.attendance || 'present'
+        };
       });
     } else {
       const batchStudents = (students || []).filter(s => s && s.batch === assessment.batch);
       batchStudents.forEach(s => {
-        if (s && s._id) mData[s._id] = '';
+        if (s && s._id) mData[s._id] = { mark: '', attendance: 'present' };
       });
     }
     setMarksData(mData);
@@ -148,7 +151,8 @@ const SubjectAssessments = () => {
     }
     try {
       const invalidMarks = Object.keys(marksData).filter(studentId => {
-        const mark = Number(marksData[studentId]);
+        const markVal = marksData[studentId].mark;
+        const mark = markVal === '' ? 0 : Number(markVal);
         return mark > activeAssessment.maxMarks;
       });
 
@@ -159,7 +163,8 @@ const SubjectAssessments = () => {
 
       const formattedMarks = Object.keys(marksData).map(studentId => ({
         student: studentId,
-        mark: Number(marksData[studentId]) || 0
+        mark: marksData[studentId].mark === '' ? undefined : Number(marksData[studentId].mark),
+        attendance: marksData[studentId].attendance || 'present'
       }));
 
       const res = await api.put(`/api/assessments/${activeAssessment._id}/marks`, { marks: formattedMarks });
@@ -203,6 +208,21 @@ const SubjectAssessments = () => {
 
   const batchFilteredStudents = students.filter(s => s && s.batch === activeAssessment?.batch);
 
+  const handleBulkAttendance = (status) => {
+    if (activeAssessment?.status !== 'draft' || user.role !== 'lecturer') return;
+    
+    const newMarksData = { ...marksData };
+    batchFilteredStudents.forEach(s => {
+      if (s && s._id) {
+        newMarksData[s._id] = {
+          ...newMarksData[s._id],
+          attendance: status
+        };
+      }
+    });
+    setMarksData(newMarksData);
+    toast.success(`Marked all students as ${status}`);
+  };
   return (
     <div className="container mx-auto px-4 py-8 bg-white min-h-screen pb-32">
       <div className="flex justify-between items-center mb-8">
@@ -322,7 +342,15 @@ const SubjectAssessments = () => {
             <div className="bg-white p-6 rounded-3xl shadow-xl border border-black mb-8">
               <div className="flex justify-between items-center mb-6 border-b pb-4">
                 <h2 className="text-xl font-black text-slate-700">{activeAssessment.name} - Mark Entry (Batch: {activeAssessment.batch})</h2>
-                <span className="px-4 py-1.5 bg-indigo-50 text-slate-700 rounded-xl font-bold text-xs uppercase">Max Marks: {activeAssessment.maxMarks}</span>
+                <div className="flex gap-3 items-center">
+                  {user.role === 'lecturer' && activeAssessment.status === 'draft' && (
+                    <>
+                      <button onClick={() => handleBulkAttendance('present')} className="px-3 py-1.5 bg-emerald-100 text-emerald-700 hover:bg-emerald-200 rounded-lg font-bold text-xs uppercase tracking-widest transition-colors shadow-sm">All Present</button>
+                      <button onClick={() => handleBulkAttendance('absent')} className="px-3 py-1.5 bg-rose-100 text-rose-700 hover:bg-rose-200 rounded-lg font-bold text-xs uppercase tracking-widest transition-colors shadow-sm">All Absent</button>
+                    </>
+                  )}
+                  <span className="px-4 py-1.5 bg-indigo-50 text-slate-700 rounded-xl font-bold text-xs uppercase">Max Marks: {activeAssessment.maxMarks}</span>
+                </div>
               </div>
 
               <div className="overflow-x-auto">
@@ -331,6 +359,7 @@ const SubjectAssessments = () => {
                     <tr>
                       <th className="p-3 text-[10px] font-bold uppercase tracking-widest text-slate-400">Student ID</th>
                       <th className="p-3 text-[10px] font-bold uppercase tracking-widest text-slate-400">Student Name</th>
+                      <th className="p-3 text-[10px] font-bold uppercase tracking-widest text-slate-400">Attendance</th>
                       <th className="p-3 text-[10px] font-bold uppercase tracking-widest text-slate-400 text-right">Awarded Marks</th>
                     </tr>
                   </thead>
@@ -341,20 +370,39 @@ const SubjectAssessments = () => {
                         <tr key={s._id} className="hover:bg-white">
                           <td className="p-3 font-mono text-xs bg-slate-100 rounded my-2 inline-block ml-3 font-bold text-slate-600">{s.studentId}</td>
                           <td className="p-3 font-bold text-slate-700 text-sm">{s.name}</td>
+                          <td className="p-3">
+                            <select
+                              className={`border rounded-lg py-1 px-3 text-xs font-bold outline-none ${
+                                marksData[s._id]?.attendance === 'absent' ? 'bg-rose-50 text-rose-700 border-rose-200' :
+                                marksData[s._id]?.attendance === 'late' ? 'bg-amber-50 text-amber-700 border-amber-200' :
+                                marksData[s._id]?.attendance === 'excused' ? 'bg-blue-50 text-blue-700 border-blue-200' :
+                                'bg-emerald-50 text-emerald-700 border-emerald-200'
+                              } ${(activeAssessment.status !== 'draft' || user.role === 'hod') ? 'opacity-50 cursor-not-allowed bg-slate-100' : ''}`}
+                              value={marksData[s._id]?.attendance || 'present'}
+                              onChange={e => setMarksData({ ...marksData, [s._id]: { ...marksData[s._id], attendance: e.target.value } })}
+                              disabled={activeAssessment.status !== 'draft' || user.role === 'hod'}
+                            >
+                              <option value="present">Present</option>
+                              <option value="absent">Absent</option>
+                              <option value="late">Late</option>
+                              <option value="excused">Excused</option>
+                            </select>
+                          </td>
                           <td className="p-3 text-right">
                             <input
                               type="number"
                               min="0"
                               max={activeAssessment.maxMarks}
-                              className={`border rounded-lg py-1 px-3 w-24 text-center font-black focus:ring-indigo-500 outline-none ${Number(marksData[s._id]) > activeAssessment.maxMarks
+                              className={`border rounded-lg py-1 px-3 w-24 text-center font-black focus:ring-indigo-500 outline-none ${Number(marksData[s._id]?.mark) > activeAssessment.maxMarks
                                 ? 'border-rose-500 bg-rose-50 text-rose-700 animate-pulse'
                                 : 'border-black bg-slate-50 text-slate-700'
                                 } ${(activeAssessment.status !== 'draft' || user.role === 'hod') ? 'opacity-50 cursor-not-allowed bg-slate-100' : ''}`}
-                              value={marksData[s._id] !== undefined ? marksData[s._id] : ''}
-                              onChange={e => setMarksData({ ...marksData, [s._id]: e.target.value })}
-                              disabled={activeAssessment.status !== 'draft' || user.role === 'hod'}
+                              value={marksData[s._id]?.mark !== undefined ? marksData[s._id].mark : ''}
+                              onChange={e => setMarksData({ ...marksData, [s._id]: { ...marksData[s._id], mark: e.target.value } })}
+                              disabled={activeAssessment.status !== 'draft' || user.role === 'hod' || marksData[s._id]?.attendance === 'absent'}
+                              placeholder={marksData[s._id]?.attendance === 'absent' ? 'N/A' : '0'}
                             />
-                            {Number(marksData[s._id]) > activeAssessment.maxMarks && (
+                            {Number(marksData[s._id]?.mark) > activeAssessment.maxMarks && (
                               <p className="text-[10px] text-rose-500 font-bold mt-1 text-right">EXCEEDS MAX ({activeAssessment.maxMarks})</p>
                             )}
                           </td>

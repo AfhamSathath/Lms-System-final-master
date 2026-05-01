@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { FiFileText, FiCheckSquare, FiAlertCircle, FiSettings, FiActivity, FiSearch, FiRefreshCcw, FiLayers } from 'react-icons/fi';
+import { Link } from 'react-router-dom';
+import { FiFileText, FiCheckSquare, FiAlertCircle, FiSettings, FiActivity, FiSearch, FiRefreshCcw, FiLayers, FiCalendar } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 import api from '../../services/api';
 
@@ -24,11 +25,12 @@ const ExamOfficerDashboard = () => {
   if (loading) return <div className="p-20 text-center font-black text-indigo-600 animate-pulse uppercase tracking-[0.2em]">Verifying Grading Integrity...</div>;
 
   const stats = [
-    { title: 'Total Results Processed', value: examData?.totalResults || 0, icon: FiFileText, color: 'bg-indigo-600' },
-    { title: 'Verification Queue', value: examData?.verificationQueue || 0, icon: FiCheckSquare, color: 'bg-violet-600' },
-    { title: 'Scheduled Exams', value: examData?.scheduledExams || 0, icon: FiAlertCircle, color: 'bg-rose-500' },
-    { title: 'Processing Ratio', value: `${examData?.gradeDist?.length || 0} Grades`, icon: FiActivity, color: 'bg-blue-600' },
+    { title: 'Total Results Processed', value: examData?.totalResults || 0, icon: FiFileText, color: 'bg-indigo-600', link: '/exam_officer/results' },
+    { title: 'Verification Queue', value: examData?.verificationQueue || 0, icon: FiCheckSquare, color: 'bg-violet-600', link: '/exam_officer/exam-tasks' },
+    { title: 'Scheduled Exams', value: examData?.scheduledExams || 0, icon: FiCalendar, color: 'bg-rose-500', link: '/exam_officer/timetables' },
+    { title: 'Repeat Requests', value: examData?.repeatRequests || 0, icon: FiRefreshCcw, color: 'bg-blue-600', link: '/exam_officer/repeats' },
   ];
+
 
   const markingQueue = [
     { id: 'CS301-2026', subject: 'Advanced Algorithms', status: 'Marking in Progress', progress: 65, lecturer: 'Dr. Sarah Smith' },
@@ -65,31 +67,37 @@ const ExamOfficerDashboard = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
         {stats.map((stat, i) => (
-          <motion.div
+          <Link
             key={i}
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.1 }}
-            className="bg-white p-10 rounded-[45px] shadow-sm border border-black flex items-center gap-8 relative overflow-hidden group"
+            to={stat.link}
+            className="block"
           >
-            <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity transform rotate-12 scale-150">
-               <stat.icon size={100} />
-            </div>
-            <div className={`${stat.color} p-6 rounded-3xl text-white shadow-xl shadow-indigo-100`}>
-               <stat.icon size={32} />
-            </div>
-            <div>
-              <p className="text-sm font-black text-[#A3AED0] uppercase tracking-widest mb-1">{stat.title}</p>
-              <p className="text-3xl font-black text-[#1B2559]">{stat.value}</p>
-            </div>
-          </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.1 }}
+              className="bg-white p-10 rounded-[45px] shadow-sm border border-black flex items-center gap-8 relative overflow-hidden group hover:shadow-xl hover:scale-[1.02] transition-all cursor-pointer"
+            >
+              <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity transform rotate-12 scale-150">
+                 <stat.icon size={100} />
+              </div>
+              <div className={`${stat.color} p-6 rounded-3xl text-white shadow-xl shadow-indigo-100`}>
+                 <stat.icon size={32} />
+              </div>
+              <div>
+                <p className="text-sm font-black text-[#A3AED0] uppercase tracking-widest mb-1">{stat.title}</p>
+                <p className="text-3xl font-black text-[#1B2559]">{stat.value}</p>
+              </div>
+            </motion.div>
+          </Link>
+
         ))}
       </div>
 
       <div className="bg-white p-12 rounded-[50px] shadow-sm border border-black">
          <div className="flex justify-between items-center mb-10">
             <h2 className="text-2xl font-black text-[#1B2559] uppercase tracking-wide">Live Marking Queue</h2>
-            <p className="text-indigo-600 font-black cursor-pointer hover:underline cursor-pointer">View Global Schedule</p>
+            <Link to="/exam_officer/timetables" className="text-indigo-600 font-black cursor-pointer hover:underline">View Global Schedule</Link>
          </div>
          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
             {markingQueue.map((item, i) => (
@@ -124,6 +132,33 @@ const ExamOfficerDashboard = () => {
             ))}
          </div>
       </div>
+      
+      {/* Exam Operations Section */}
+      <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-10">
+         <div className="bg-gradient-to-br from-indigo-600 to-violet-700 p-12 rounded-[50px] shadow-2xl shadow-indigo-200 text-white relative overflow-hidden group border border-black">
+            <FiCalendar className="absolute -right-10 -bottom-10 text-white/10 w-64 h-64 transform rotate-12 group-hover:scale-110 transition-transform" />
+            <h2 className="text-3xl font-black mb-4 uppercase tracking-tight">Exam Timetable</h2>
+            <p className="text-indigo-100 text-lg mb-10 font-medium max-w-sm">Schedule assessments, assign halls, and manage examination dates with automated conflict detection.</p>
+            <Link 
+               to="/exam_officer/timetables" 
+               className="inline-flex items-center gap-3 px-10 py-5 bg-white text-indigo-600 font-black rounded-3xl hover:bg-indigo-50 transition-all shadow-xl"
+            >
+               <FiCalendar /> Manage Timetables
+            </Link>
+         </div>
+         
+         <div className="bg-white p-12 rounded-[50px] shadow-sm border border-black flex flex-col justify-center">
+            <h2 className="text-2xl font-black text-[#1B2559] mb-4 uppercase tracking-tight">Certification Center</h2>
+            <p className="text-[#A3AED0] text-lg mb-8 font-medium">Verify grading accuracy and issue official academic certificates for finalized batches.</p>
+            <Link 
+               to="/exam_officer/certification" 
+               className="inline-flex items-center gap-3 px-10 py-5 bg-[#f4f7fe] text-[#1B2559] font-black rounded-3xl hover:bg-gray-100 transition-all border border-black/5"
+            >
+               <FiFileText /> Issue Certificates
+            </Link>
+         </div>
+      </div>
+
     </div>
   );
 };

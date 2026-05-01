@@ -2,7 +2,51 @@ const Assessment = require('../models/Assessment');
 const Course = require('../models/course');
 const User = require('../models/user');
 const Notification = require('../models/notification');
-// Assuming emailService exists, we can mock it here if needed
+const LecturerAssignment = require('../models/LecturerAssignment');
+
+// Helper to auto-update lecturer assignment progress
+const updateLecturerAssignmentProgress = async (subjectId, lecturerId) => {
+  try {
+    const assignment = await LecturerAssignment.findOne({
+      subject: subjectId,
+      lecturer: lecturerId,
+      isActive: true
+    });
+
+    if (!assignment) return;
+
+    // Count assessments
+    const assessments = await Assessment.find({
+      subject: subjectId,
+      lecturer: lecturerId
+    });
+
+    assignment.curriculum.assignmentsCompleted = assessments.length;
+    assignment.curriculum.totalAssignments = Math.max(3, assessments.length);
+
+    // Calculate progress percentage
+    const totalItems = (assignment.curriculum.totalLectures || 0) +
+      (assignment.curriculum.totalPracticals || 0) +
+      (assignment.curriculum.totalAssignments || 0);
+    
+    const completedItems = (assignment.curriculum.lecturesCompleted || 0) +
+      (assignment.curriculum.practicalsCompleted || 0) +
+      (assignment.curriculum.assignmentsCompleted || 0);
+
+    assignment.curriculum.progressPercentage = totalItems > 0 ? Math.min(Math.round((completedItems / totalItems) * 100), 100) : 0;
+
+    // Auto-mark as completed if 100%
+    if (assignment.curriculum.progressPercentage === 100 && assignment.status !== 'completed') {
+      assignment.status = 'completed';
+    } else if (assignment.curriculum.progressPercentage < 100 && assignment.status === 'completed') {
+      assignment.status = 'active';
+    }
+
+    await assignment.save();
+  } catch (error) {
+    console.error('[progress] Error updating assessment progress:', error);
+  }
+};
 
 // @desc    Create an assessment
 // @route   POST /api/assessments
@@ -20,6 +64,8 @@ exports.createAssessment = async (req, res, next) => {
       targetGroups,
       maxMarks
     });
+
+    await updateLecturerAssignmentProgress(subject, req.user.id);
 
     res.status(201).json({
       success: true,
@@ -57,6 +103,8 @@ exports.updateAssessment = async (req, res, next) => {
     assessment.maxMarks = maxMarks || assessment.maxMarks;
 
     await assessment.save();
+    
+    await updateLecturerAssignmentProgress(assessment.subject, assessment.lecturer);
 
     res.json({
       success: true,
@@ -82,7 +130,10 @@ exports.deleteAssessment = async (req, res, next) => {
       return res.status(403).json({ success: false, message: 'Cannot delete assessment once published to HOD' });
     }
 
+    const { subject, lecturer } = assessment;
     await assessment.deleteOne();
+
+    await updateLecturerAssignmentProgress(subject, lecturer);
 
     res.json({
       success: true,
@@ -170,6 +221,8 @@ exports.submitToHOD = async (req, res, next) => {
     assessment.status = 'pending_hod';
     await assessment.save();
 
+    await updateLecturerAssignmentProgress(assessment.subject._id, assessment.lecturer);
+
     // Notify HOD of the department
     const hod = await User.findOne({
       role: 'hod',
@@ -227,6 +280,8 @@ exports.approveAssessment = async (req, res, next) => {
 
     assessment.status = 'published'; // HOD immediately publishes to students after approval
     await assessment.save();
+
+    await updateLecturerAssignmentProgress(assessment.subject, assessment.lecturer);
 
     res.json({
       success: true,

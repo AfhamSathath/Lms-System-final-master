@@ -111,6 +111,7 @@ exports.moderatePaper = async (req, res, next) => {
 
     if (status === 'Moderated') {
       paper.moderatedAt = Date.now();
+      paper.moderatorSignature = req.user.signature;
     }
 
     await paper.save();
@@ -187,6 +188,7 @@ exports.hodReview = async (req, res, next) => {
 
     if (status === 'Approved') {
       paper.approvedAt = Date.now();
+      paper.hodSignature = req.user.signature;
       
       // Notify Exam Officers
       const examOfficers = await User.find({ role: 'exam_officer' }).select('_id');
@@ -230,6 +232,8 @@ exports.examOfficerAccept = async (req, res, next) => {
     if (!paper) return res.status(404).json({ success: false, message: 'Paper not found' });
 
     paper.status = 'Accepted_By_Exam_Officer';
+    paper.examOfficerSignature = req.user.signature;
+    paper.acceptedAtExamOfficer = Date.now();
     await paper.save();
 
     // Notify Lecturer
