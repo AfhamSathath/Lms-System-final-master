@@ -32,6 +32,13 @@ const ModerationTasks = () => {
       modelAnswersSuggestions: '',
       grammarSpelling: '',
       improvementComments: ''
+    },
+    submittedDocuments: {
+      examPaperSignedApproved: false,
+      coursePlanApproved: false,
+      modelAnswersApproved: false,
+      continuousAssessmentPapersApproved: false,
+      previousExamPapersApproved: false
     }
   });
 
@@ -87,6 +94,13 @@ const ModerationTasks = () => {
           modelAnswersSuggestions: '',
           grammarSpelling: '',
           improvementComments: ''
+        },
+        submittedDocuments: {
+          examPaperSignedApproved: false,
+          coursePlanApproved: false,
+          modelAnswersApproved: false,
+          continuousAssessmentPapersApproved: false,
+          previousExamPapersApproved: false
         }
       });
       fetchData();
@@ -372,6 +386,13 @@ const ModerationTasks = () => {
                               modelAnswersSuggestions: '',
                               grammarSpelling: '',
                               improvementComments: ''
+                            },
+                            submittedDocuments: paper.moderationReport?.submittedDocuments || {
+                              examPaperSignedApproved: false,
+                              coursePlanApproved: false,
+                              modelAnswersApproved: false,
+                              continuousAssessmentPapersApproved: false,
+                              previousExamPapersApproved: false
                             }
                           });
                           setShowReviewModal(true);
@@ -468,11 +489,33 @@ const ModerationTasks = () => {
                     ].map((doc) => {
                       if (!doc.url || (doc.isMultiple && doc.url.length === 0)) return null;
 
+                      const isApproved = reviewData.submittedDocuments?.[`${doc.id}Approved`];
+
                       return (
                         <div key={doc.id} className="bg-white border border-black p-4 rounded-2xl flex flex-col gap-3">
                           <div className="flex justify-between items-center">
                             <span className="text-[10px] font-black uppercase text-slate-800 tracking-widest">{doc.label}</span>
-                            <span className="text-[8px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100 uppercase">Uploaded</span>
+                            <div className="flex items-center gap-2">
+                              <span className="text-[8px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100 uppercase">Uploaded</span>
+                              {activeTab === 'pending' && (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setReviewData(prev => ({
+                                      ...prev,
+                                      submittedDocuments: {
+                                        ...prev.submittedDocuments,
+                                        [`${doc.id}Approved`]: !prev.submittedDocuments?.[`${doc.id}Approved`]
+                                      }
+                                    }));
+                                  }}
+                                  className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-[8px] font-black uppercase transition-all border ${isApproved ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-slate-100 text-slate-500 border-slate-200 hover:bg-slate-200'}`}
+                                >
+                                  {isApproved ? <FiCheckCircle size={10} /> : <FiCheck size={10} />}
+                                  {isApproved ? 'Approved' : 'Approve'}
+                                </button>
+                              )}
+                            </div>
                           </div>
 
                           <div className="flex flex-wrap gap-2">
@@ -560,15 +603,17 @@ const ModerationTasks = () => {
                           ))}
                         </div>
                       </div>
-                      <textarea
-                        className="w-full p-4 bg-slate-50 border-2 border-slate-200 rounded-2xl focus:border-indigo-500 focus:bg-white transition-all min-h-[80px] text-sm font-bold"
-                        placeholder="If NO, please provide suggestions for improvements..."
-                        value={reviewData.moderatorSection?.organizationSuggestions || ''}
-                        onChange={(e) => setReviewData(prev => ({
-                          ...prev,
-                          moderatorSection: { ...prev.moderatorSection, organizationSuggestions: e.target.value }
-                        }))}
-                      />
+                      {reviewData.moderatorSection?.organizationClear !== 'YES' && (
+                        <textarea
+                          className="w-full p-4 bg-slate-50 border-2 border-slate-200 rounded-2xl focus:border-indigo-500 focus:bg-white transition-all min-h-[80px] text-sm font-bold"
+                          placeholder="If NO, please provide suggestions for improvements..."
+                          value={reviewData.moderatorSection?.organizationSuggestions || ''}
+                          onChange={(e) => setReviewData(prev => ({
+                            ...prev,
+                            moderatorSection: { ...prev.moderatorSection, organizationSuggestions: e.target.value }
+                          }))}
+                        />
+                      )}
                     </div>
 
                     {/* 2.4 */}
@@ -594,15 +639,17 @@ const ModerationTasks = () => {
                           ))}
                         </div>
                       </div>
-                      <textarea
-                        className="w-full p-4 bg-slate-50 border-2 border-slate-200 rounded-2xl focus:border-indigo-500 focus:bg-white transition-all min-h-[80px] text-sm font-bold"
-                        placeholder="If NO, please provide suggestions for improvements..."
-                        value={reviewData.moderatorSection?.wordingSuggestions || ''}
-                        onChange={(e) => setReviewData(prev => ({
-                          ...prev,
-                          moderatorSection: { ...prev.moderatorSection, wordingSuggestions: e.target.value }
-                        }))}
-                      />
+                      {reviewData.moderatorSection?.wordingProper !== 'YES' && (
+                        <textarea
+                          className="w-full p-4 bg-slate-50 border-2 border-slate-200 rounded-2xl focus:border-indigo-500 focus:bg-white transition-all min-h-[80px] text-sm font-bold"
+                          placeholder="If NO, please provide suggestions for improvements..."
+                          value={reviewData.moderatorSection?.wordingSuggestions || ''}
+                          onChange={(e) => setReviewData(prev => ({
+                            ...prev,
+                            moderatorSection: { ...prev.moderatorSection, wordingSuggestions: e.target.value }
+                          }))}
+                        />
+                      )}
                     </div>
 
                     {/* 2.5 */}
@@ -628,15 +675,17 @@ const ModerationTasks = () => {
                           ))}
                         </div>
                       </div>
-                      <textarea
-                        className="w-full p-4 bg-slate-50 border-2 border-slate-200 rounded-2xl focus:border-indigo-500 focus:bg-white transition-all min-h-[80px] text-sm font-bold"
-                        placeholder="If NO, please provide suggestions for improvements..."
-                        value={reviewData.moderatorSection?.modelAnswersSuggestions || ''}
-                        onChange={(e) => setReviewData(prev => ({
-                          ...prev,
-                          moderatorSection: { ...prev.moderatorSection, modelAnswersSuggestions: e.target.value }
-                        }))}
-                      />
+                      {reviewData.moderatorSection?.modelAnswersPrepared !== 'YES' && (
+                        <textarea
+                          className="w-full p-4 bg-slate-50 border-2 border-slate-200 rounded-2xl focus:border-indigo-500 focus:bg-white transition-all min-h-[80px] text-sm font-bold"
+                          placeholder="If NO, please provide suggestions for improvements..."
+                          value={reviewData.moderatorSection?.modelAnswersSuggestions || ''}
+                          onChange={(e) => setReviewData(prev => ({
+                            ...prev,
+                            moderatorSection: { ...prev.moderatorSection, modelAnswersSuggestions: e.target.value }
+                          }))}
+                        />
+                      )}
                     </div>
 
                     {/* 2.6 */}

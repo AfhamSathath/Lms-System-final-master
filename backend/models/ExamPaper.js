@@ -72,14 +72,19 @@ const examPaperSchema = new mongoose.Schema({
     submittedDocuments: {
       examPaperSigned: { type: Boolean, default: false },
       examPaperSignedUrl: String,
+      examPaperSignedApproved: { type: Boolean, default: false },
       coursePlan: { type: Boolean, default: false },
       coursePlanUrl: String,
+      coursePlanApproved: { type: Boolean, default: false },
       modelAnswers: { type: Boolean, default: false },
       modelAnswersUrl: String,
+      modelAnswersApproved: { type: Boolean, default: false },
       continuousAssessmentPapers: { type: Boolean, default: false },
       continuousAssessmentPapersUrl: [String],
+      continuousAssessmentPapersApproved: { type: Boolean, default: false },
       previousExamPapers: { type: Boolean, default: false },
-      previousExamPapersUrl: [String]
+      previousExamPapersUrl: [String],
+      previousExamPapersApproved: { type: Boolean, default: false }
     },
     ilosAssessed: [{
       questionNo: String,

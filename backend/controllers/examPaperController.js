@@ -127,7 +127,7 @@ exports.submitPaper = async (req, res, next) => {
 // @access  Private (Moderator)
 exports.moderatePaper = async (req, res, next) => {
   try {
-    const { status, comment, moderatorSection } = req.body;
+    const { status, comment, moderatorSection, submittedDocuments } = req.body;
 
     const paper = await ExamPaper.findById(req.params.id).populate('subject', 'name code');
     if (!paper) return res.status(404).json({ success: false, message: 'Paper not found' });
@@ -147,6 +147,10 @@ exports.moderatePaper = async (req, res, next) => {
         moderatedAt: Date.now(),
         moderatorSignature: req.user.signature
       };
+    }
+
+    if (submittedDocuments) {
+      paper.moderationReport.submittedDocuments = submittedDocuments;
     }
 
     if (status === 'Moderated') {

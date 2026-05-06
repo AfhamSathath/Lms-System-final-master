@@ -696,7 +696,7 @@ const ExamPapers = () => {
                               examDate: paper.examDate ? new Date(paper.examDate).toISOString().split('T')[0] : ''
                             });
                             setModerationReport({
-                              submittedDocuments: {
+                              submittedDocuments: paper.moderationReport?.submittedDocuments || {
                                 examPaperSigned: false,
                                 coursePlan: false,
                                 modelAnswers: false,
@@ -1107,12 +1107,20 @@ const ExamPapers = () => {
                             ].map(doc => {
                               const isMultiple = ['continuousAssessmentPapers', 'previousExamPapers'].includes(doc.id);
                               const urls = moderationReport.submittedDocuments[`${doc.id}Url`];
+                              const isApproved = moderationReport.submittedDocuments[`${doc.id}Approved`];
                               
                               return (
-                                <tr key={doc.id} className="hover:bg-slate-50 transition-colors">
+                                <tr key={doc.id} className={`transition-colors ${isApproved ? 'bg-emerald-50/50' : 'hover:bg-slate-50'}`}>
                                   <td className="border-2 border-slate-900 p-3 text-center font-bold">{doc.no}</td>
                                   <td className="border-2 border-slate-900 p-3 font-bold">
-                                    {doc.label}
+                                    <div className="flex items-center gap-2">
+                                      {doc.label}
+                                      {isApproved && (
+                                        <span className="text-[8px] font-black uppercase tracking-widest text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded-full border border-emerald-200">
+                                          Approved by 2nd Examiner
+                                        </span>
+                                      )}
+                                    </div>
                                     {isMultiple && (
                                       <div className="mt-2 space-y-2">
                                         {Array.isArray(urls) && urls.map((url, idx) => (
@@ -1126,13 +1134,15 @@ const ExamPapers = () => {
                                               >
                                                 View
                                               </button>
-                                              <button
-                                                type="button"
-                                                onClick={() => removeDoc(doc.id, idx)}
-                                                className="text-[9px] font-black text-rose-600 hover:underline uppercase"
-                                              >
-                                                Remove
-                                              </button>
+                                              {!isApproved && (
+                                                <button
+                                                  type="button"
+                                                  onClick={() => removeDoc(doc.id, idx)}
+                                                  className="text-[9px] font-black text-rose-600 hover:underline uppercase"
+                                                >
+                                                  Remove
+                                                </button>
+                                              )}
                                             </div>
                                           </div>
                                         ))}
@@ -1140,51 +1150,59 @@ const ExamPapers = () => {
                                     )}
                                   </td>
                                   <td className="border-2 border-slate-900 p-3 text-center">
-                                    <div className="flex flex-col items-center gap-1">
-                                      <input
-                                        type="file"
-                                        accept=".pdf"
-                                        id={`upload-${doc.id}`}
-                                        className="hidden"
-                                        onChange={(e) => handleDocUpload(e, doc.id)}
-                                      />
-                                      <label
-                                        htmlFor={`upload-${doc.id}`}
-                                        className={`px-3 py-1.5 rounded-lg border-2 flex items-center gap-2 cursor-pointer transition-all ${moderationReport.submittedDocuments[`${doc.id}Url`] && !isMultiple ? 'bg-emerald-50 border-emerald-500 text-emerald-700' : 'border-slate-200 text-slate-400 hover:border-slate-900 hover:text-slate-900'}`}
-                                      >
-                                        <FiUpload size={14} />
-                                        <span className="text-[10px] font-black uppercase tracking-widest">
-                                          {isMultiple 
-                                            ? 'Add Another PDF' 
-                                            : moderationReport.submittedDocuments[`${doc.id}Url`] ? 'Replace PDF' : 'Upload PDF'}
-                                        </span>
-                                      </label>
-                                      {moderationReport.submittedDocuments[`${doc.id}Url`] && !isMultiple && (
-                                        <div className="flex flex-col items-center gap-1">
-                                          <button
-                                            type="button"
-                                            onClick={() => handleDownload(moderationReport.submittedDocuments[`${doc.id}Url`], `${doc.id}.pdf`)}
-                                            className="text-[9px] font-bold text-indigo-500 hover:underline flex items-center gap-1"
-                                          >
-                                            <FiDownload size={10} /> View Uploaded
-                                          </button>
-                                          <button
-                                            type="button"
-                                            onClick={() => removeSingleDoc(doc.id)}
-                                            className="text-[9px] font-bold text-rose-500 hover:underline flex items-center gap-1"
-                                          >
-                                            <FiX size={10} /> Remove
-                                          </button>
-                                        </div>
-                                      )}
-                                    </div>
+                                    {isApproved ? (
+                                      <div className="text-[9px] font-black uppercase text-emerald-600 tracking-widest flex flex-col items-center gap-1">
+                                        <FiCheckCircle size={14} />
+                                        Upload Not Required
+                                      </div>
+                                    ) : (
+                                      <div className="flex flex-col items-center gap-1">
+                                        <input
+                                          type="file"
+                                          accept=".pdf"
+                                          id={`upload-${doc.id}`}
+                                          className="hidden"
+                                          onChange={(e) => handleDocUpload(e, doc.id)}
+                                        />
+                                        <label
+                                          htmlFor={`upload-${doc.id}`}
+                                          className={`px-3 py-1.5 rounded-lg border-2 flex items-center gap-2 cursor-pointer transition-all ${moderationReport.submittedDocuments[`${doc.id}Url`] && !isMultiple ? 'bg-emerald-50 border-emerald-500 text-emerald-700' : 'border-slate-200 text-slate-400 hover:border-slate-900 hover:text-slate-900'}`}
+                                        >
+                                          <FiUpload size={14} />
+                                          <span className="text-[10px] font-black uppercase tracking-widest">
+                                            {isMultiple 
+                                              ? 'Add Another PDF' 
+                                              : moderationReport.submittedDocuments[`${doc.id}Url`] ? 'Replace PDF' : 'Upload PDF'}
+                                          </span>
+                                        </label>
+                                        {moderationReport.submittedDocuments[`${doc.id}Url`] && !isMultiple && (
+                                          <div className="flex flex-col items-center gap-1">
+                                            <button
+                                              type="button"
+                                              onClick={() => handleDownload(moderationReport.submittedDocuments[`${doc.id}Url`], `${doc.id}.pdf`)}
+                                              className="text-[9px] font-bold text-indigo-500 hover:underline flex items-center gap-1"
+                                            >
+                                              <FiDownload size={10} /> View Uploaded
+                                            </button>
+                                            <button
+                                              type="button"
+                                              onClick={() => removeSingleDoc(doc.id)}
+                                              className="text-[9px] font-bold text-rose-500 hover:underline flex items-center gap-1"
+                                            >
+                                              <FiX size={10} /> Remove
+                                            </button>
+                                          </div>
+                                        )}
+                                      </div>
+                                    )}
                                   </td>
                                   <td className="border-2 border-slate-900 p-3 text-center">
                                     <input
                                       type="checkbox"
-                                      checked={moderationReport.submittedDocuments[doc.id]}
-                                      onChange={() => handleDocTick(doc.id)}
-                                      className="w-5 h-5 border-2 border-slate-900 text-slate-900 focus:ring-0 cursor-pointer"
+                                      checked={isApproved ? true : moderationReport.submittedDocuments[doc.id]}
+                                      onChange={() => !isApproved && handleDocTick(doc.id)}
+                                      disabled={isApproved}
+                                      className={`w-5 h-5 border-2 border-slate-900 focus:ring-0 ${isApproved ? 'text-emerald-500 cursor-not-allowed' : 'text-slate-900 cursor-pointer'}`}
                                     />
                                   </td>
                                 </tr>
@@ -1400,7 +1418,17 @@ const ExamPapers = () => {
 
                      <div className="bg-white border border-black rounded-[2rem] p-8 shadow-sm space-y-6">
                         <div>
-                           <p className="text-[10px] font-black text-slate-400 uppercase mb-4 tracking-[0.2em]">Quality Report Details</p>
+                           <div className="flex justify-between items-center mb-4">
+                              <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Quality Report Details</p>
+                              {selectedPaperForModal.moderationReport?.moderatorSection && (
+                                 <button 
+                                    onClick={() => generateReportPDF(selectedPaperForModal, selectedPaperForModal)}
+                                    className="px-4 py-2 bg-slate-900 text-white rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-indigo-600 transition-all flex items-center gap-2"
+                                 >
+                                    <FiDownload size={12} /> Download PDF
+                                 </button>
+                              )}
+                           </div>
                            {selectedPaperForModal.moderationReport?.moderatorSection ? (
                               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                  {[
