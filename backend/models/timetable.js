@@ -26,8 +26,17 @@ const timetableSchema = new mongoose.Schema({
   venue: { type: String, required: true },
   status: {
     type: String,
-    enum: ['draft', 'pending_dean', 'pending_hod', 'published'],
+    enum: ['draft', 'pending_dean', 'pending_hod', 'published', 'finished', 'problem'],
     default: 'draft'
+  },
+  problemReportedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  },
+  problemComments: String,
+  isVenueRestored: {
+    type: Boolean,
+    default: false
   },
   supervisors: [{
     type: mongoose.Schema.Types.ObjectId,

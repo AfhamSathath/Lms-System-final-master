@@ -49,6 +49,7 @@ const fileSchema = new mongoose.Schema({
       'solution',
       'reference',
       'exam_paper',
+      'moderation_document',
       'other'
     ],
     default: 'other'

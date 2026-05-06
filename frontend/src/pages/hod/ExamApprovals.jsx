@@ -12,6 +12,8 @@ const ExamApprovals = () => {
   const [activeTab, setActiveTab] = useState('pending');
   const [showModal, setShowModal] = useState(false);
   const [showDetailModal, setShowDetailModal] = useState(false);
+  const [showHistoryModal, setShowHistoryModal] = useState(false);
+  const [activeVersionTab, setActiveVersionTab] = useState('current');
   const [selectedPaper, setSelectedPaper] = useState(null);
   const [reviewData, setReviewData] = useState({
     status: '',
@@ -186,6 +188,31 @@ const ExamApprovals = () => {
                     </div>
                   </div>
 
+                  <div className="flex items-center justify-between px-2 text-slate-500 mb-6 bg-slate-50/50 p-2 rounded-xl border border-dashed border-slate-200">
+                    <div className="flex items-center gap-2">
+                      <FiFileText size={12} className="text-slate-400" />
+                      <span className="text-[10px] font-bold truncate max-w-[120px]">{paper.fileName || 'Exam Paper'}</span>
+                    </div>
+                    <div className="flex gap-1 overflow-x-auto no-scrollbar max-w-[150px]">
+                      <button
+                        onClick={() => { setSelectedPaper(paper); setShowHistoryModal(true); setActiveVersionTab('current'); }}
+                        className="flex items-center gap-1 px-2 py-0.5 rounded-lg transition-all border border-indigo-200 bg-white hover:bg-indigo-50 shadow-sm"
+                        title="Current Version"
+                      >
+                        <span className="text-[9px] font-black uppercase tracking-tighter">v{paper.version}</span>
+                      </button>
+                      {[...(paper.versionHistory || [])].reverse().map((v, i) => (
+                        <button
+                          key={i}
+                          onClick={() => { setSelectedPaper(paper); setShowHistoryModal(true); setActiveVersionTab(v.version); }}
+                          className="flex items-center gap-1 px-2 py-0.5 rounded-lg transition-all border border-slate-200 bg-white/50 hover:bg-white text-slate-400"
+                        >
+                          <span className="text-[9px] font-black uppercase tracking-tighter">v{v.version}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
                   <div className="flex gap-2">
                     {activeTab === 'pending' ? (
                       <button
@@ -274,6 +301,36 @@ const ExamApprovals = () => {
                       {selectedPaper.instructions || 'No instructions provided.'}
                     </p>
                   </div>
+
+                  {selectedPaper.moderationReport?.moderatorSection && (
+                    <div className="mt-6 p-6 bg-indigo-50/50 border border-indigo-100 rounded-[2rem] space-y-4">
+                      <h4 className="text-[10px] font-black uppercase text-indigo-600 tracking-widest flex items-center gap-2">
+                        Moderation Quality Report Summary
+                      </h4>
+                      <div className="grid grid-cols-1 gap-3 max-h-60 overflow-y-auto pr-2">
+                        {[
+                          { label: '2.1 ILOs & Blooms', value: selectedPaper.moderationReport.moderatorSection.ilosComments },
+                          { label: '2.2 Paper Assessment', value: selectedPaper.moderationReport.moderatorSection.paperAssessment },
+                          { label: '2.3 Organization', value: selectedPaper.moderationReport.moderatorSection.organizationClear, extra: selectedPaper.moderationReport.moderatorSection.organizationSuggestions },
+                          { label: '2.4 Wording', value: selectedPaper.moderationReport.moderatorSection.wordingProper, extra: selectedPaper.moderationReport.moderatorSection.wordingSuggestions },
+                          { label: '2.5 Model Answers', value: selectedPaper.moderationReport.moderatorSection.modelAnswersPrepared, extra: selectedPaper.moderationReport.moderatorSection.modelAnswersSuggestions },
+                          { label: '2.6 Grammar/Spelling', value: selectedPaper.moderationReport.moderatorSection.grammarSpelling },
+                          { label: '2.7 Improvements', value: selectedPaper.moderationReport.moderatorSection.improvementComments }
+                        ].map((field, idx) => field.value && (
+                          <div key={idx} className="bg-white/80 p-3 rounded-xl border border-indigo-50 shadow-sm">
+                            <div className="flex justify-between items-center mb-1">
+                              <p className="text-[8px] font-black text-indigo-400 uppercase">{field.label}</p>
+                              {['YES', 'NO'].includes(field.value) && (
+                                <span className={`text-[8px] font-black px-1.5 py-0.5 rounded-full ${field.value === 'YES' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>{field.value}</span>
+                              )}
+                            </div>
+                            {!['YES', 'NO'].includes(field.value) && <p className="text-[10px] font-bold text-slate-700">{field.value}</p>}
+                            {field.extra && <p className="text-[9px] mt-1 text-slate-500 italic border-t border-indigo-50/50 pt-1">Sug: {field.extra}</p>}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <form onSubmit={handleHodReview} className="p-8 space-y-6">
@@ -382,6 +439,34 @@ const ExamApprovals = () => {
                 ) : (
                   <p className="text-[10px] font-bold text-slate-400 italic">No moderator comments found.</p>
                 )}
+
+                {selectedPaper.moderationReport?.moderatorSection && (
+                  <div className="mt-4 p-5 bg-indigo-50 border border-indigo-100 rounded-[2rem] space-y-4">
+                    <h4 className="text-[10px] font-black uppercase text-indigo-600 tracking-widest">Quality Report Details</h4>
+                    <div className="space-y-3">
+                      {[
+                        { label: '2.1 ILOs & Blooms', value: selectedPaper.moderationReport.moderatorSection.ilosComments },
+                        { label: '2.2 Paper Assessment', value: selectedPaper.moderationReport.moderatorSection.paperAssessment },
+                        { label: '2.3 Organization', value: selectedPaper.moderationReport.moderatorSection.organizationClear, extra: selectedPaper.moderationReport.moderatorSection.organizationSuggestions },
+                        { label: '2.4 Wording', value: selectedPaper.moderationReport.moderatorSection.wordingProper, extra: selectedPaper.moderationReport.moderatorSection.wordingSuggestions },
+                        { label: '2.5 Model Answers', value: selectedPaper.moderationReport.moderatorSection.modelAnswersPrepared, extra: selectedPaper.moderationReport.moderatorSection.modelAnswersSuggestions },
+                        { label: '2.6 Grammar/Spelling', value: selectedPaper.moderationReport.moderatorSection.grammarSpelling },
+                        { label: '2.7 Improvements', value: selectedPaper.moderationReport.moderatorSection.improvementComments }
+                      ].map((field, idx) => field.value && (
+                        <div key={idx} className="bg-white/80 p-3 rounded-xl border border-indigo-50 shadow-sm">
+                          <div className="flex justify-between items-center mb-1">
+                            <p className="text-[8px] font-black text-indigo-400 uppercase">{field.label}</p>
+                            {['YES', 'NO'].includes(field.value) && (
+                              <span className={`text-[8px] font-black px-1.5 py-0.5 rounded-full ${field.value === 'YES' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>{field.value}</span>
+                            )}
+                          </div>
+                          {!['YES', 'NO'].includes(field.value) && <p className="text-[10px] font-bold text-slate-700 leading-snug">{field.value}</p>}
+                          {field.extra && <p className="text-[9px] mt-1 text-slate-500 italic border-t border-indigo-50/50 pt-1">Sug: {field.extra}</p>}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* HOD Decisions */}
@@ -415,9 +500,146 @@ const ExamApprovals = () => {
           </div>
         </div>
       )}
+
+      {/* Version History Modal */}
+      {showHistoryModal && selectedPaper && (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-md">
+          <div className="bg-white rounded-[3rem] border border-black w-full max-w-2xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300 flex flex-col max-h-[90vh]">
+            <div className="p-8 border-b border-black bg-slate-900 text-white flex justify-between items-center">
+              <div>
+                <h2 className="text-xl font-black uppercase tracking-tighter flex items-center gap-2">
+                  <FiClock /> Paper Audit Trail
+                </h2>
+                <p className="text-[10px] font-black uppercase text-indigo-400 tracking-widest mt-1">
+                  {selectedPaper.subject.code} • {selectedPaper.subject.name}
+                </p>
+              </div>
+              <button onClick={() => setShowHistoryModal(false)} className="w-10 h-10 rounded-xl border border-white/20 flex items-center justify-center hover:bg-white/10 transition-all">
+                <FiX />
+              </button>
+            </div>
+
+            <div className="overflow-y-auto p-8 space-y-8 flex-1 bg-slate-50/50">
+              {/* Latest Version (Current) */}
+              <div className="relative pl-8 border-l-2 border-indigo-500">
+                <div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-indigo-500 border-4 border-white shadow-sm"></div>
+                <div className="flex items-center justify-between mb-4">
+                  <span className="px-3 py-1 bg-indigo-600 text-white rounded-full text-[10px] font-black uppercase tracking-widest">
+                    Current Version (v{selectedPaper.version})
+                  </span>
+                  <span className="text-[10px] font-bold text-slate-400 italic">
+                    {new Date(selectedPaper.submittedAt).toLocaleString()}
+                  </span>
+                </div>
+
+                <div className="bg-white border border-black rounded-2xl p-6 shadow-sm">
+                  <p className="text-[10px] font-black text-slate-400 uppercase mb-3 tracking-widest">Latest Moderation Quality Report</p>
+                  {selectedPaper.moderationReport?.moderatorSection ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                      {[
+                        { label: '2.1 ILOs', value: selectedPaper.moderationReport.moderatorSection.ilosComments },
+                        { label: '2.2 Assessment', value: selectedPaper.moderationReport.moderatorSection.paperAssessment },
+                        { label: '2.3 Org.', value: selectedPaper.moderationReport.moderatorSection.organizationSuggestions },
+                        { label: '2.4 Wording', value: selectedPaper.moderationReport.moderatorSection.wordingSuggestions },
+                        { label: '2.5 Answers', value: selectedPaper.moderationReport.moderatorSection.modelAnswersSuggestions },
+                        { label: '2.6 Grammar', value: selectedPaper.moderationReport.moderatorSection.grammarSpelling },
+                        { label: 'Current Status', value: selectedPaper.status.replace(/_/g, ' ') }
+                      ].filter(f => f.value).map((f, i) => (
+                        <div key={i} className="bg-slate-50 p-2 rounded-lg border border-slate-100 group-hover:bg-white transition-colors">
+                          <p className="text-[7px] font-black uppercase text-indigo-400 mb-0.5">{f.label}</p>
+                          <p className="text-[10px] font-bold text-slate-700 line-clamp-2" title={f.value}>{f.value}</p>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-xs font-bold text-slate-400 italic">No report filed for this version yet.</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Historical Versions */}
+              {selectedPaper.versionHistory?.length > 0 ? (
+                [...selectedPaper.versionHistory].reverse().map((hist, idx) => (
+                  <div key={idx} className="relative pl-8 border-l-2 border-slate-200 opacity-80 hover:opacity-100 transition-opacity">
+                    <div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-slate-300 border-4 border-white"></div>
+                    <div className="flex items-center justify-between mb-4">
+                      <span className="px-3 py-1 bg-slate-200 text-slate-600 rounded-full text-[10px] font-black uppercase tracking-widest border border-slate-300">
+                        Version v{hist.version}
+                      </span>
+                      <span className="text-[10px] font-bold text-slate-400 italic">
+                        {new Date(hist.submittedAt).toLocaleString()}
+                      </span>
+                    </div>
+
+                    <div className="bg-white border border-black/10 rounded-2xl p-6 shadow-sm">
+                      <p className="text-[10px] font-black text-slate-400 uppercase mb-3 tracking-widest">Historical Review Snapshot</p>
+                      {hist.moderationReport?.moderatorSection ? (
+                        <div className="space-y-4">
+                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                            {[
+                              { label: '2.1 ILOs', value: hist.moderationReport.moderatorSection.ilosComments },
+                              { label: '2.2 Assessment', value: hist.moderationReport.moderatorSection.paperAssessment },
+                              { label: '2.3 Org.', value: hist.moderationReport.moderatorSection.organizationSuggestions },
+                              { label: '2.4 Wording', value: hist.moderationReport.moderatorSection.wordingSuggestions },
+                              { label: '2.5 Answers', value: hist.moderationReport.moderatorSection.modelAnswersSuggestions },
+                              { label: '2.6 Grammar', value: hist.moderationReport.moderatorSection.grammarSpelling },
+                              { label: 'Outcome', value: hist.status.replace(/_/g, ' ') }
+                            ].filter(f => f.value).map((f, i) => (
+                              <div key={i} className="bg-slate-50 p-2 rounded-lg border border-slate-100">
+                                <p className="text-[7px] font-black uppercase text-indigo-400 mb-0.5">{f.label}</p>
+                                <p className="text-[10px] font-bold text-slate-700 line-clamp-2" title={f.value}>{f.value}</p>
+                              </div>
+                            ))}
+                          </div>
+                          <button
+                            onClick={() => handleDownload(hist.fileUrl, `${selectedPaper.subject.code}_v${hist.version}.pdf`)}
+                            className="text-[9px] font-black uppercase text-indigo-600 flex items-center gap-1 hover:underline"
+                          >
+                            <FiDownload size={10} /> Download v{hist.version} PDF
+                          </button>
+                        </div>
+                      ) : (
+                        <p className="text-xs font-bold text-slate-400 italic">No report was filed for this version.</p>
+                      )}
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="space-y-6">
+                  <div className="text-center py-10 bg-white border border-black/5 rounded-3xl">
+                    <p className="text-sm font-bold text-slate-400 uppercase tracking-widest italic mb-2">No structured version snapshots</p>
+                    <p className="text-[10px] text-slate-400 max-w-xs mx-auto">Snapshots are captured upon resubmission. Previous version data for this paper was not captured in the new format.</p>
+                  </div>
+
+                  {(selectedPaper.moderatorComments?.length > 0 || selectedPaper.hodComments?.length > 0) && (
+                    <div className="space-y-4">
+                      <h3 className="text-[10px] font-black uppercase text-slate-400 tracking-widest px-4">Available Decision History</h3>
+                      <div className="space-y-3">
+                        {[...selectedPaper.moderatorComments, ...selectedPaper.hodComments]
+                          .sort((a, b) => new Date(b.date) - new Date(a.date))
+                          .map((c, i) => (
+                            <div key={i} className="p-4 bg-white border border-black/10 rounded-2xl flex justify-between items-start gap-4">
+                              <div>
+                                <p className="text-[8px] font-black uppercase text-indigo-500 mb-1">{selectedPaper.moderatorComments.includes(c) ? 'Moderator' : 'HOD'}</p>
+                                <p className="text-xs font-medium text-slate-600 italic">"{c.comment}"</p>
+                              </div>
+                              <span className="text-[8px] font-bold text-slate-400 whitespace-nowrap">{new Date(c.date).toLocaleDateString()}</span>
+                            </div>
+                          ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            <div className="p-6 bg-slate-50 border-t border-black text-center">
+              <p className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em]">Institutional Paper Audit Trail</p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
-
-
   );
 };
 

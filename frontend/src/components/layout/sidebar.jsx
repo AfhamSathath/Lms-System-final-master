@@ -294,7 +294,9 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         { name: 'Student Accounts', path: 'accounts', icon: FiTrendingUp },
         { name: 'Repeat Fees', path: 'repeats', icon: FiRefreshCw },
         { name: 'Mahapola Bursary', path: 'mahapola', icon: FiDollarSign },
+        { name: 'Exam Timetable', path: 'timetables', icon: FiCalendar },
         { name: 'Refunds', path: 'refunds', icon: FiActivity },
+
         { name: 'My Profile', path: 'profile', icon: FiUser }
         ];
       case 'exam_officer':

@@ -4,6 +4,10 @@ import { useAuth } from '../../context/Authcontext';
 import Loader from '../../components/common/loader';
 import { FiCalendar, FiClock, FiMapPin } from 'react-icons/fi';
 import { format } from 'date-fns';
+import Modal from '../../components/common/model';
+import TimetableSummary from '../../components/common/TimetableSummary';
+import { FiArchive } from 'react-icons/fi';
+
 
 const LecturerTimetable = () => {
   const { user } = useAuth();
@@ -13,8 +17,10 @@ const LecturerTimetable = () => {
 
   const [selectedYear, setSelectedYear] = useState('all');
   const [selectedSemester, setSelectedSemester] = useState('all');
+  const [showSummary, setShowSummary] = useState(false);
 
   const academicYears = ['1st Year', '2nd Year', '3rd Year', '4th Year'];
+
   const semesters = [1, 2];
 
   useEffect(() => {
@@ -48,17 +54,36 @@ const LecturerTimetable = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="flex flex-col md:flex-row md:items-center justify-between mb-8">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between mb-8 gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-800">Exam Schedule</h1>
+          <h1 className="text-3xl font-black text-gray-900 tracking-tight">Exam Schedule</h1>
           <p className="text-gray-500 mt-1">View all published exams and your assigned supervisions</p>
         </div>
-        {supervisingCount > 0 && (
-          <div className="bg-purple-100 border border-purple-200 text-purple-700 px-4 py-2 rounded-lg mt-4 md:mt-0 flex items-center shadow-sm">
-            <span className="font-bold mr-2">{supervisingCount}</span> Assigned Supervisions
-          </div>
-        )}
+        <div className="flex flex-wrap items-center gap-3">
+          <button 
+            onClick={() => setShowSummary(true)}
+            className="flex items-center justify-center gap-2 bg-indigo-600 text-white px-5 py-2.5 rounded-xl font-black text-xs hover:bg-indigo-700 transition-all shadow-md hover:-translate-y-0.5"
+          >
+            <FiArchive className="h-4 w-4" />
+            History Summary
+          </button>
+          {supervisingCount > 0 && (
+            <div className="bg-purple-100 border border-purple-200 text-purple-700 px-4 py-2.5 rounded-xl flex items-center shadow-sm">
+              <span className="font-bold mr-2">{supervisingCount}</span> Assigned Supervisions
+            </div>
+          )}
+        </div>
       </div>
+
+      <Modal 
+        isOpen={showSummary} 
+        onClose={() => setShowSummary(false)} 
+        title="Historical Timetable Summary"
+        size="xl"
+      >
+        <TimetableSummary />
+      </Modal>
+
 
       {/* Filters */}
       <div className="bg-white rounded-xl shadow-lg p-6 mb-8 flex flex-wrap gap-4 border border-black">

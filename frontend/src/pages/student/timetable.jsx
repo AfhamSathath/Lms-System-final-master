@@ -3,6 +3,10 @@ import api from '../../services/api';
 import Loader from '../../components/common/loader';
 import { FiCalendar, FiClock, FiMapPin } from 'react-icons/fi';
 import { format } from 'date-fns';
+import Modal from '../../components/common/model';
+import TimetableSummary from '../../components/common/TimetableSummary';
+import { FiArchive } from 'react-icons/fi';
+
 
 const StudentTimetable = () => {
   const [allPublished, setAllPublished] = useState([]);
@@ -11,8 +15,10 @@ const StudentTimetable = () => {
   
   const [selectedYear, setSelectedYear] = useState('all');
   const [selectedSemester, setSelectedSemester] = useState('all');
+  const [showSummary, setShowSummary] = useState(false);
 
   const academicYears = ['1st Year', '2nd Year', '3rd Year', '4th Year'];
+
   const semesters = [1, 2];
 
   useEffect(() => {
@@ -62,10 +68,29 @@ const StudentTimetable = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-4xl font-black text-gray-900 tracking-tight">My Exam Timetable</h1>
-        <p className="text-gray-500 mt-2 text-lg">Stay prepared for your upcoming academic assessments.</p>
+      <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-4xl font-black text-gray-900 tracking-tight">My Exam Timetable</h1>
+          <p className="text-gray-500 mt-2 text-lg">Stay prepared for your upcoming academic assessments.</p>
+        </div>
+        <button 
+          onClick={() => setShowSummary(true)}
+          className="flex items-center justify-center gap-2 bg-black text-white px-6 py-3 rounded-2xl font-black text-sm hover:bg-gray-800 transition-all shadow-lg hover:-translate-y-1"
+        >
+          <FiArchive className="h-5 w-5" />
+          View History Summary
+        </button>
       </div>
+
+      <Modal 
+        isOpen={showSummary} 
+        onClose={() => setShowSummary(false)} 
+        title="Historical Timetable Summary"
+        size="xl"
+      >
+        <TimetableSummary />
+      </Modal>
+
       
       {/* Filters */}
       <div className="bg-white rounded-2xl shadow-xl p-6 mb-10 flex flex-wrap gap-4 border border-black items-end">

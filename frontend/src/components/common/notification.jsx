@@ -232,8 +232,13 @@ const Notification = () => {
             <div
               key={n._id}
               onClick={() => handleClick(n)}
-              className={`p-4 cursor-pointer hover:bg-gray-50 ${!n.isRead ? "bg-purple-50" : ""
-                }`}
+              className={`p-4 cursor-pointer hover:bg-gray-50 transition-colors ${
+                n.priority === "HIGH" 
+                  ? "bg-rose-50 border-l-4 border-rose-500" 
+                  : !n.isRead 
+                    ? "bg-purple-50" 
+                    : ""
+              }`}
             >
               <div className="flex items-start gap-3">
                 <div className="text-xl">{getIcon(n.type)}</div>
@@ -282,7 +287,10 @@ const Notification = () => {
                 </div>
 
                 {n.priority === "HIGH" && (
-                  <span className="w-2 h-2 bg-red-500 rounded-full mt-2" />
+                  <span className="flex h-3 w-3 relative mt-1">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-3 w-3 bg-rose-500"></span>
+                  </span>
                 )}
                 {n.priority === "MEDIUM" && (
                   <span className="w-2 h-2 bg-yellow-500 rounded-full mt-2" />

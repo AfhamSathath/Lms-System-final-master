@@ -28,6 +28,10 @@ const moderatorAssignmentSchema = new mongoose.Schema({
     type: Number,
     required: [true, 'Semester is required']
   },
+  batch: {
+    type: String,
+    required: [true, 'Batch is required']
+  },
   isActive: {
     type: Boolean,
     default: true

@@ -1,7 +1,9 @@
 const Timetable = require('../models/timetable');
 const Subject = require('../models/course');
 const User = require('../models/user');
+const Notification = require('../models/notification');
 const emailService = require('../utils/emailService');
+const csvHelper = require('../utils/csvHelper');
 const ModeratorAssignment = require('../models/ModeratorAssignment');
 
 const getDepartmentsForFaculty = (facultyOrDept) => {
@@ -184,7 +186,11 @@ exports.getTimetable = async (req, res, next) => {
 // @access  Private
 exports.createTimetable = async (req, res, next) => {
   try {
+    if (req.user.role !== 'exam_officer') {
+      return res.status(403).json({ success: false, message: 'Only Exam Officers can create timetables' });
+    }
     const { subject, examType, department, year, semester, date, startTime, endTime, venue } = req.body;
+
 
     if (!subject || !department || !date || !startTime || !endTime || !venue) {
       return res.status(400).json({ success: false, message: 'Missing required fields' });
@@ -223,10 +229,11 @@ exports.updateTimetable = async (req, res, next) => {
       return res.status(404).json({ success: false, message: 'Timetable not found' });
     }
 
-    const canUpdate = ['exam_officer', 'registrar', 'admin', 'dean', 'hod'].includes(req.user.role);
+    const canUpdate = req.user.role === 'exam_officer';
     if (!canUpdate) {
-      return res.status(403).json({ success: false, message: 'Not authorized to update timetables' });
+      return res.status(403).json({ success: false, message: 'Only Exam Officers can modify timetable details' });
     }
+
 
     let fieldsToUpdate = ['subject', 'examType', 'department', 'year', 'semester', 'date', 'startTime', 'endTime', 'venue', 'status', 'supervisors', 'batch'];
     
@@ -260,10 +267,11 @@ exports.deleteTimetable = async (req, res, next) => {
       return res.status(404).json({ success: false, message: 'Timetable not found' });
     }
 
-    const canDelete = ['exam_officer', 'registrar', 'admin'].includes(req.user.role);
+    const canDelete = req.user.role === 'exam_officer';
     if (!canDelete) {
-      return res.status(403).json({ success: false, message: 'Not authorized to delete timetables' });
+      return res.status(403).json({ success: false, message: 'Only Exam Officers can delete timetables' });
     }
+
 
     await timetable.deleteOne();
 
@@ -277,7 +285,11 @@ exports.deleteTimetable = async (req, res, next) => {
 // @access  Private
 exports.bulkCreateTimetables = async (req, res, next) => {
   try {
+    if (req.user.role !== 'exam_officer') {
+      return res.status(403).json({ success: false, message: 'Only Exam Officers can bulk create timetables' });
+    }
     const { timetables } = req.body;
+
 
     if (!timetables || !Array.isArray(timetables) || timetables.length === 0) {
       return res.status(400).json({ success: false, message: 'Invalid or empty timetables array' });
@@ -307,6 +319,7 @@ exports.bulkCreateTimetables = async (req, res, next) => {
           startTime: entry.startTime,
           endTime: entry.endTime,
           venue: entry.venue,
+          batch: entry.batch,
           status: entry.status || 'draft'
         });
         await timetable.save();
@@ -350,7 +363,7 @@ exports.bulkUpdateTimetableStatus = async (req, res, next) => {
 
     const updateData = {};
     if (status) {
-      if (!['draft', 'pending_dean', 'pending_hod', 'published'].includes(status)) {
+      if (!['draft', 'pending_dean', 'pending_hod', 'published', 'finished', 'problem'].includes(status)) {
         return res.status(400).json({ success: false, message: 'Invalid status' });
       }
       updateData.status = status;
@@ -363,19 +376,26 @@ exports.bulkUpdateTimetableStatus = async (req, res, next) => {
     // Role-based status transition validation (only if status is changing)
     const role = req.user.role;
     if (status) {
-      if (status === 'pending_dean' && !['exam_officer', 'registrar', 'admin', 'hod'].includes(role)) {
-         return res.status(403).json({ success: false, message: 'Only Exam Officers/HODs can send for Dean approval' });
+      if (status === 'pending_dean' && role !== 'exam_officer') {
+         return res.status(403).json({ success: false, message: 'Only Exam Officers can send for Dean approval' });
       }
-      if (status === 'pending_hod' && !['dean', 'admin'].includes(role)) {
+      if (status === 'pending_hod' && role !== 'dean') {
          return res.status(403).json({ success: false, message: 'Only Deans can approve and send to HOD' });
       }
-      if (status === 'published' && !['hod', 'admin'].includes(role)) {
+      if (status === 'published' && role !== 'hod') {
          return res.status(403).json({ success: false, message: 'Only HODs can publish timetables' });
       }
-      if (status === 'draft' && !['dean', 'exam_officer', 'registrar', 'admin'].includes(role)) {
-         return res.status(403).json({ success: false, message: 'Unauthorized to revert to draft' });
+      if (status === 'finished' && role !== 'hod') {
+         return res.status(403).json({ success: false, message: 'Only HODs can mark exams as finished' });
+      }
+      if (status === 'problem' && role !== 'hod') {
+         return res.status(403).json({ success: false, message: 'Only HODs can report problems' });
+      }
+      if (status === 'draft' && !['dean', 'hod', 'exam_officer'].includes(role)) {
+         return res.status(403).json({ success: false, message: 'Unauthorized to revert status' });
       }
     }
+
 
     // Perform update
     const now = Date.now();
@@ -390,6 +410,12 @@ exports.bulkUpdateTimetableStatus = async (req, res, next) => {
       updateData.hodSignature = signature;
       updateData.approvedAtHOD = now;
       updateData.publishedAt = now;
+    } else if (status === 'finished') {
+      updateData.isVenueRestored = true; // Automatically restore venue availability
+    } else if (status === 'problem') {
+      const { problemComments } = req.body;
+      updateData.problemReportedBy = req.user.id;
+      updateData.problemComments = problemComments || 'Problem reported by HOD';
     }
 
     await Timetable.updateMany(
@@ -399,7 +425,8 @@ exports.bulkUpdateTimetableStatus = async (req, res, next) => {
 
     // Fetch updated timetables for notification
     const updatedTimetables = await Timetable.find({ _id: { $in: timetableIds } })
-      .populate('subject', 'name code department');
+      .populate('subject', 'name code department')
+      .populate('supervisors', 'name');
 
     // Trigger Notifications
     try {
@@ -525,6 +552,33 @@ exports.bulkUpdateTimetableStatus = async (req, res, next) => {
             await emailService.sendTimetableRejected(officer, t, req.user.role);
           }
         }
+      } else if (status === 'problem') {
+        // High Red Alert Notifications for Exam Officers
+        const examOfficers = await User.find({ role: { $in: ['exam_officer', 'admin'] } });
+        const { problemComments } = req.body;
+        
+        for (const t of updatedTimetables) {
+          for (const officer of examOfficers) {
+            // Create in-app high priority notification
+            await Notification.create({
+              user: officer._id,
+              title: 'URGENT: Exam Timetable Problem Reported',
+              message: `HOD reported a problem for ${t.subject?.code} - ${t.subject?.name}. Issue: "${problemComments || 'Check timetable for details'}"`,
+              type: 'SYSTEM_ALERT',
+              priority: 'HIGH',
+              link: '/registrar/timetables'
+            });
+
+            // Also send email if needed (can reuse rejected or create a specific one, using rejected for now to alert them)
+            // It will at least send an email with the rejection/problem template
+            await emailService.sendTimetableRejected(officer, t, req.user.role).catch(err => console.error('Problem email error', err));
+          }
+        }
+      } else if (status === 'finished') {
+        // Persist finished timetables to CSV history
+        for (const t of updatedTimetables) {
+          csvHelper.appendTimetableToHistory(t);
+        }
       }
     } catch (emailError) {
       console.error('Email Notification Error:', emailError);
@@ -536,6 +590,66 @@ exports.bulkUpdateTimetableStatus = async (req, res, next) => {
       message: status 
         ? `Successfully updated ${timetableIds.length} timetables to ${status.replace('_', ' ').toUpperCase()}`
         : `Successfully updated ${timetableIds.length} timetables`
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Bulk delete timetable entries
+// @route   DELETE /api/timetables/bulk
+// @access  Private
+exports.bulkDeleteTimetables = async (req, res, next) => {
+  try {
+    const { timetableIds } = req.body;
+
+    if (!timetableIds || !Array.isArray(timetableIds) || timetableIds.length === 0) {
+      return res.status(400).json({ success: false, message: 'Invalid or empty timetable IDs' });
+    }
+
+    const canDelete = req.user.role === 'exam_officer';
+    if (!canDelete) {
+      return res.status(403).json({ success: false, message: 'Only Exam Officers can delete timetables' });
+    }
+
+    const result = await Timetable.deleteMany({ _id: { $in: timetableIds } });
+
+    res.json({
+      success: true,
+      message: `${result.deletedCount} timetable entries deleted successfully`
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Bulk assign/clear supervisors
+// @route   PUT /api/timetables/bulk-supervisors
+// @access  Private
+exports.bulkAssignSupervisors = async (req, res, next) => {
+  try {
+    const { timetableIds, supervisorIds } = req.body;
+
+    if (!timetableIds || !Array.isArray(timetableIds) || timetableIds.length === 0) {
+      return res.status(400).json({ success: false, message: 'Invalid or empty timetable IDs' });
+    }
+
+    // Role check - usually HODs or Exam Officers manage supervisors
+    const canManage = ['hod', 'exam_officer', 'admin'].includes(req.user.role);
+    if (!canManage) {
+      return res.status(403).json({ success: false, message: 'Not authorized to manage supervisors' });
+    }
+
+    const supervisorsArray = Array.isArray(supervisorIds) ? supervisorIds : [];
+
+    await Timetable.updateMany(
+      { _id: { $in: timetableIds } },
+      { supervisors: supervisorsArray }
+    );
+
+    res.json({
+      success: true,
+      message: `Supervisors updated for ${timetableIds.length} timetables`
     });
   } catch (error) {
     next(error);
@@ -583,6 +697,10 @@ exports.assignSupervisor = async (req, res, next) => {
 // @access  Private
 exports.generateTimetable = async (req, res, next) => {
   try {
+    if (req.user.role !== 'exam_officer') {
+      return res.status(403).json({ success: false, message: 'Only Exam Officers can automatically generate timetables' });
+    }
+
     const { 
       startDate: startDateStr, 
       year, 
@@ -642,7 +760,8 @@ exports.generateTimetable = async (req, res, next) => {
 
     // 2. Prepare reference data for clashes (only if avoidance is on)
     const clashTimetables = avoidConflicts ? await Timetable.find({ 
-      date: { $gte: new Date(startDateStr) } 
+      date: { $gte: new Date(startDateStr) },
+      status: { $ne: 'finished' }
     }).lean() : [];
 
     // 3. Algorithm
@@ -839,6 +958,279 @@ exports.exportTimetablePDF = async (req, res, next) => {
     res.set({
       'Content-Type': 'application/pdf',
       'Content-Disposition': `attachment; filename=timetable_${department || 'campus'}.pdf`,
+      'Content-Length': pdfBuffer.length
+    });
+
+    res.send(pdfBuffer);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Get summary of old timetables (date < today)
+// @route   GET /api/timetables/summary
+// @access  Private
+exports.getOldTimetablesSummary = async (req, res, next) => {
+  try {
+    const { department, year, semester, batch, period = 'all' } = req.query;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    let query = {};
+    if (period === 'past') {
+      query.date = { $lt: today };
+    }
+
+
+    if (department && department !== 'all') query.department = department;
+    if (year && year !== 'all') query.year = year;
+    if (semester && semester !== 'all') query.semester = semester;
+    if (batch && batch !== 'all') query.batch = batch;
+
+    // Role-based filtering (Intersection)
+    const role = req.user.role;
+    if (role === 'student') {
+      query.status = 'published';
+      if (req.user.department) query.department = req.user.department;
+    } else if (role === 'dean') {
+      if (req.user.faculty || req.user.department) {
+        const allowedDepts = getDepartmentsForFaculty(req.user.faculty || req.user.department);
+        if (query.department && typeof query.department === 'string') {
+          if (!allowedDepts.includes(query.department)) query.department = { $in: [] };
+        } else {
+          query.department = { $in: allowedDepts };
+        }
+      }
+    } else if (role === 'hod') {
+      if (req.user.department) query.department = req.user.department;
+    } else if (role === 'lecturer') {
+      const taughtSubjects = await Subject.find({ lecturer: req.user._id }).select('_id');
+      const taughtSubjectIds = taughtSubjects.map(s => s._id);
+      
+      const roleQuery = {
+        $or: [
+          { status: 'published', department: req.user.department },
+          { supervisors: req.user._id },
+          { subject: { $in: taughtSubjectIds } }
+        ]
+      };
+      query = { $and: [query, roleQuery] };
+    }
+
+    console.log('Summary Query:', JSON.stringify(query, null, 2));
+
+    const oldTimetables = await Timetable.find(query)
+      .populate('subject', 'name code year semester category')
+      .lean();
+
+    console.log(`Found ${oldTimetables.length} historical records`);
+
+
+
+    // Calculate summary statistics
+    const totalExams = oldTimetables.length;
+    const departmentBreakdown = {};
+    const yearBreakdown = {};
+    const venueUsage = {};
+    const examTypeBreakdown = {};
+
+    oldTimetables.forEach(t => {
+      if (t.department) departmentBreakdown[t.department] = (departmentBreakdown[t.department] || 0) + 1;
+      if (t.year) yearBreakdown[t.year] = (yearBreakdown[t.year] || 0) + 1;
+      if (t.venue) venueUsage[t.venue] = (venueUsage[t.venue] || 0) + 1;
+      if (t.examType) examTypeBreakdown[t.examType] = (examTypeBreakdown[t.examType] || 0) + 1;
+    });
+
+    res.json({
+      success: true,
+      summary: {
+        totalExams,
+        departmentBreakdown,
+        yearBreakdown,
+        venueUsage,
+        examTypeBreakdown,
+        recentOldExams: oldTimetables.sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 10)
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Export Aggregated Timetable CSV History
+// @route   GET /api/timetables/export-csv-history
+// @access  Private
+exports.exportTimetableCSVHistory = async (req, res, next) => {
+  try {
+    const fs = require('fs');
+    const path = require('path');
+    
+    const { department, year, semester, batch } = req.query;
+    
+    const dirPath = path.join(__dirname, '..', 'data', 'history');
+    if (!fs.existsSync(dirPath)) {
+      return res.status(404).json({ success: false, message: 'No historical records found' });
+    }
+
+    const files = fs.readdirSync(dirPath).filter(f => f.endsWith('.csv'));
+    
+    if (files.length === 0) {
+      return res.status(404).json({ success: false, message: 'No historical records found' });
+    }
+
+    let combinedCsv = 'Subject Name,Subject Code,Department,Year,Semester,Date,Start Time,End Time,Venue,Batch,Supervisors,Completed At,Exam Officer Signature,Dean Signature,HOD Signature\n';
+    
+    for (const file of files) {
+      // Basic filename filtering to optimize
+      if (year && year !== 'all') {
+        const safeYear = year.replace(/\s+/g, '_');
+        if (!file.includes(safeYear)) continue;
+      }
+      if (semester && semester !== 'all') {
+        if (!file.includes(`Sem${semester}`)) continue;
+      }
+      if (department && department !== 'all') {
+        const safeDept = department.replace(/\s+/g, '_');
+        if (!file.includes(safeDept)) continue;
+      }
+
+      const filePath = path.join(dirPath, file);
+      const content = fs.readFileSync(filePath, 'utf-8');
+      
+      const lines = content.split('\n');
+      if (lines.length < 2) continue;
+
+      // Find Batch index from the file's own header
+      const fileHeader = lines[0].split(',');
+      const batchIdx = fileHeader.findIndex(c => c.trim().toLowerCase() === 'batch');
+
+      // Skip header and append data lines
+      for (let i = 1; i < lines.length; i++) {
+        if (!lines[i].trim()) continue;
+        
+        // If batch filter is applied, check the dynamic batch column
+        if (batch && batch !== 'all' && batchIdx !== -1) {
+          // A simple CSV parse to get the column
+          const cols = lines[i].match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || [];
+          const rowBatch = cols[batchIdx] ? cols[batchIdx].replace(/"/g, '') : '';
+          if (rowBatch !== batch) continue;
+        }
+        
+        combinedCsv += lines[i] + '\n';
+      }
+    }
+
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', `attachment; filename=Exam_History_${department !== 'all' && department ? department : 'Campus'}.csv`);
+    return res.send(combinedCsv);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Export Aggregated Timetable PDF History
+// @route   GET /api/timetables/export-pdf-history
+// @access  Private
+exports.exportTimetablePDFHistory = async (req, res, next) => {
+  try {
+    const fs = require('fs');
+    const path = require('path');
+    
+    const { department, year, semester, batch } = req.query;
+    
+    const dirPath = path.join(__dirname, '..', 'data', 'history');
+    if (!fs.existsSync(dirPath)) {
+      return res.status(404).json({ success: false, message: 'No historical records found' });
+    }
+
+    const files = fs.readdirSync(dirPath).filter(f => f.endsWith('.csv'));
+    
+    if (files.length === 0) {
+      return res.status(404).json({ success: false, message: 'No historical records found' });
+    }
+
+    const timetables = [];
+    
+    for (const file of files) {
+      if (year && year !== 'all') {
+        const safeYear = year.replace(/\s+/g, '_');
+        if (!file.includes(safeYear)) continue;
+      }
+      if (semester && semester !== 'all') {
+        if (!file.includes(`Sem${semester}`)) continue;
+      }
+      if (department && department !== 'all') {
+        const safeDept = department.replace(/\s+/g, '_');
+        if (!file.includes(safeDept)) continue;
+      }
+
+      const filePath = path.join(dirPath, file);
+      const content = fs.readFileSync(filePath, 'utf-8');
+      
+      const lines = content.split('\n');
+      if (lines.length < 2) continue;
+
+      const fileHeader = lines[0].split(',').map(c => c.trim().toLowerCase());
+      
+      for (let i = 1; i < lines.length; i++) {
+        if (!lines[i].trim()) continue;
+        
+        const cols = lines[i].match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || [];
+        const getVal = (colName) => {
+          const idx = fileHeader.indexOf(colName);
+          return idx !== -1 && cols[idx] ? cols[idx].replace(/^"|"$/g, '') : '';
+        };
+
+        const rowBatch = getVal('batch');
+        if (batch && batch !== 'all' && rowBatch !== batch) continue;
+        
+        const dateStr = getVal('date');
+        let parsedDate = null;
+        if (dateStr) {
+          // Attempt to parse Date format from CSV (usually MM/DD/YYYY)
+          parsedDate = new Date(dateStr);
+        }
+
+        // Reconstruct a timetable object for the PDF generator
+        timetables.push({
+          subject: {
+            name: getVal('subject name'),
+            code: getVal('subject code'),
+            category: 'Theory' // fallback since we don't store category in CSV explicitly yet, handled by PDF gen
+          },
+          department: getVal('department') || department,
+          year: getVal('year') || year,
+          semester: getVal('semester') || semester,
+          date: parsedDate,
+          startTime: getVal('start time'),
+          endTime: getVal('end time'),
+          venue: getVal('venue'),
+          batch: rowBatch,
+          examOfficerSignature: getVal('exam officer signature'),
+          deanSignature: getVal('dean signature'),
+          hodSignature: getVal('hod signature')
+        });
+      }
+    }
+
+    if (timetables.length === 0) {
+      return res.status(404).json({ success: false, message: 'No historical records matched your filters' });
+    }
+
+    // Sort by date
+    timetables.sort((a, b) => {
+       const da = a.date ? a.date.getTime() : 0;
+       const db = b.date ? b.date.getTime() : 0;
+       return da - db;
+    });
+
+    const emailService = require('../utils/emailService');
+    const metadata = { department, year, semester, batch };
+    const pdfBuffer = await emailService.generateTimetablePDF(timetables, metadata);
+
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `attachment; filename=Exam_History_${department !== 'all' && department ? department : 'Campus'}.pdf`,
       'Content-Length': pdfBuffer.length
     });
 

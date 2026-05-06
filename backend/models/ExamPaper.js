@@ -60,13 +60,67 @@ const examPaperSchema = new mongoose.Schema({
   department: String,
   academicYear: String,
   semester: Number,
+  batch: String,
   submittedAt: Date,
   moderatedAt: Date,
   approvedAt: Date,
   moderatorSignature: String,
   hodSignature: String,
   examOfficerSignature: String,
-  acceptedAtExamOfficer: Date
+  acceptedAtExamOfficer: Date,
+  moderationReport: {
+    submittedDocuments: {
+      examPaperSigned: { type: Boolean, default: false },
+      examPaperSignedUrl: String,
+      coursePlan: { type: Boolean, default: false },
+      coursePlanUrl: String,
+      modelAnswers: { type: Boolean, default: false },
+      modelAnswersUrl: String,
+      continuousAssessmentPapers: { type: Boolean, default: false },
+      continuousAssessmentPapersUrl: [String],
+      previousExamPapers: { type: Boolean, default: false },
+      previousExamPapersUrl: [String]
+    },
+    ilosAssessed: [{
+      questionNo: String,
+      ilo: String,
+      bloomsTaxonomy: {
+        remembering: { type: Boolean, default: false },
+        understanding: { type: Boolean, default: false },
+        applying: { type: Boolean, default: false },
+        analyzing: { type: Boolean, default: false },
+        evaluating: { type: Boolean, default: false },
+        creating: { type: Boolean, default: false }
+      }
+    }],
+    reportDate: { type: Date, default: Date.now },
+    moderatorSection: {
+      ilosComments: String,
+      paperAssessment: String,
+      organizationClear: { type: String, enum: ['YES', 'NO', ''], default: '' },
+      organizationSuggestions: String,
+      wordingProper: { type: String, enum: ['YES', 'NO', ''], default: '' },
+      wordingSuggestions: String,
+      modelAnswersPrepared: { type: String, enum: ['YES', 'NO', ''], default: '' },
+      modelAnswersSuggestions: String,
+      grammarSpelling: String,
+      improvementComments: String,
+      moderatorSignature: String,
+      moderatedAt: Date
+    }
+  },
+  versionHistory: [{
+    version: Number,
+    fileUrl: String,
+    fileName: String,
+    submittedAt: Date,
+    moderatedAt: Date,
+    approvedAt: Date,
+    moderationReport: Object,
+    moderatorComments: Array,
+    hodComments: Array,
+    status: String
+  }]
 }, {
   timestamps: true
 });

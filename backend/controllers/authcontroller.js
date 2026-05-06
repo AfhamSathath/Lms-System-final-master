@@ -33,6 +33,20 @@ exports.registerUser = async (req, res, next) => {
     }
 
     const {
+      name,
+      email,
+      password,
+      role,
+      gender,
+      dateOfBirth,
+      department,
+      faculty,
+      phone,
+      address,
+      studentId,
+      lecturerId,
+      semester,
+      yearOfStudy,
       emergencyContact,
       qualifications,
       specialization,
@@ -80,6 +94,7 @@ exports.registerUser = async (req, res, next) => {
       gender,
       dateOfBirth,
       department,
+      faculty,
       phone,
       address,
       emergencyContact,
@@ -121,6 +136,7 @@ exports.registerUser = async (req, res, next) => {
         studentId: user.studentId,
         lecturerId: user.lecturerId,
         department: user.department,
+        faculty: user.faculty,
         semester: user.semester,
         yearOfStudy: user.yearOfStudy,
         batch: user.batch,
@@ -132,6 +148,7 @@ exports.registerUser = async (req, res, next) => {
         specialization: user.specialization,
         isActive: user.isActive,
         profilePicture: user.profilePicture,
+        signature: user.signature,
         createdAt: user.createdAt
       }
     });
@@ -245,11 +262,13 @@ exports.loginUser = async (req, res, next) => {
         studentId: user.studentId,
         lecturerId: user.lecturerId,
         department: user.department,
+        faculty: user.faculty,
         semester: user.semester,
         yearOfStudy: user.yearOfStudy,
         batch: user.batch,
         isActive: user.isActive,
         profilePicture: user.profilePicture,
+        signature: user.signature,
         lastLogin: user.lastLogin
       }
     });
@@ -283,6 +302,7 @@ exports.getMe = async (req, res, next) => {
         studentId: user.studentId,
         lecturerId: user.lecturerId,
         department: user.department,
+        faculty: user.faculty,
         semester: user.semester,
         yearOfStudy: user.yearOfStudy,
         batch: user.batch,
@@ -295,6 +315,7 @@ exports.getMe = async (req, res, next) => {
         emergencyContact: user.emergencyContact,
         isActive: user.isActive,
         profilePicture: user.profilePicture,
+        signature: user.signature,
         lastLogin: user.lastLogin,
         createdAt: user.createdAt
       }

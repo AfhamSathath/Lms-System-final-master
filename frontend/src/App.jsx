@@ -294,8 +294,11 @@ function MainRoutes() {
         <Route path="revenue" element={<BursarRevenue />} />
         <Route path="repeats" element={<BursarRepeatFees />} />
         <Route path="mahapola" element={<BursarMahapolaManagement />} />
+        <Route path="timetables" element={<RegistrarTimetables />} />
+        <Route path="timetable" element={<RegistrarTimetables />} />
         <Route path="profile" element={<RegistrarProfile />} />
       </Route>
+
 
 
       {/* Exam Officer Routes */}

@@ -8,7 +8,17 @@ const User = require('../models/user');
 // @access  Private (Lecturer)
 exports.submitPaper = async (req, res, next) => {
   try {
-    const { subjectId, fileUrl, fileName, instructions, duration, totalMarks, examType, examDate } = req.body;
+    const { 
+      subjectId, 
+      fileUrl, 
+      fileName, 
+      instructions, 
+      duration, 
+      totalMarks, 
+      examType, 
+      examDate,
+      moderationReport 
+    } = req.body;
 
     // Find moderator assignment for this subject
     const assignment = await ModeratorAssignment.findOne({
@@ -32,8 +42,21 @@ exports.submitPaper = async (req, res, next) => {
     });
 
     if (paper) {
-      // Update existing paper (Resubmission)
-      const oldVersion = paper.version;
+      // 1. Capture CURRENT state to history before overwriting
+      paper.versionHistory.push({
+        version: paper.version,
+        fileUrl: paper.fileUrl,
+        fileName: paper.fileName,
+        submittedAt: paper.submittedAt,
+        moderatedAt: paper.moderatedAt,
+        approvedAt: paper.approvedAt,
+        moderationReport: paper.moderationReport ? JSON.parse(JSON.stringify(paper.moderationReport)) : undefined,
+        moderatorComments: paper.moderatorComments,
+        hodComments: paper.hodComments,
+        status: paper.status
+      });
+
+      // 2. Update existing paper (Resubmission)
       paper.fileUrl = fileUrl;
       paper.fileName = fileName;
       paper.instructions = instructions;
@@ -41,6 +64,13 @@ exports.submitPaper = async (req, res, next) => {
       paper.totalMarks = totalMarks;
       paper.examType = examType;
       paper.examDate = examDate;
+      paper.batch = assignment.batch;
+      if (moderationReport) {
+        paper.moderationReport = {
+          ...moderationReport,
+          reportDate: Date.now()
+        };
+      }
       paper.status = 'Pending_Moderation';
       paper.version += 1;
       paper.submittedAt = Date.now();
@@ -67,9 +97,11 @@ exports.submitPaper = async (req, res, next) => {
         totalMarks,
         examType,
         examDate,
+        moderationReport: moderationReport ? { ...moderationReport, reportDate: Date.now() } : undefined,
         department: req.user.department,
         academicYear: assignment.academicYear,
         semester: assignment.semester,
+        batch: assignment.batch,
         status: 'Pending_Moderation',
         submittedAt: Date.now()
       });
@@ -95,7 +127,7 @@ exports.submitPaper = async (req, res, next) => {
 // @access  Private (Moderator)
 exports.moderatePaper = async (req, res, next) => {
   try {
-    const { status, comment } = req.body;
+    const { status, comment, moderatorSection } = req.body;
 
     const paper = await ExamPaper.findById(req.params.id).populate('subject', 'name code');
     if (!paper) return res.status(404).json({ success: false, message: 'Paper not found' });
@@ -107,6 +139,14 @@ exports.moderatePaper = async (req, res, next) => {
     paper.status = status;
     if (comment) {
       paper.moderatorComments.push({ comment });
+    }
+
+    if (moderatorSection) {
+      paper.moderationReport.moderatorSection = {
+        ...moderatorSection,
+        moderatedAt: Date.now(),
+        moderatorSignature: req.user.signature
+      };
     }
 
     if (status === 'Moderated') {
@@ -257,8 +297,8 @@ exports.examOfficerAccept = async (req, res, next) => {
 exports.getPapersForReview = async (req, res, next) => {
   try {
     let query = {};
-    if (req.user.role === 'hod') {
-      // HODs see all papers in their department to track history
+    if (req.user.role === 'hod' || req.user.role === 'lecturer') {
+      // HODs and Lecturers see all papers in their department to track history/reviews
       query = { department: req.user.department };
     } else if (req.user.role === 'exam_officer') {
       // Exam Officers see papers pending their acceptance or already accepted

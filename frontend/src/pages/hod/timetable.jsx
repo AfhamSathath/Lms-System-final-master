@@ -1,10 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import api from '../../services/api';
 import Loader from '../../components/common/loader';
+import Modal from '../../components/common/model';
+import TimetableSummary from '../../components/common/TimetableSummary';
+import { FiArchive } from 'react-icons/fi';
+
 
 const HodTimetable = () => {
   const [loading, setLoading] = useState(true);
   const [timetables, setTimetables] = useState([]);
+  const [showSummary, setShowSummary] = useState(false);
+
 
   useEffect(() => {
     fetchTimetables();
@@ -26,10 +32,29 @@ const HodTimetable = () => {
 
   return (
     <div className="container mx-auto px-6 py-8">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Exam Timetable</h1>
-        <p className="text-gray-600">Upcoming exam schedules for all subjects</p>
+      <div className="flex justify-between items-center mb-8">
+        <div>
+          <h1 className="text-3xl font-black text-gray-900 tracking-tight">Exam Timetable</h1>
+          <p className="text-gray-500 mt-1">Upcoming exam schedules for all subjects</p>
+        </div>
+        <button 
+          onClick={() => setShowSummary(true)}
+          className="flex items-center justify-center gap-2 bg-indigo-600 text-white px-5 py-3 rounded-2xl font-black text-sm hover:bg-indigo-700 transition-all shadow-lg hover:-translate-y-1"
+        >
+          <FiArchive className="h-5 w-5" />
+          History Summary
+        </button>
       </div>
+
+      <Modal 
+        isOpen={showSummary} 
+        onClose={() => setShowSummary(false)} 
+        title="Historical Timetable Summary"
+        size="xl"
+      >
+        <TimetableSummary />
+      </Modal>
+
 
       {timetables.length === 0 ? (
         <p className="text-gray-500">No upcoming timetable entries</p>

@@ -2,10 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
 import {
-  FiCalendar, FiPlus, FiEdit2, FiTrash2, FiSearch, FiClock, FiMapPin, FiBook, FiUsers, 
+  FiCalendar, FiPlus, FiEdit2, FiTrash2, FiSearch, FiClock, FiMapPin, FiBook, FiUsers,
   FiFilter, FiChevronDown, FiUser, FiShield, FiZap, FiCheck, FiLayers, FiAlertCircle,
-  FiDownload, FiTable, FiGrid, FiSend
+  FiDownload, FiTable, FiGrid, FiSend, FiArchive
 } from 'react-icons/fi';
+import TimetableSummary from '../../components/common/TimetableSummary';
+
 
 import api from '../../services/api';
 import Loader from '../../components/common/loader';
@@ -33,12 +35,17 @@ const RegistrarTimetables = () => {
   const [showGenerateModal, setShowGenerateModal] = useState(false);
   const [selectedTimetable, setSelectedTimetable] = useState(null);
   const [viewType, setViewType] = useState('card');
+  const [showSummary, setShowSummary] = useState(false);
   const [eoSignature, setEoSignature] = useState(null);
+
   const [formData, setFormData] = useState({
     subject: '', year: '', semester: '', examType: 'final',
     date: '', startTime: '', endTime: '', venue: '', department: '', batch: ''
   });
   const [manualBatch, setManualBatch] = useState('');
+  const [selectedTimetableIds, setSelectedTimetableIds] = useState([]);
+  const [showProblemModal, setShowProblemModal] = useState(false);
+  const [problemText, setProblemText] = useState('');
 
   const academicYears = ['1st Year', '2nd Year', '3rd Year', '4th Year', '5th Year'];
   const semesters = [1, 2];
@@ -136,7 +143,7 @@ const RegistrarTimetables = () => {
 
     try {
       await api.put('/api/timetables/bulk-status', { timetableIds: [id], status });
-      const successMsg = status === 'published' 
+      const successMsg = status === 'published'
         ? 'Timetable published with your digital signature'
         : `Status updated with your digital signature`;
       toast.success(successMsg);
@@ -169,15 +176,15 @@ const RegistrarTimetables = () => {
     } else if (status === 'published') {
       targetTimetables = filteredTimetables.filter(t => t.status === 'pending_hod');
     }
-    
+
     const targetIds = targetTimetables.map(t => t._id);
-    
+
     if (targetIds.length === 0) return toast.error('No relevant timetables to send');
 
     try {
       setLoading(true);
       await api.put('/api/timetables/bulk-status', { timetableIds: targetIds, status });
-      const successMsg = status === 'published' 
+      const successMsg = status === 'published'
         ? 'All timetables published with your digital signature'
         : `Batch successfully sent to ${status.replace('pending_', '').toUpperCase()} with signature`;
       toast.success(successMsg);
@@ -279,15 +286,15 @@ const RegistrarTimetables = () => {
       toast.error('No timetables found in current filter');
       return;
     }
-    
+
     if (!window.confirm(`Bulk Update: Are you sure you want to change the batch to "${manualBatch}" for all ${filteredTimetables.length} filtered timetables?`)) return;
-    
+
     try {
       setLoading(true);
       const timetableIds = filteredTimetables.map(t => t._id);
-      await api.put('/api/timetables/bulk-status', { 
-        timetableIds, 
-        batch: manualBatch 
+      await api.put('/api/timetables/bulk-status', {
+        timetableIds,
+        batch: manualBatch
       });
       toast.success(`Successfully updated batch to ${manualBatch}`);
       fetchData();
@@ -389,6 +396,70 @@ const RegistrarTimetables = () => {
     }
   };
 
+  const handleSelectTimetable = (id) => {
+    setSelectedTimetableIds(prev =>
+      prev.includes(id) ? prev.filter(tId => tId !== id) : [...prev, id]
+    );
+  };
+
+  const handleSelectAll = (e, batchTimetables = null) => {
+    if (e.target.checked) {
+      const idsToAdd = batchTimetables
+        ? batchTimetables.map(t => t._id)
+        : filteredTimetables.map(t => t._id);
+      setSelectedTimetableIds(prev => [...new Set([...prev, ...idsToAdd])]);
+    } else {
+      if (batchTimetables) {
+        const batchIds = batchTimetables.map(t => t._id);
+        setSelectedTimetableIds(prev => prev.filter(id => !batchIds.includes(id)));
+      } else {
+        setSelectedTimetableIds([]);
+      }
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedTimetableIds.length === 0) return;
+    if (!window.confirm(`Are you sure you want to delete ${selectedTimetableIds.length} timetable entries?`)) return;
+
+    try {
+      setLoading(true);
+      await api.delete('/api/timetables/bulk', { data: { timetableIds: selectedTimetableIds } });
+      toast.success(`${selectedTimetableIds.length} entries deleted successfully`);
+      setSelectedTimetableIds([]);
+      fetchData();
+    } catch (err) {
+      console.error(err);
+      toast.error('Bulk delete failed');
+      setLoading(false);
+    }
+  };
+
+  const handleBulkClearSupervisors = async () => {
+    if (selectedTimetableIds.length === 0) return;
+    if (!window.confirm(`Are you sure you want to clear all examiners/supervisors from ${selectedTimetableIds.length} timetables?`)) return;
+
+    try {
+      setLoading(true);
+      // We can reuse the bulk-status or create a new endpoint, but since we have a single assignment endpoint, 
+      // we'll just loop or if we want to be efficient, we should have a bulk supervisor endpoint.
+      // For now, let's just clear them by calling the supervisor endpoint for each or adding a bulk one.
+      // I'll add a bulk supervisor endpoint in the backend for better performance.
+      await api.put('/api/timetables/bulk-supervisors', {
+        timetableIds: selectedTimetableIds,
+        supervisorIds: []
+      });
+
+      toast.success(`Examiners cleared for ${selectedTimetableIds.length} timetables`);
+      setSelectedTimetableIds([]);
+      fetchData();
+    } catch (err) {
+      console.error(err);
+      toast.error('Bulk clear failed');
+      setLoading(false);
+    }
+  };
+
   const openEditModal = t => {
     setSelectedTimetable(t);
     setFormData({
@@ -417,10 +488,11 @@ const RegistrarTimetables = () => {
     }
   };
 
-  const canEdit = ['exam_officer', 'registrar', 'admin', 'hod'].includes(user?.role);
+  const canEdit = user?.role === 'exam_officer';
   const canApproveDean = user?.role === 'dean';
   const canApproveHod = user?.role === 'hod';
-  const isAdminOrOfficer = ['exam_officer', 'registrar', 'admin'].includes(user?.role);
+  const isAdminOrOfficer = user?.role === 'exam_officer';
+
 
   // For HODs, preferably show lecturers in their department first or filter them
   const availableLecturers = user?.role === 'hod' && user?.department
@@ -460,40 +532,65 @@ const RegistrarTimetables = () => {
             <FiDownload /> Export PDF
           </button>
 
-            <div className="flex gap-2">
-              {isAdminOrOfficer && filteredTimetables.some(t => !t.status || t.status === 'draft') && (
-                <button 
-                  onClick={() => handleBulkStatusChange('pending_dean')} 
-                  className="bg-white border-2 border-purple-600 text-purple-600 px-6 py-3 rounded-lg hover:bg-purple-50 transition-colors flex items-center shadow-md font-black uppercase text-xs tracking-widest"
+          <button
+            onClick={() => setShowSummary(true)}
+            className="bg-slate-900 text-white px-4 py-3 rounded-lg hover:bg-black transition-colors flex items-center gap-2 shadow-lg font-bold text-sm"
+          >
+            <FiArchive /> History Summary
+          </button>
+
+
+          <div className="flex gap-2">
+            {isAdminOrOfficer && filteredTimetables.some(t => !t.status || t.status === 'draft') && (
+              <button
+                onClick={() => handleBulkStatusChange('pending_dean')}
+                className="bg-white border-2 border-purple-600 text-purple-600 px-6 py-3 rounded-lg hover:bg-purple-50 transition-colors flex items-center shadow-md font-black uppercase text-xs tracking-widest"
+              >
+                <FiSend className="mr-2" /> Send All to Dean
+              </button>
+            )}
+            {canApproveDean && filteredTimetables.some(t => t.status === 'pending_dean') && (
+              <button
+                onClick={() => handleBulkStatusChange('pending_hod')}
+                className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors flex items-center shadow-md font-black uppercase text-xs tracking-widest"
+              >
+                <FiSend className="mr-2" /> Approve & Send All to HOD
+              </button>
+            )}
+            {canApproveHod && filteredTimetables.some(t => t.status === 'pending_hod') && (
+              <button
+                onClick={() => handleBulkStatusChange('published')}
+                className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors flex items-center shadow-md font-black uppercase text-xs tracking-widest"
+              >
+                <FiSend className="mr-2" /> Publish All Timetables
+              </button>
+            )}
+            {isAdminOrOfficer && (
+              <button
+                onClick={() => setShowGenerateModal(true)}
+                className="bg-emerald-600 text-white px-6 py-3 rounded-lg hover:bg-emerald-700 transition-colors flex items-center shadow-lg font-bold"
+              >
+                Auto Generate
+              </button>
+            )}
+            {selectedTimetableIds.length > 0 && isAdminOrOfficer && (
+              <div className="flex gap-2 animate-in slide-in-from-right duration-300">
+                <button
+                  onClick={handleBulkClearSupervisors}
+                  className="bg-amber-600 text-white px-4 py-3 rounded-lg hover:bg-amber-700 transition-colors flex items-center shadow-lg font-bold text-xs uppercase tracking-widest"
+                  title="Clear Examiners"
                 >
-                  <FiSend className="mr-2" /> Send All to Dean
+                  <FiUsers className="mr-2" /> Clear Examiners ({selectedTimetableIds.length})
                 </button>
-              )}
-              {canApproveDean && filteredTimetables.some(t => t.status === 'pending_dean') && (
-                <button 
-                  onClick={() => handleBulkStatusChange('pending_hod')} 
-                  className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors flex items-center shadow-md font-black uppercase text-xs tracking-widest"
+                <button
+                  onClick={handleBulkDelete}
+                  className="bg-red-600 text-white px-4 py-3 rounded-lg hover:bg-red-700 transition-colors flex items-center shadow-lg font-bold text-xs uppercase tracking-widest"
                 >
-                  <FiSend className="mr-2" /> Approve & Send All to HOD
+                  <FiTrash2 className="mr-2" /> Bulk Delete ({selectedTimetableIds.length})
                 </button>
-              )}
-              {canApproveHod && filteredTimetables.some(t => t.status === 'pending_hod') && (
-                <button 
-                  onClick={() => handleBulkStatusChange('published')} 
-                  className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors flex items-center shadow-md font-black uppercase text-xs tracking-widest"
-                >
-                  <FiSend className="mr-2" /> Publish All Timetables
-                </button>
-              )}
-              {isAdminOrOfficer && (
-                <button 
-                  onClick={() => setShowGenerateModal(true)} 
-                  className="bg-emerald-600 text-white px-6 py-3 rounded-lg hover:bg-emerald-700 transition-colors flex items-center shadow-lg font-bold"
-                >
-                  Auto Generate
-                </button>
-              )}
-            </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -528,9 +625,9 @@ const RegistrarTimetables = () => {
           </div>
           <div className="relative">
             <FiUsers className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-            <select 
-              value={selectedDepartment} 
-              onChange={e => setSelectedDepartment(e.target.value)} 
+            <select
+              value={selectedDepartment}
+              onChange={e => setSelectedDepartment(e.target.value)}
               disabled={user?.role === 'hod'}
               className={`w-full pl-10 pr-4 py-3 border border-black rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none appearance-none ${user?.role === 'hod' ? 'bg-gray-50 text-gray-500 cursor-not-allowed' : ''}`}
             >
@@ -541,25 +638,25 @@ const RegistrarTimetables = () => {
           </div>
           <div className="relative">
             <div className="flex flex-col justify-center px-4 py-1 border border-black rounded-lg bg-slate-50 h-full relative group">
-               <span className="text-[9px] font-black text-purple-600 uppercase tracking-widest leading-tight">Current Batch</span>
-               <div className="flex items-center gap-2">
-                 <input 
+              <span className="text-[9px] font-black text-purple-600 uppercase tracking-widest leading-tight">Current Batch</span>
+              <div className="flex items-center gap-2">
+                <input
                   type="text"
                   value={manualBatch}
                   onChange={e => setManualBatch(e.target.value)}
                   className="bg-transparent text-sm font-black text-slate-900 border-none p-0 focus:ring-0 w-24"
-                 />
-                 {manualBatch !== getBatch(selectedYear) && (
-                   <button 
+                />
+                {manualBatch !== getBatch(selectedYear) && (
+                  <button
                     onClick={handleBulkBatchUpdate}
                     title="Update all filtered to this batch"
                     className="p-1 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-all shadow-lg animate-in fade-in zoom-in duration-300"
-                   >
-                     <FiCheck size={12} />
-                   </button>
-                 )}
-               </div>
-               <div className="absolute -top-2 -right-2 hidden group-hover:block bg-black text-white text-[8px] px-2 py-1 rounded-md z-10">Edit & Save All</div>
+                  >
+                    <FiCheck size={12} />
+                  </button>
+                )}
+              </div>
+              <div className="absolute -top-2 -right-2 hidden group-hover:block bg-black text-white text-[8px] px-2 py-1 rounded-md z-10">Edit & Save All</div>
             </div>
           </div>
         </div>
@@ -575,7 +672,7 @@ const RegistrarTimetables = () => {
           </button>
         </div>
       </div>      {/* Timetable Content */}
-           {/* Result Section */}
+      {/* Result Section */}
       {loading ? (
         <div className="flex justify-center py-12"><Loader /></div>
       ) : filteredTimetables.length > 0 ? (
@@ -591,14 +688,34 @@ const RegistrarTimetables = () => {
             ).map(([batchKey, batchTimetables]) => (
               <div key={batchKey} className="space-y-6">
                 <div className="flex items-center gap-4">
-                  <h3 className="text-xl font-black uppercase tracking-widest text-slate-800 bg-slate-100 px-6 py-2 rounded-2xl border-l-4 border-purple-600 shadow-sm">{batchKey}</h3>
+                  <div className="flex items-center gap-2">
+                    {isAdminOrOfficer && (
+                      <input
+                        type="checkbox"
+                        onChange={(e) => handleSelectAll(e, batchTimetables)}
+                        checked={batchTimetables.every(t => selectedTimetableIds.includes(t._id))}
+                        className="w-5 h-5 rounded border-2 border-black text-purple-600 focus:ring-purple-500"
+                      />
+                    )}
+                    <h3 className="text-xl font-black uppercase tracking-widest text-slate-800 bg-slate-100 px-6 py-2 rounded-2xl border-l-4 border-purple-600 shadow-sm">{batchKey}</h3>
+                  </div>
                   <div className="h-px bg-slate-200 flex-1"></div>
                   <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">{batchTimetables.length} Subjects</span>
                 </div>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                   {batchTimetables.map(t => (
-                    <div key={t._id} className="bg-white border border-black rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col group fade-in">
+                    <div key={t._id} className={`bg-white border border-black rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col group fade-in relative ${selectedTimetableIds.includes(t._id) ? 'ring-4 ring-purple-500' : ''}`}>
+                      {isAdminOrOfficer && (
+                        <div className="absolute top-4 left-4 z-10">
+                          <input
+                            type="checkbox"
+                            checked={selectedTimetableIds.includes(t._id)}
+                            onChange={() => handleSelectTimetable(t._id)}
+                            className="w-6 h-6 rounded-lg border-2 border-black text-purple-600 focus:ring-purple-500 cursor-pointer shadow-sm"
+                          />
+                        </div>
+                      )}
                       {/* ... existing card content ... */}
                       <div className="p-6 border-b border-black bg-slate-50 group-hover:bg-purple-50 transition-colors">
                         <div className="flex justify-between items-start mb-2">
@@ -617,11 +734,20 @@ const RegistrarTimetables = () => {
                         <div className="flex items-center mt-2 px-3 py-2 rounded-xl bg-slate-50 border border-black w-fit">
                           <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 mr-3">Status:</span>
                           <span className={`text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest border border-black ${t.status === 'published' ? 'bg-green-100 text-green-800 border-green-300' :
-                              t.status === 'pending_dean' ? 'bg-blue-100 text-blue-800 border-blue-300' :
-                                t.status === 'pending_hod' ? 'bg-orange-100 text-orange-800 border-orange-300' :
-                                  'bg-gray-100 text-gray-800 border-gray-300'
+                            t.status === 'pending_dean' ? 'bg-blue-100 text-blue-800 border-blue-300' :
+                              t.status === 'pending_hod' ? 'bg-orange-100 text-orange-800 border-orange-300' :
+                                t.status === 'finished' ? 'bg-emerald-100 text-emerald-800 border-emerald-300' :
+                                  t.status === 'problem' ? 'bg-rose-100 text-rose-800 border-rose-300 animate-pulse' :
+                                    'bg-gray-100 text-gray-800 border-gray-300'
                             }`}>{t.status?.replace('_', ' ') || 'DRAFT'}</span>
                         </div>
+
+                        {t.status === 'problem' && t.problemComments && (
+                          <div className="mt-2 p-3 bg-rose-50 border border-rose-100 rounded-xl">
+                            <span className="text-[10px] font-black uppercase text-rose-400 block mb-1">Issue Reported:</span>
+                            <p className="text-xs font-bold text-rose-700 italic">"{t.problemComments}"</p>
+                          </div>
+                        )}
 
                         {t.supervisors && t.supervisors.length > 0 && (
                           <div className="flex items-center mt-2 px-3 py-2 flex-wrap gap-2 border-t border-slate-100 pt-4">
@@ -661,6 +787,44 @@ const RegistrarTimetables = () => {
                               <button onClick={() => handleStatusChange(t._id, 'published')} className="w-full px-4 py-3 bg-green-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-green-700 transition-all shadow-lg">Publish Timetable</button>
                             </div>
                           )}
+
+                          {user.role === 'hod' && t.status === 'published' && (
+                            <div className="flex gap-2 w-full">
+                              <button
+                                onClick={() => {
+                                  setSelectedTimetable(t);
+                                  setShowProblemModal(true);
+                                }}
+                                className="flex-1 px-4 py-2 bg-rose-50 text-rose-700 text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-rose-100 transition-all border border-rose-200"
+                              >
+                                Report Problem
+                              </button>
+                              <button
+                                onClick={() => handleStatusChange(t._id, 'finished')}
+                                className="flex-1 px-4 py-2 bg-emerald-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-emerald-700 transition-all shadow-md"
+                              >
+                                Mark Finished
+                              </button>
+                            </div>
+                          )}
+
+                          {isAdminOrOfficer && t.status === 'problem' && (
+                            <button
+                              onClick={() => handleStatusChange(t._id, 'draft')}
+                              className="w-full px-4 py-3 bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-slate-800 transition-all shadow-lg"
+                            >
+                              Resolve & Re-draft
+                            </button>
+                          )}
+
+                          {user.role === 'dean' && t.status === 'problem' && (
+                            <button
+                              onClick={() => handleStatusChange(t._id, 'draft')}
+                              className="w-full px-4 py-3 bg-indigo-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-indigo-700 transition-all shadow-lg"
+                            >
+                              Forward to Officer
+                            </button>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -688,14 +852,37 @@ const RegistrarTimetables = () => {
               <table className="w-full border-collapse border-2 border-black">
                 <thead>
                   <tr className="bg-slate-50">
+                    {isAdminOrOfficer && (
+                      <th className="border-2 border-black p-4 text-center w-12">
+                        <input
+                          type="checkbox"
+                          onChange={(e) => handleSelectAll(e)}
+                          checked={selectedTimetableIds.length === filteredTimetables.length && filteredTimetables.length > 0}
+                          className="w-5 h-5 rounded border-2 border-black text-purple-600 focus:ring-purple-500"
+                        />
+                      </th>
+                    )}
                     <th className="border-2 border-black p-4 text-left font-black uppercase text-xs md:text-sm w-40">Date</th>
                     <th className="border-2 border-black p-4 text-left font-black uppercase text-xs md:text-sm w-64">Time</th>
                     <th className="border-2 border-black p-4 text-left font-black uppercase text-xs md:text-sm">Subject Name</th>
+                    {(isAdminOrOfficer || canApproveDean || canApproveHod) && (
+                      <th className="border-2 border-black p-4 text-left font-black uppercase text-xs md:text-sm w-48">Status / Actions</th>
+                    )}
                   </tr>
                 </thead>
                 <tbody>
                   {[...filteredTimetables].sort((a, b) => new Date(a.date) - new Date(b.date)).map(t => (
-                    <tr key={t._id} className="hover:bg-slate-50 transition-colors group">
+                    <tr key={t._id} className={`hover:bg-slate-50 transition-colors group ${selectedTimetableIds.includes(t._id) ? 'bg-purple-50' : ''}`}>
+                      {isAdminOrOfficer && (
+                        <td className="border-2 border-black p-4 text-center">
+                          <input
+                            type="checkbox"
+                            checked={selectedTimetableIds.includes(t._id)}
+                            onChange={() => handleSelectTimetable(t._id)}
+                            className="w-5 h-5 rounded border-2 border-black text-purple-600 focus:ring-purple-500"
+                          />
+                        </td>
+                      )}
                       <td className="border-2 border-black p-4 font-bold text-xs md:text-sm">
                         {t.date ? format(new Date(t.date), 'dd.MM.yyyy') : '-'}
                         <div className="text-[10px] text-slate-400 uppercase font-bold">{t.date ? format(new Date(t.date), 'EEEE') : ''}</div>
@@ -719,6 +906,31 @@ const RegistrarTimetables = () => {
                           </div>
                         )}
                       </td>
+                      {(isAdminOrOfficer || canApproveDean || canApproveHod) && (
+                        <td className="border-2 border-black p-4">
+                          <div className="flex flex-col gap-2">
+                            <span className={`text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-widest border border-black w-fit ${t.status === 'published' ? 'bg-green-100 text-green-800 border-green-300' :
+                                t.status === 'pending_dean' ? 'bg-blue-100 text-blue-800 border-blue-300' :
+                                  t.status === 'pending_hod' ? 'bg-orange-100 text-orange-800 border-orange-300' :
+                                    t.status === 'finished' ? 'bg-emerald-100 text-emerald-800 border-emerald-300' :
+                                      t.status === 'problem' ? 'bg-rose-100 text-rose-800 border-rose-300' :
+                                        'bg-gray-100 text-gray-800 border-gray-300'
+                              }`}>{t.status?.replace('_', ' ') || 'DRAFT'}</span>
+
+                            <div className="flex flex-wrap gap-1">
+                              {user.role === 'hod' && t.status === 'published' && (
+                                <>
+                                  <button onClick={() => { setSelectedTimetable(t); setShowProblemModal(true); }} className="px-2 py-1 bg-rose-50 text-rose-700 text-[8px] font-black uppercase border border-rose-200 rounded shadow-sm">Issue</button>
+                                  <button onClick={() => handleStatusChange(t._id, 'finished')} className="px-2 py-1 bg-emerald-600 text-white text-[8px] font-black uppercase rounded shadow-sm">Finish</button>
+                                </>
+                              )}
+                              {(isAdminOrOfficer || user.role === 'dean') && t.status === 'problem' && (
+                                <button onClick={() => handleStatusChange(t._id, 'draft')} className="px-2 py-1 bg-slate-900 text-white text-[8px] font-black uppercase rounded shadow-sm">Resolve</button>
+                              )}
+                            </div>
+                          </div>
+                        </td>
+                      )}
                     </tr>
                   ))}
                 </tbody>
@@ -731,11 +943,11 @@ const RegistrarTimetables = () => {
               </div>
               <div className="text-center flex flex-col items-center">
                 {eoSignature && (
-                   <img 
-                      src={`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}${eoSignature}`} 
-                      alt="AR Signature" 
-                      className="h-10 md:h-12 object-contain mb-1" 
-                   />
+                  <img
+                    src={`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}${eoSignature}`}
+                    alt="AR Signature"
+                    className="h-10 md:h-12 object-contain mb-1"
+                  />
                 )}
                 <div className="w-64 border-b-2 border-black mb-3"></div>
                 <div className="text-[10px] md:text-xs font-black uppercase tracking-widest">Assistant Registrar</div>
@@ -775,7 +987,13 @@ const RegistrarTimetables = () => {
       </Modal>
 
 
+      {/* History Summary Modal */}
+      <Modal isOpen={showSummary} onClose={() => setShowSummary(false)} title="Historical Timetable Summary" size="xl">
+        <TimetableSummary />
+      </Modal>
+
       {/* Auto Generate Modal */}
+
       <Modal isOpen={showGenerateModal} onClose={() => setShowGenerateModal(false)} title="Auto-Generate Exam Schedule" size="4xl">
         <GenerateTimetableForm
           departments={departments}
@@ -792,6 +1010,45 @@ const RegistrarTimetables = () => {
           user={user}
           getBatch={getBatch}
         />
+      </Modal>
+
+      {/* Problem Report Modal */}
+      <Modal isOpen={showProblemModal} onClose={() => { setShowProblemModal(false); setProblemText(''); }} title="Report Examination Issue" size="md">
+        <div className="space-y-4">
+          <div>
+            <label className="block mb-2 font-black uppercase text-[10px] text-slate-400">Describe the Problem</label>
+            <textarea
+              value={problemText}
+              onChange={e => setProblemText(e.target.value)}
+              placeholder="e.g. Venue conflict, supervisor unavailable, technical issue..."
+              className="w-full border border-black p-4 rounded-2xl focus:ring-2 focus:ring-rose-500 h-32 text-sm font-bold"
+            />
+          </div>
+          <div className="flex justify-end gap-3 pt-4 border-t">
+            <button onClick={() => { setShowProblemModal(false); setProblemText(''); }} className="px-6 py-2 bg-white border border-black text-gray-700 font-bold rounded-xl">Cancel</button>
+            <button
+              onClick={async () => {
+                if (!problemText) return toast.error('Please describe the problem');
+                try {
+                  await api.put('/api/timetables/bulk-status', {
+                    timetableIds: [selectedTimetable._id],
+                    status: 'problem',
+                    problemComments: problemText
+                  });
+                  toast.success('Problem reported to Dean');
+                  setShowProblemModal(false);
+                  setProblemText('');
+                  fetchData();
+                } catch (err) {
+                  toast.error('Failed to report problem');
+                }
+              }}
+              className="px-6 py-2 bg-rose-600 text-white font-bold rounded-xl shadow-lg shadow-rose-100 hover:bg-rose-700 transition-all"
+            >
+              Send to Dean
+            </button>
+          </div>
+        </div>
       </Modal>
 
       {/* Supervisor Modal */}
@@ -854,10 +1111,10 @@ const TimetableForm = ({ formData, handleInputChange, handleSubjectChange, handl
         </div>
         <div>
           <label className="block mb-1 font-medium">Department</label>
-          <select 
-            name="department" 
-            value={formData.department} 
-            onChange={handleInputChange} 
+          <select
+            name="department"
+            value={formData.department}
+            onChange={handleInputChange}
             disabled={isHod}
             className={getFieldClass(isHod)}
           >
@@ -874,11 +1131,11 @@ const TimetableForm = ({ formData, handleInputChange, handleSubjectChange, handl
         </div>
         <div>
           <label className="block mb-1 font-medium">Exam Type</label>
-          <input 
-            type="text" 
-            value="Final" 
-            disabled 
-            className={getFieldClass(true)} 
+          <input
+            type="text"
+            value="Final"
+            disabled
+            className={getFieldClass(true)}
           />
         </div>
         <div>
@@ -899,13 +1156,13 @@ const TimetableForm = ({ formData, handleInputChange, handleSubjectChange, handl
         </div>
         <div>
           <label className="block mb-1 font-medium text-purple-700 font-bold">Batch (HOD Editable)</label>
-          <input 
-            type="text" 
-            name="batch" 
-            value={formData.batch} 
-            onChange={handleInputChange} 
+          <input
+            type="text"
+            name="batch"
+            value={formData.batch}
+            onChange={handleInputChange}
             placeholder="e.g. 2026/2027"
-            className="w-full border border-purple-600 px-4 py-2 rounded-lg focus:ring-2 focus:ring-purple-500 bg-purple-50 font-bold" 
+            className="w-full border border-purple-600 px-4 py-2 rounded-lg focus:ring-2 focus:ring-purple-500 bg-purple-50 font-bold"
           />
         </div>
       </div>
@@ -927,6 +1184,7 @@ const GenerateTimetableForm = ({ departments, academicYears, semesters, onGenera
     year: initialFilters?.year !== 'all' ? initialFilters.year : 'all',
     semester: initialFilters?.semester !== 'all' ? initialFilters.semester : 'all',
     department: initialFilters?.department !== 'all' ? initialFilters.department : 'all',
+    batch: getBatch(initialFilters?.year !== 'all' ? initialFilters.year : 'all'),
     examType: 'final',
     slots: [
       { startTime: '08:30', endTime: '11:30' },
@@ -941,7 +1199,14 @@ const GenerateTimetableForm = ({ departments, academicYears, semesters, onGenera
   const [isGenerating, setIsGenerating] = useState(false);
   const [progress, setProgress] = useState(0);
 
-  const handleInputChange = e => setGenData({ ...genData, [e.target.name]: e.target.value });
+  const handleInputChange = e => {
+    const { name, value } = e.target;
+    const updates = { [name]: value };
+    if (name === 'year') {
+      updates.batch = getBatch(value);
+    }
+    setGenData({ ...genData, ...updates });
+  };
 
   const handleSlotChange = (index, field, value) => {
     const newSlots = [...genData.slots];
@@ -1011,10 +1276,10 @@ const GenerateTimetableForm = ({ departments, academicYears, semesters, onGenera
             </div>
             <div>
               <label className="block text-[10px] font-black uppercase text-slate-500 mb-1">Department</label>
-              <select 
-                name="department" 
-                value={genData.department} 
-                onChange={handleInputChange} 
+              <select
+                name="department"
+                value={genData.department}
+                onChange={handleInputChange}
                 disabled={user?.role === 'hod'}
                 className={`w-full border border-black p-2 rounded-xl focus:ring-2 focus:ring-purple-500 text-sm font-bold ${user?.role === 'hod' ? 'bg-gray-50 text-gray-500 cursor-not-allowed' : ''}`}
               >
@@ -1027,17 +1292,24 @@ const GenerateTimetableForm = ({ departments, academicYears, semesters, onGenera
               <input type="date" name="startDate" value={genData.startDate} onChange={handleInputChange} className="w-full border border-black p-2 rounded-xl focus:ring-2 focus:ring-purple-500 text-sm font-bold" />
             </div>
             <div>
-              <label className="block text-[10px] font-black uppercase text-slate-500 mb-1">Exam Type</label>
+              <label className="block text-[10px] font-black uppercase text-slate-500 mb-1">Exam Type & Batch</label>
               <div className="flex gap-2">
-                <input 
-                  type="text" 
-                  value="Final" 
-                  disabled 
-                  className="flex-1 border border-black p-2 rounded-xl bg-gray-50 text-gray-500 text-sm font-bold cursor-not-allowed" 
+                <input
+                  type="text"
+                  value="Final"
+                  disabled
+                  className="flex-1 border border-black p-2 rounded-xl bg-gray-50 text-gray-500 text-sm font-bold cursor-not-allowed"
                 />
-                <div className="flex-1 bg-purple-50 border border-purple-200 p-2 rounded-xl">
-                  <span className="block text-[8px] font-black uppercase text-purple-400">Current Batch</span>
-                  <span className="text-sm font-black text-purple-700">{getBatch(genData.year)}</span>
+                <div className="flex-1">
+                  <input
+                    type="text"
+                    name="batch"
+                    value={genData.batch}
+                    onChange={handleInputChange}
+                    placeholder="Current Batch"
+                    className="w-full border border-purple-600 px-3 py-2 rounded-xl focus:ring-2 focus:ring-purple-500 bg-purple-50 font-bold text-purple-800 text-sm"
+                  />
+                  <span className="block text-[8px] font-black uppercase text-purple-400 mt-1">Editable by Exam Officer</span>
                 </div>
               </div>
             </div>
@@ -1180,7 +1452,7 @@ const GenerateTimetableForm = ({ departments, academicYears, semesters, onGenera
         </button>
         <div className="flex gap-3">
           <button type="button" onClick={onClose} className="px-8 py-3 bg-white border border-black text-gray-700 font-black uppercase text-[10px] tracking-widest rounded-xl hover:bg-slate-50">Discard</button>
-          <button type="button" onClick={() => onSave(previewEntries)} className="px-12 py-3 bg-purple-600 text-white font-black uppercase text-[10px] tracking-widest rounded-xl hover:bg-purple-700 shadow-xl shadow-purple-100 flex items-center gap-2">
+          <button type="button" onClick={() => onSave(previewEntries.map(e => ({ ...e, batch: genData.batch })))} className="px-12 py-3 bg-purple-600 text-white font-black uppercase text-[10px] tracking-widest rounded-xl hover:bg-purple-700 shadow-xl shadow-purple-100 flex items-center gap-2">
             Confirm & Save Timetable
           </button>
         </div>
