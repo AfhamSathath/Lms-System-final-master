@@ -23,7 +23,7 @@ const enrollmentSchema = new mongoose.Schema({
   },
   yearOfStudy: {
     type: String,
-    enum: ['1st Year', '2nd Year', '3rd Year', '4th Year'],
+    enum: ['1st Year', '2nd Year', '3rd Year', '4th Year', '5th Year'],
     required: [true, 'Year of study is required']
   },
   enrollmentDate: {

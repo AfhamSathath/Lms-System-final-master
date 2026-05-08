@@ -162,8 +162,8 @@ exports.getFiles = async (req, res, next) => {
         query.$or.push({ subject: { $in: courseIds } });
       }
       
-      // EXCLUDE active exam papers from showing up in study materials
-      query.fileType = { $ne: 'exam_paper' };
+      // EXCLUDE active exam papers and internal docs from showing up in student view
+      query.fileType = { $nin: ['exam_paper', 'moderation_document'] };
     }
 
     const files = await File.find(query)

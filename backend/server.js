@@ -42,6 +42,7 @@ const attendanceSessionRoutes = require('./routes/attendanceSessionRoutes');
 const claimRoutes = require('./routes/claimRoutes');
 const examPaperRoutes = require('./routes/examPaperRoutes');
 const moderatorAssignmentRoutes = require('./routes/moderatorAssignmentRoutes');
+const hallRoutes = require('./routes/hallRoutes');
 
 const app = express();
 
@@ -120,6 +121,7 @@ app.use('/api/attendance-sessions', attendanceSessionRoutes);
 app.use('/api/claims', claimRoutes);
 app.use('/api/exam-papers', examPaperRoutes);
 app.use('/api/moderator-assignments', moderatorAssignmentRoutes);
+app.use('/api/halls', hallRoutes);
 
 // Error handler
 const errorHandler = require('./middleware/error');

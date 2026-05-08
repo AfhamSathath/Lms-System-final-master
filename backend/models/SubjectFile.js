@@ -50,25 +50,27 @@ const subjectFileSchema = new mongoose.Schema({
     required: [true, 'MIME type is required']
   },
 
-  fileType: {
-    type: String,
-    enum: [
-      'lecture_notes',
-      'slides',
-      'lab_manual',
-      'assignment',
-      'past_paper',
-      'solution',
-      'reference',
-      'syllabus',
-      'curriculum',
-      'grading_rubric',
-      'reading_material',
-      'video_link',
-      'other'
-    ],
-    required: [true, 'File type is required']
-  },
+    fileType: {
+      type: String,
+      enum: [
+        'lecture_notes',
+        'slides',
+        'lab_manual',
+        'assignment',
+        'past_paper',
+        'solution',
+        'reference',
+        'syllabus',
+        'curriculum',
+        'grading_rubric',
+        'reading_material',
+        'video_link',
+        'exam_paper',
+        'moderation_document',
+        'other'
+      ],
+      required: [true, 'File type is required']
+    },
 
   academicYear: {
     type: String,

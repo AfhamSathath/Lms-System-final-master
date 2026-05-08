@@ -58,7 +58,7 @@ const userSchema = new mongoose.Schema({
   semester: {
     type: Number,
     min: 1,
-    max: 8
+    max: 2
   },
   yearOfStudy: {
     type: Number,

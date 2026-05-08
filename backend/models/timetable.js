@@ -77,13 +77,20 @@ timetableSchema.pre('save', async function(next) {
       }).select('batch');
       
       if (student && student.batch) {
-        this.batch = student.batch;
+    this.batch = student.batch;
       }
     } catch (err) {
       console.error('Batch autofill error:', err);
     }
   }
   next();
+});
+
+timetableSchema.add({
+  studentCount: {
+    type: Number,
+    default: 0
+  }
 });
 
 module.exports = mongoose.model('Timetable', timetableSchema);

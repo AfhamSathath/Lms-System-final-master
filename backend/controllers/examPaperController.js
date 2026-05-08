@@ -301,14 +301,25 @@ exports.examOfficerAccept = async (req, res, next) => {
 exports.getPapersForReview = async (req, res, next) => {
   try {
     let query = {};
-    if (req.user.role === 'hod' || req.user.role === 'lecturer') {
-      // HODs and Lecturers see all papers in their department to track history/reviews
+    if (req.user.role === 'hod') {
+      // HODs see all papers in their department to track history/reviews
       query = { department: req.user.department };
+    } else if (req.user.role === 'lecturer') {
+      // Lecturers only see papers they authored or are assigned to moderate
+      query = { 
+        $or: [
+          { lecturer: req.user.id },
+          { moderator: req.user.id }
+        ]
+      };
     } else if (req.user.role === 'exam_officer') {
       // Exam Officers see papers pending their acceptance or already accepted
       query = { status: { $in: ['Pending_Exam_Officer', 'Accepted_By_Exam_Officer'] } };
+    } else if (req.user.role === 'student') {
+      // Students should not be able to access the review list at all
+      return res.status(403).json({ success: false, message: 'Access denied. Students cannot view exam papers.' });
     } else {
-      // Moderators see all papers assigned to them
+      // Other roles (e.g., moderator if distinct)
       query = { moderator: req.user.id };
     }
 

@@ -78,7 +78,7 @@ exports.assignLecturerToSubject = async (req, res, next) => {
       startDate: req.body.startDate,
       endDate: req.body.endDate,
       curriculum: {
-        totalLectures: Number(req.body.curriculum?.totalLectures || subject.credits * 15 || 30),
+        totalLectures: Number(req.body.curriculum?.totalLectures || subject.lectureHours || (subject.credits ? subject.credits * 15 : 30)),
         totalPracticals: Number(req.body.curriculum?.totalPracticals || 0),
         totalAssignments: Number(req.body.curriculum?.totalAssignments || 0)
       },
@@ -183,7 +183,7 @@ exports.getLecturerSubjects = async (req, res, next) => {
             startDate: new Date(),
             endDate: new Date(new Date().setMonth(new Date().getMonth() + 4)),
             curriculum: {
-              totalLectures: sub.credits ? sub.credits * 15 : 30,
+              totalLectures: sub.lectureHours || (sub.credits ? sub.credits * 15 : 30),
               totalPracticals: sub.category === 'Practical' ? 15 : 0,
               totalAssignments: 3
             },

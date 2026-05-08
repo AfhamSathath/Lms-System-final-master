@@ -26,6 +26,7 @@ const RegistrarTimetables = () => {
   const [selectedSupervisors, setSelectedSupervisors] = useState([]);
   const [subjects, setSubjects] = useState([]);
   const [departments, setDepartments] = useState([]);
+  const [allHalls, setAllHalls] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedYear, setSelectedYear] = useState('all');
   const [selectedSemester, setSelectedSemester] = useState('all');
@@ -40,7 +41,7 @@ const RegistrarTimetables = () => {
 
   const [formData, setFormData] = useState({
     subject: '', year: '', semester: '', examType: 'final',
-    date: '', startTime: '', endTime: '', venue: '', department: '', batch: ''
+    date: '', startTime: '', endTime: '', venue: '', department: '', batch: '', studentCount: 0
   });
   const [manualBatch, setManualBatch] = useState('');
   const [selectedTimetableIds, setSelectedTimetableIds] = useState([]);
@@ -56,7 +57,7 @@ const RegistrarTimetables = () => {
 
   // Auto-select HOD department
   useEffect(() => {
-    if (user?.role === 'hod' && user?.department) {
+    if ((user?.role === 'hod' || user?.role === 'student') && user?.department) {
       setSelectedDepartment(user.department);
       setFormData(prev => ({ ...prev, department: user.department }));
     }
@@ -72,14 +73,17 @@ const RegistrarTimetables = () => {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const [tRes, sRes, lRes] = await Promise.all([
+      const [tRes, sRes, lRes, dRes, hRes] = await Promise.all([
         api.get('/api/timetables'),
         api.get('/api/subjects'),
-        api.get('/api/users?role=lecturer').catch(() => ({ data: { users: [] } }))
+        api.get('/api/users?role=lecturer').catch(() => ({ data: { users: [] } })),
+        api.get('/api/departments'),
+        api.get('/api/halls').catch(() => ({ data: { halls: [] } }))
       ]);
       const uniqueDepts = [...new Set((sRes.data.subjects || []).map(s => s.department).filter(Boolean))];
       setSubjects(sRes.data.subjects || []);
       setDepartments(uniqueDepts);
+      setAllHalls(hRes.data.halls || []);
       setLecturers(lRes.data.users || []);
       const sortedTimetables = (tRes.data.timetables || []).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
       setTimetables(sortedTimetables);
@@ -231,7 +235,7 @@ const RegistrarTimetables = () => {
       // HOD can only reset batch, other fields are locked
       setFormData(prev => ({ ...prev, batch: '' }));
     } else {
-      setFormData({ subject: '', year: '', semester: '', examType: 'final', date: '', startTime: '', endTime: '', venue: '', department: '', batch: '' });
+      setFormData({ subject: '', year: '', semester: '', examType: 'final', date: '', startTime: '', endTime: '', venue: '', department: '', batch: '', studentCount: 0 });
     }
   };
 
@@ -472,7 +476,8 @@ const RegistrarTimetables = () => {
       endTime: t.endTime || '',
       venue: t.venue || '',
       department: t.department || '',
-      batch: t.batch || ''
+      batch: t.batch || '',
+      studentCount: t.studentCount || 0
     });
     setShowEditModal(true);
   };
@@ -573,21 +578,25 @@ const RegistrarTimetables = () => {
                 Auto Generate
               </button>
             )}
-            {selectedTimetableIds.length > 0 && isAdminOrOfficer && (
+            {selectedTimetableIds.length > 0 && (
               <div className="flex gap-2 animate-in slide-in-from-right duration-300">
-                <button
-                  onClick={handleBulkClearSupervisors}
-                  className="bg-amber-600 text-white px-4 py-3 rounded-lg hover:bg-amber-700 transition-colors flex items-center shadow-lg font-bold text-xs uppercase tracking-widest"
-                  title="Clear Examiners"
-                >
-                  <FiUsers className="mr-2" /> Clear Examiners ({selectedTimetableIds.length})
-                </button>
-                <button
-                  onClick={handleBulkDelete}
-                  className="bg-red-600 text-white px-4 py-3 rounded-lg hover:bg-red-700 transition-colors flex items-center shadow-lg font-bold text-xs uppercase tracking-widest"
-                >
-                  <FiTrash2 className="mr-2" /> Bulk Delete ({selectedTimetableIds.length})
-                </button>
+                {user?.role === 'hod' && (
+                  <button
+                    onClick={handleBulkClearSupervisors}
+                    className="bg-amber-600 text-white px-4 py-3 rounded-lg hover:bg-amber-700 transition-colors flex items-center shadow-lg font-bold text-xs uppercase tracking-widest"
+                    title="Clear Examiners"
+                  >
+                    <FiUsers className="mr-2" /> Clear Examiners ({selectedTimetableIds.length})
+                  </button>
+                )}
+                {isAdminOrOfficer && (
+                  <button
+                    onClick={handleBulkDelete}
+                    className="bg-red-600 text-white px-4 py-3 rounded-lg hover:bg-red-700 transition-colors flex items-center shadow-lg font-bold text-xs uppercase tracking-widest"
+                  >
+                    <FiTrash2 className="mr-2" /> Bulk Delete ({selectedTimetableIds.length})
+                  </button>
+                )}
               </div>
             )}
           </div>
@@ -628,8 +637,8 @@ const RegistrarTimetables = () => {
             <select
               value={selectedDepartment}
               onChange={e => setSelectedDepartment(e.target.value)}
-              disabled={user?.role === 'hod'}
-              className={`w-full pl-10 pr-4 py-3 border border-black rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none appearance-none ${user?.role === 'hod' ? 'bg-gray-50 text-gray-500 cursor-not-allowed' : ''}`}
+              disabled={user?.role === 'hod' || user?.role === 'student'}
+              className={`w-full pl-10 pr-4 py-3 border border-black rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none appearance-none ${user?.role === 'hod' || user?.role === 'student' ? 'bg-gray-50 text-gray-500 cursor-not-allowed' : ''}`}
             >
               <option value="all">All Departments</option>
               {departments.map(d => <option key={d} value={d}>{d}</option>)}
@@ -729,7 +738,22 @@ const RegistrarTimetables = () => {
                         <div className="flex items-center text-gray-600 font-bold text-sm"><FiCalendar className="mr-3 text-purple-500" />{t.date ? format(new Date(t.date), 'MMMM dd, yyyy') : '-'}</div>
                         <div className="flex items-center text-gray-600 font-bold text-sm"><FiClock className="mr-3 text-emerald-500" />{t.startTime} - {t.endTime}</div>
                         <div className="flex items-center text-gray-600 font-bold text-sm"><FiMapPin className="mr-3 text-red-500" />{t.venue || '-'}</div>
-                        <div className="flex items-center text-gray-600 font-bold text-sm"><FiUsers className="mr-3 text-indigo-500" />{t.department || '-'}</div>
+                        <div className="flex items-center text-gray-600 font-bold text-sm"><FiLayers className="mr-3 text-indigo-500" />{t.department || '-'}</div>
+                        <div className="flex items-center text-gray-600 font-bold text-sm"><FiUsers className="mr-3 text-purple-500" />{t.studentCount || 0} Students</div>
+                        <div className="mt-2 pt-2 border-t border-slate-100">
+                          <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-1">Supervisors</p>
+                          <div className="flex flex-wrap gap-1">
+                            {t.supervisors && t.supervisors.length > 0 ? (
+                              t.supervisors.map((s, idx) => (
+                                <span key={idx} className="bg-slate-100 text-slate-700 px-2 py-0.5 rounded-lg text-[10px] font-bold border border-slate-200">
+                                  {typeof s === 'object' ? s.name : (lecturers.find(l => (l._id || l.id) === s)?.name || 'Lecturer')}
+                                </span>
+                              ))
+                            ) : (
+                              <span className="text-[10px] italic text-rose-400 font-bold">No supervisors assigned</span>
+                            )}
+                          </div>
+                        </div>
 
                         <div className="flex items-center mt-2 px-3 py-2 rounded-xl bg-slate-50 border border-black w-fit">
                           <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 mr-3">Status:</span>
@@ -910,11 +934,11 @@ const RegistrarTimetables = () => {
                         <td className="border-2 border-black p-4">
                           <div className="flex flex-col gap-2">
                             <span className={`text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-widest border border-black w-fit ${t.status === 'published' ? 'bg-green-100 text-green-800 border-green-300' :
-                                t.status === 'pending_dean' ? 'bg-blue-100 text-blue-800 border-blue-300' :
-                                  t.status === 'pending_hod' ? 'bg-orange-100 text-orange-800 border-orange-300' :
-                                    t.status === 'finished' ? 'bg-emerald-100 text-emerald-800 border-emerald-300' :
-                                      t.status === 'problem' ? 'bg-rose-100 text-rose-800 border-rose-300' :
-                                        'bg-gray-100 text-gray-800 border-gray-300'
+                              t.status === 'pending_dean' ? 'bg-blue-100 text-blue-800 border-blue-300' :
+                                t.status === 'pending_hod' ? 'bg-orange-100 text-orange-800 border-orange-300' :
+                                  t.status === 'finished' ? 'bg-emerald-100 text-emerald-800 border-emerald-300' :
+                                    t.status === 'problem' ? 'bg-rose-100 text-rose-800 border-rose-300' :
+                                      'bg-gray-100 text-gray-800 border-gray-300'
                               }`}>{t.status?.replace('_', ' ') || 'DRAFT'}</span>
 
                             <div className="flex flex-wrap gap-1">
@@ -997,6 +1021,8 @@ const RegistrarTimetables = () => {
       <Modal isOpen={showGenerateModal} onClose={() => setShowGenerateModal(false)} title="Auto-Generate Exam Schedule" size="4xl">
         <GenerateTimetableForm
           departments={departments}
+          allHalls={allHalls}
+          lecturers={lecturers}
           academicYears={academicYears}
           semesters={semesters}
           onGenerate={handleGenerate}
@@ -1165,6 +1191,17 @@ const TimetableForm = ({ formData, handleInputChange, handleSubjectChange, handl
             className="w-full border border-purple-600 px-4 py-2 rounded-lg focus:ring-2 focus:ring-purple-500 bg-purple-50 font-bold"
           />
         </div>
+        <div>
+          <label className="block mb-1 font-medium text-purple-700 font-bold">Student Count</label>
+          <input
+            type="number"
+            name="studentCount"
+            value={formData.studentCount}
+            onChange={handleInputChange}
+            disabled={isHod}
+            className={getFieldClass(isHod)}
+          />
+        </div>
       </div>
       <div className="flex justify-end space-x-2 mt-4">
         <button type="button" onClick={resetForm} className="px-6 py-2 bg-white border border-black text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">Reset</button>
@@ -1177,7 +1214,7 @@ const TimetableForm = ({ formData, handleInputChange, handleSubjectChange, handl
 
 
 // Auto-Generate Timetable Form Component
-const GenerateTimetableForm = ({ departments, academicYears, semesters, onGenerate, onSave, onClose, initialFilters, user, getBatch }) => {
+const GenerateTimetableForm = ({ departments, allHalls, lecturers, academicYears, semesters, onGenerate, onSave, onClose, initialFilters, user, getBatch }) => {
   const [step, setStep] = useState(1); // 1: Setup, 2: Preview
   const [genData, setGenData] = useState({
     startDate: '',
@@ -1318,13 +1355,39 @@ const GenerateTimetableForm = ({ departments, academicYears, semesters, onGenera
           <div className="space-y-4">
             <h3 className="font-black uppercase text-xs tracking-widest text-slate-400 border-b pb-2">Constraints & Slots</h3>
             <div>
-              <label className="block text-[10px] font-black uppercase text-slate-500 mb-1">Venues (Comma separated)</label>
+              <div className="flex justify-between items-center mb-1">
+                <label className="block text-[10px] font-black uppercase text-slate-500">Venues (Comma separated)</label>
+                <span className="text-[8px] font-black text-slate-400">SELECT HALLS BELOW</span>
+              </div>
               <textarea
                 value={genData.venues.join(', ')}
                 onChange={e => handleVenueChange(e.target.value)}
                 placeholder="Hall A, Hall B, Main Lab..."
-                className="w-full border border-black p-2 rounded-xl focus:ring-2 focus:ring-purple-500 text-sm font-bold h-20"
+                className="w-full border border-black p-2 rounded-xl focus:ring-2 focus:ring-purple-500 text-sm font-bold h-16"
               />
+
+              <div className="mt-2 flex flex-wrap gap-1 max-h-24 overflow-y-auto p-1 border border-dashed border-slate-200 rounded-lg">
+                {(allHalls || []).map((h, i) => {
+                  const isSelected = genData.venues.includes(h.name);
+                  return (
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={() => {
+                        if (isSelected) {
+                          setGenData({ ...genData, venues: genData.venues.filter(v => v !== h.name) });
+                        } else {
+                          setGenData({ ...genData, venues: [...genData.venues, h.name] });
+                        }
+                      }}
+                      className={`px-2 py-1 rounded-md text-[9px] font-bold border transition-all ${isSelected ? 'bg-purple-600 border-purple-600 text-white' : 'bg-white border-slate-200 text-slate-600 hover:border-purple-300'}`}
+                      title={h.location || ''}
+                    >
+                      {h.name} ({h.capacity || '?'})
+                    </button>
+                  );
+                })}
+              </div>
             </div>
             <div>
               <div className="flex justify-between items-center mb-2">
@@ -1395,9 +1458,18 @@ const GenerateTimetableForm = ({ departments, academicYears, semesters, onGenera
           <h3 className="font-black text-emerald-800 uppercase tracking-tighter">Algorithm Result</h3>
           <p className="text-xs text-emerald-600 font-bold">Successfully scheduled {previewEntries.length} subjects with a 2-day gap.</p>
           {unscheduledSubjects.length > 0 && (
-            <p className="text-[10px] text-rose-600 font-black uppercase mt-1 flex items-center gap-1">
-              <FiAlertCircle size={10} /> {unscheduledSubjects.length} subjects could not be scheduled
-            </p>
+            <div className="mt-2 space-y-1">
+              <p className="text-[10px] text-rose-600 font-black uppercase flex items-center gap-1">
+                <FiAlertCircle size={10} /> {unscheduledSubjects.length} subjects could not be scheduled
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {unscheduledSubjects.map((sub, idx) => (
+                  <span key={idx} className="bg-rose-50 text-rose-600 text-[9px] font-bold px-2 py-1 rounded border border-rose-100" title={`Needs ${sub.studentCount} seats`}>
+                    {sub.code} ({sub.studentCount} students)
+                  </span>
+                ))}
+              </div>
+            </div>
           )}
         </div>
         <div className="flex items-center gap-2">
@@ -1417,8 +1489,9 @@ const GenerateTimetableForm = ({ departments, academicYears, semesters, onGenera
               <th className="p-4 text-[10px] font-black uppercase tracking-widest text-slate-500">Date</th>
               <th className="p-4 text-[10px] font-black uppercase tracking-widest text-slate-500">Time</th>
               <th className="p-4 text-[10px] font-black uppercase tracking-widest text-slate-500">Subject / Staff</th>
-              <th className="p-4 text-[10px] font-black uppercase tracking-widest text-slate-500">Venue</th>
-
+              <th className="p-4 text-[10px] font-black uppercase tracking-widest text-slate-500">Students</th>
+              <th className="p-4 text-[10px] font-black uppercase tracking-widest text-slate-500">Venue (Cap)</th>
+              <th className="p-4 text-[10px] font-black uppercase tracking-widest text-slate-500">Supervisors</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
@@ -1436,9 +1509,27 @@ const GenerateTimetableForm = ({ departments, academicYears, semesters, onGenera
                 <td className="p-4">
                   <p className="text-xs font-black text-slate-800">{entry.subjectCode} - {entry.subjectName}</p>
                 </td>
-
                 <td className="p-4">
-                  <span className="px-3 py-1 bg-white border border-black rounded-lg text-[10px] font-bold">{entry.venue}</span>
+                  <span className="px-2 py-1 bg-purple-50 text-purple-700 rounded-lg text-[10px] font-black">{entry.studentCount} Students</span>
+                </td>
+                <td className="p-4">
+                  <div className="flex flex-col">
+                    <span className="text-xs font-bold text-slate-800">{entry.venue}</span>
+                    <span className="text-[9px] font-black text-emerald-600 uppercase">Capacity: {entry.venueCapacity || 'N/A'}</span>
+                  </div>
+                </td>
+                <td className="p-4">
+                  <div className="flex flex-wrap gap-1 max-w-[200px]">
+                    {entry.supervisors && entry.supervisors.length > 0 ? (
+                      entry.supervisors.map((sId, idx) => (
+                        <span key={idx} className="bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded text-[9px] font-bold border border-slate-200">
+                          {lecturers.find(l => (l._id || l.id) === sId)?.name || 'Lecturer'}
+                        </span>
+                      ))
+                    ) : (
+                      <span className="text-[9px] italic text-rose-400 font-bold">None</span>
+                    )}
+                  </div>
                 </td>
               </tr>
             ))}

@@ -639,12 +639,22 @@ const ExamPapers = () => {
                                     <div className="p-4 bg-white/60 border border-slate-200 rounded-2xl space-y-3">
                                       <div className="flex justify-between items-center mb-1">
                                         <p className="text-[8px] font-black uppercase tracking-widest text-slate-500">Historical Report Snapshot (v{hist.version})</p>
+                                      <div className="flex gap-3">
                                         <button 
                                           onClick={() => handleDownload(hist.fileUrl, `${task.subject.code}_v${hist.version}.pdf`)}
                                           className="text-[8px] font-black text-indigo-600 hover:underline flex items-center gap-1"
                                         >
-                                          <FiDownload size={10} /> View PDF
+                                          <FiDownload size={10} /> View Paper
                                         </button>
+                                        {hist.moderationReport?.moderatorSection && (
+                                          <button 
+                                            onClick={() => generateReportPDF(paper, hist)}
+                                            className="text-[8px] font-black text-emerald-600 hover:underline flex items-center gap-1"
+                                          >
+                                            <FiFileText size={10} /> Download Report
+                                          </button>
+                                        )}
+                                      </div>
                                       </div>
                                       <div className="grid grid-cols-1 gap-3">
                                         {[
@@ -1132,7 +1142,7 @@ const ExamPapers = () => {
                                                 onClick={() => handleDownload(url, `${doc.id}_${idx + 1}.pdf`)}
                                                 className="text-[9px] font-black text-indigo-600 hover:underline uppercase"
                                               >
-                                                View
+                                                Download
                                               </button>
                                               {!isApproved && (
                                                 <button
@@ -1169,33 +1179,33 @@ const ExamPapers = () => {
                                           className={`px-3 py-1.5 rounded-lg border-2 flex items-center gap-2 cursor-pointer transition-all ${moderationReport.submittedDocuments[`${doc.id}Url`] && !isMultiple ? 'bg-emerald-50 border-emerald-500 text-emerald-700' : 'border-slate-200 text-slate-400 hover:border-slate-900 hover:text-slate-900'}`}
                                         >
                                           <FiUpload size={14} />
-                                          <span className="text-[10px] font-black uppercase tracking-widest">
-                                            {isMultiple 
-                                              ? 'Add Another PDF' 
-                                              : moderationReport.submittedDocuments[`${doc.id}Url`] ? 'Replace PDF' : 'Upload PDF'}
-                                          </span>
-                                        </label>
-                                        {moderationReport.submittedDocuments[`${doc.id}Url`] && !isMultiple && (
-                                          <div className="flex flex-col items-center gap-1">
-                                            <button
-                                              type="button"
-                                              onClick={() => handleDownload(moderationReport.submittedDocuments[`${doc.id}Url`], `${doc.id}.pdf`)}
-                                              className="text-[9px] font-bold text-indigo-500 hover:underline flex items-center gap-1"
-                                            >
-                                              <FiDownload size={10} /> View Uploaded
-                                            </button>
-                                            <button
-                                              type="button"
-                                              onClick={() => removeSingleDoc(doc.id)}
-                                              className="text-[9px] font-bold text-rose-500 hover:underline flex items-center gap-1"
-                                            >
-                                              <FiX size={10} /> Remove
-                                            </button>
-                                          </div>
-                                        )}
-                                      </div>
-                                    )}
-                                  </td>
+                                            <span className="text-[10px] font-black uppercase tracking-widest">
+                                              {isMultiple 
+                                                ? 'Add Another PDF' 
+                                                : moderationReport.submittedDocuments[`${doc.id}Url`] ? 'Replace PDF' : 'Upload PDF'}
+                                            </span>
+                                          </label>
+                                          {moderationReport.submittedDocuments[`${doc.id}Url`] && !isMultiple && (
+                                            <div className="flex flex-col items-center gap-1">
+                                              <button
+                                                type="button"
+                                                onClick={() => handleDownload(moderationReport.submittedDocuments[`${doc.id}Url`], `${doc.id}.pdf`)}
+                                                className="text-[9px] font-bold text-indigo-500 hover:underline flex items-center gap-1"
+                                              >
+                                                <FiDownload size={10} /> Download Uploaded
+                                              </button>
+                                              <button
+                                                type="button"
+                                                onClick={() => removeSingleDoc(doc.id)}
+                                                className="text-[9px] font-bold text-rose-500 hover:underline flex items-center gap-1"
+                                              >
+                                                <FiX size={10} /> Remove
+                                              </button>
+                                            </div>
+                                          )}
+                                        </div>
+                                      )}
+                                    </td>
                                   <td className="border-2 border-slate-900 p-3 text-center">
                                     <input
                                       type="checkbox"
@@ -1420,14 +1430,22 @@ const ExamPapers = () => {
                         <div>
                            <div className="flex justify-between items-center mb-4">
                               <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Quality Report Details</p>
-                              {selectedPaperForModal.moderationReport?.moderatorSection && (
+                              <div className="flex gap-2">
                                  <button 
-                                    onClick={() => generateReportPDF(selectedPaperForModal, selectedPaperForModal)}
-                                    className="px-4 py-2 bg-slate-900 text-white rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-indigo-600 transition-all flex items-center gap-2"
+                                    onClick={() => handleDownload(selectedPaperForModal.fileUrl, `${selectedPaperForModal.fileName || 'exam-paper'}_v${selectedPaperForModal.version}.pdf`)}
+                                    className="px-4 py-2 bg-indigo-600 text-white rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-slate-900 transition-all flex items-center gap-2"
                                  >
-                                    <FiDownload size={12} /> Download PDF
+                                    <FiDownload size={12} /> Download Paper
                                  </button>
-                              )}
+                                 {selectedPaperForModal.moderationReport?.moderatorSection && (
+                                    <button 
+                                       onClick={() => generateReportPDF(selectedPaperForModal, selectedPaperForModal)}
+                                       className="px-4 py-2 bg-slate-900 text-white rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-indigo-600 transition-all flex items-center gap-2"
+                                    >
+                                       <FiDownload size={12} /> Download Report
+                                    </button>
+                                 )}
+                              </div>
                            </div>
                            {selectedPaperForModal.moderationReport?.moderatorSection ? (
                               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

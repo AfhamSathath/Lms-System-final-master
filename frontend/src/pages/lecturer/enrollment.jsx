@@ -20,6 +20,8 @@ const LecturerEnrollment = () => {
   const [filterBatch, setFilterBatch] = useState('All');
   const batches = ['2024/2025', '2023/2024', '2022/2023', '2021/2022', 'Repeat Batch (All)'];
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showBatchModal, setShowBatchModal] = useState(false);
+  const [selectedBatchToEnroll, setSelectedBatchToEnroll] = useState('');
   const [filters, setFilters] = useState({
     search: '',
     yearOfStudy: '',
@@ -46,17 +48,13 @@ const LecturerEnrollment = () => {
   const fetchEnrollmentData = async (assignment) => {
     setEnrolledStudents([]);
     try {
-      // 1. Fetch department students
-      const studentsRes = await api.get('/api/auth/users?role=student');
-      const allStudents = studentsRes.data.users || [];
-      const deptStudents = allStudents.filter(s => 
-        (s.department || '').toLowerCase() === (assignment.department || '').toLowerCase()
-      );
-      setDepartmentStudents(deptStudents);
-
       // Year mapping from "1st Year" to 1
-      const yearMap = { '1st Year': 1, '2nd Year': 2, '3rd Year': 3, '4th Year': 4 };
+      const yearMap = { '1st Year': 1, '2nd Year': 2, '3rd Year': 3, '4th Year': 4, '5th Year': 5 };
       const yearNum = yearMap[assignment.academicYear] || assignment.academicYear;
+      
+      const studentsRes = await api.get(`/api/auth/users?role=student&department=${encodeURIComponent(assignment.department || assignment.subject?.department || '')}`);
+      const allStudents = studentsRes.data.users || [];
+      setDepartmentStudents(allStudents);
 
       // Set default filters based on assignment
       setFilters(prev => ({
@@ -107,16 +105,22 @@ const LecturerEnrollment = () => {
   };
 
   const handleAutoEnrollBatch = async () => {
-    if (!window.confirm(`This will automatically enroll all active students from ${selectedSubject.department} ${selectedSubject.subject.year}. Continue?`)) return;
+    if (!selectedBatchToEnroll) {
+      toast.error('Please select a batch first');
+      return;
+    }
     
     setLoading(true);
     try {
       const res = await api.post('/api/enrollments/enroll-batch', {
         courseId: selectedSubject.subject?._id || selectedSubject.subject,
         academicYear: selectedSubject.academicYear,
-        semester: selectedSubject.semester
+        semester: selectedSubject.semester,
+        batch: selectedBatchToEnroll
       });
       toast.success(res.data.message);
+      setShowBatchModal(false);
+      setSelectedBatchToEnroll('');
       fetchEnrollmentData(selectedSubject);
     } catch (err) {
       toast.error(err.response?.data?.message || 'Automatic enrollment failed');
@@ -147,13 +151,18 @@ const LecturerEnrollment = () => {
   });
 
   const studentsToEnroll = departmentStudents.filter(s => {
+    // Relaxed matching for students to ensure they show up even with inconsistent data
     const matchesFilters = 
       (!filters.batch || s.batch === filters.batch) &&
-      (!filters.yearOfStudy || s.yearOfStudy?.toString() === filters.yearOfStudy?.toString()) &&
-      (!filters.semester || s.semester?.toString() === filters.semester?.toString()) &&
-      (!filters.search || s.name?.toLowerCase().includes(filters.search.toLowerCase()) || s.studentId?.toLowerCase().includes(filters.search.toLowerCase()));
+      (!filters.yearOfStudy || s.yearOfStudy?.toString() === filters.yearOfStudy?.toString() || !s.yearOfStudy) &&
+      (!filters.semester || s.semester?.toString() === filters.semester?.toString() || !s.semester) &&
+      (!filters.search || 
+        s.name?.toLowerCase().includes(filters.search.toLowerCase()) || 
+        s.studentId?.toLowerCase().includes(filters.search.toLowerCase()) ||
+        s.email?.toLowerCase().includes(filters.search.toLowerCase())
+      );
     
-    return !enrolledStudents.some(e => e.student?._id === s._id) && matchesFilters;
+    return !enrolledStudents.some(e => (e.student?._id || e.student) === s._id) && matchesFilters;
   });
 
   if (loading) return <Loader fullScreen />;
@@ -228,7 +237,7 @@ const LecturerEnrollment = () => {
                     </div>
                     <div className="flex gap-3">
                       <button
-                        onClick={handleAutoEnrollBatch}
+                        onClick={() => setShowBatchModal(true)}
                         className="bg-indigo-50 text-indigo-600 px-6 py-4 rounded-2xl font-black flex items-center gap-2 hover:bg-white border border-black transition shadow-sm active:scale-95"
                         title="Auto-enroll students by batch"
                       >

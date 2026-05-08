@@ -48,6 +48,12 @@ const StudentFeedback = () => {
     e.preventDefault();
     if (!selectedCourse) return;
     
+    const enrollment = enrollments.find(env => env.course?._id === selectedCourse._id);
+    if (!enrollment) {
+      toast.error('Could not verify enrollment details for this course.');
+      return;
+    }
+    
     setSubmitting(true);
     try {
       await api.post('/api/feedback', {
@@ -59,8 +65,8 @@ const StudentFeedback = () => {
           overallExperience: form.overallExperience
         },
         comments: form.comments,
-        semester: selectedCourse.semester,
-        academicYear: selectedCourse.academicYear,
+        semester: enrollment.semester || selectedCourse.semester,
+        academicYear: enrollment.academicYear,
         isAnonymous: form.isAnonymous
       });
       
@@ -129,7 +135,7 @@ const StudentFeedback = () => {
                        <p className={`text-[10px] font-black uppercase tracking-widest ${
                          selectedCourse?._id === enrollment.course?._id ? 'text-indigo-400' : hasSubmitted(enrollment.course?._id) ? 'text-emerald-500' : 'text-slate-400'
                        }`}>
-                         {enrollment.course?.courseCode}
+                         {enrollment.course?.code}
                        </p>
                        {hasSubmitted(enrollment.course?._id) && (
                          <span className="bg-emerald-500 text-white p-1 rounded-full text-[8px]">
@@ -138,7 +144,7 @@ const StudentFeedback = () => {
                        )}
                     </div>
                     <h4 className={`text-md font-extrabold mb-2 leading-tight ${selectedCourse?._id === enrollment.course?._id ? 'text-white' : 'text-slate-700'}`}>
-                      {enrollment.course?.courseName}
+                      {enrollment.course?.name}
                     </h4>
                     <p className={`text-[10px] font-bold ${selectedCourse?._id === enrollment.course?._id ? 'text-slate-500' : 'text-slate-400'}`}>
                       SEM {enrollment.course?.semester} • {enrollment.academicYear}
@@ -170,7 +176,7 @@ const StudentFeedback = () => {
                    </div>
                    <div>
                       <h2 className="text-3xl font-black text-slate-800 leading-none mb-2">Faculty Evaluation</h2>
-                      <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px]">Evaluating: {selectedCourse.courseName}</p>
+                      <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px]">Evaluating: {selectedCourse.name}</p>
                    </div>
                  </div>
 

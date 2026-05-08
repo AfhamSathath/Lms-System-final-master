@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/Authcontext';
 import api from '../../services/api';
 import Loader from '../../components/common/loader';
-import { FiAward, FiFileText, FiDownload, FiCheck, FiX, FiMessageSquare, FiShield, FiUser } from 'react-icons/fi';
+import { FiAward, FiFileText, FiDownload, FiCheck, FiX, FiMessageSquare, FiShield, FiUser, FiClock } from 'react-icons/fi';
 import toast from 'react-hot-toast';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 const ExamApprovals = () => {
   const { user } = useAuth();
@@ -76,6 +78,187 @@ const ExamApprovals = () => {
       'Changes_Requested_HOD': 'bg-rose-100 text-rose-700 border-rose-300'
     };
     return styles[status] || 'bg-slate-50 text-slate-400 border-slate-100';
+  };
+
+  const generateReportPDF = async (paper, versionData) => {
+    const doc = new jsPDF();
+    const sec = versionData.moderationReport?.moderatorSection;
+    if (!sec) {
+      toast.error('No report details available to generate PDF');
+      return;
+    }
+
+    try {
+      const img = new Image();
+      img.src = '/esn.webp';
+      await new Promise((resolve, reject) => {
+        img.onload = resolve;
+        img.onerror = reject;
+      });
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0);
+      const imgData = canvas.toDataURL('image/png');
+      doc.addImage(imgData, 'PNG', 14, 15, 20, 20);
+    } catch (err) {
+      console.error('Failed to load logo', err);
+    }
+
+    doc.setFont('times', 'bold');
+    doc.setFontSize(16);
+    doc.text('Trincomalee Campus, Eastern University, Sri Lanka', 40, 22);
+    doc.setFontSize(14);
+    doc.text('Moderation Quality Report', 40, 30);
+    
+    doc.setFont('times', 'normal');
+    doc.setFontSize(11);
+    doc.text(`Subject: ${paper.subject?.code} - ${paper.subject?.name}`, 14, 45);
+    doc.text(`Version: ${versionData.version}`, 14, 51);
+    doc.text(`Outcome: ${versionData.status?.replace(/_/g, ' ')}`, 14, 57);
+    doc.text(`Date: ${new Date(versionData.submittedAt || Date.now()).toLocaleDateString()}`, 14, 63);
+
+    const tableData = [
+      ['2.1 ILOs & Blooms', sec.ilosComments || ''],
+      ['2.2 Paper Assessment', sec.paperAssessment || ''],
+      ['2.3 Organization', `${sec.organizationClear ? sec.organizationClear : ''}${sec.organizationSuggestions ? '\nSug: ' + sec.organizationSuggestions : ''}`.trim()],
+      ['2.4 Wording', `${sec.wordingProper ? sec.wordingProper : ''}${sec.wordingSuggestions ? '\nSug: ' + sec.wordingSuggestions : ''}`.trim()],
+      ['2.5 Model Answers', `${sec.modelAnswersPrepared ? sec.modelAnswersPrepared : ''}${sec.modelAnswersSuggestions ? '\nSug: ' + sec.modelAnswersSuggestions : ''}`.trim()],
+      ['2.6 Grammar/Spelling', sec.grammarSpelling || ''],
+      ['2.7 Improvements', sec.improvementComments || '']
+    ];
+
+    autoTable(doc, {
+      startY: 70,
+      head: [['Criteria', 'Moderator Feedback']],
+      body: tableData,
+      theme: 'grid',
+      headStyles: { fillColor: [79, 70, 229], font: 'times', fontStyle: 'bold' },
+      bodyStyles: { font: 'times' },
+      styles: { fontSize: 10, cellPadding: 4 },
+      columnStyles: {
+        0: { cellWidth: 45, fontStyle: 'bold' },
+        1: { cellWidth: 'auto' }
+      }
+    });
+
+    const finalY = doc.lastAutoTable.finalY + 20;
+    const modSig = sec.moderatorSignature || versionData.moderatorSignature;
+    const modTime = sec.moderatedAt || versionData.moderatedAt;
+
+    if (modTime) {
+      doc.setFont('times', 'bold');
+      doc.setFontSize(11);
+      doc.text(`Moderation Timestamp:`, 14, finalY);
+      doc.setFont('times', 'normal');
+      doc.text(`${new Date(modTime).toLocaleString()}`, 55, finalY);
+    }
+
+    if (modSig) {
+      doc.setFont('times', 'bold');
+      doc.text('Moderator Digital Signature:', 14, finalY + 15);
+      try {
+        const sigImg = new Image();
+        const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+        let cleanSigUrl = modSig;
+        if (modSig.includes('\\')) {
+          cleanSigUrl = modSig.replace(/\\/g, '/');
+        }
+        if (!cleanSigUrl.startsWith('http')) {
+          cleanSigUrl = cleanSigUrl.startsWith('/') ? cleanSigUrl : `/${cleanSigUrl}`;
+          cleanSigUrl = `${baseUrl}${cleanSigUrl.includes('/uploads/') ? cleanSigUrl : '/uploads/' + cleanSigUrl.replace(/^\/+/, '')}`;
+        }
+        sigImg.crossOrigin = 'Anonymous';
+        sigImg.src = cleanSigUrl;
+        
+        await new Promise((resolve, reject) => {
+          sigImg.onload = resolve;
+          sigImg.onerror = reject;
+        });
+        
+        const sigCanvas = document.createElement('canvas');
+        sigCanvas.width = sigImg.width;
+        sigCanvas.height = sigImg.height;
+        const sigCtx = sigCanvas.getContext('2d');
+        sigCtx.drawImage(sigImg, 0, 0);
+        const sigData = sigCanvas.toDataURL('image/png');
+        doc.addImage(sigData, 'PNG', 14, finalY + 20, 50, 20);
+      } catch (err) {
+        console.error('Failed to load signature', err);
+        doc.setFont('times', 'italic');
+        doc.text('[Digital Signature Verified & Recorded]', 14, finalY + 25);
+      }
+    }
+
+    // --- HOD SECTION (NEW) ---
+    const hodY = finalY + 60;
+    
+    // Add separator line
+    doc.setDrawColor(100);
+    doc.setLineWidth(0.5);
+    doc.line(14, hodY - 10, 196, hodY - 10);
+
+    doc.setFont('times', 'bold');
+    doc.setFontSize(12);
+    doc.text('To be filled by the Head of the Department:', 14, hodY);
+    
+    doc.setFontSize(11);
+    doc.setFont('times', 'normal');
+    doc.text('Comments of the Head of Department:', 14, hodY + 10);
+    
+    // Dotted lines for comments
+    doc.setDrawColor(200);
+    doc.setLineDash([0.5, 0.5], 0);
+    doc.line(14, hodY + 20, 196, hodY + 20);
+    doc.line(14, hodY + 30, 196, hodY + 30);
+    
+    // Place existing HOD comment if available
+    const hodComments = paper.hodComments || [];
+    const latestHodComment = hodComments.length > 0 ? hodComments[hodComments.length - 1].comment : '';
+    if (latestHodComment) {
+      doc.setFont('times', 'italic');
+      doc.text(latestHodComment, 16, hodY + 18, { maxWidth: 180 });
+    }
+
+    doc.setFont('times', 'bold');
+    doc.text('Approved for the Printing of the Exam Paper:', 14, hodY + 45);
+    
+    doc.setFont('times', 'normal');
+    doc.text('Signature by Head of Department: ................................................................', 14, hodY + 60);
+    doc.text('Date: ................................', 150, hodY + 60);
+
+    // If current HOD is logged in and has signature, add it
+    if (paper.status === 'Approved' && user?.signature) {
+      try {
+        const hodSigImg = new Image();
+        const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+        let hodSigUrl = user.signature;
+        if (!hodSigUrl.startsWith('http')) {
+          hodSigUrl = `${baseUrl}${hodSigUrl.startsWith('/') ? '' : '/'}${hodSigUrl}`;
+        }
+        hodSigImg.crossOrigin = 'Anonymous';
+        hodSigImg.src = hodSigUrl;
+        
+        await new Promise((resolve, reject) => {
+          hodSigImg.onload = resolve;
+          hodSigImg.onerror = reject;
+        });
+        
+        const sigCanvas = document.createElement('canvas');
+        sigCanvas.width = hodSigImg.width;
+        sigCanvas.height = hodSigImg.height;
+        const sigCtx = sigCanvas.getContext('2d');
+        sigCtx.drawImage(hodSigImg, 0, 0);
+        const sigData = sigCanvas.toDataURL('image/png');
+        doc.addImage(sigData, 'PNG', 70, hodY + 48, 40, 15);
+        doc.text(new Date().toLocaleDateString(), 162, hodY + 59);
+      } catch (err) {
+        console.error('Failed to load HOD signature', err);
+      }
+    }
+
+    doc.save(`${paper.subject?.code}_Quality_Report_v${versionData.version}.pdf`);
   };
 
   const handleDownload = async (fileUrl, fileName) => {
@@ -251,27 +434,24 @@ const ExamApprovals = () => {
                   <h2 className="text-xl font-black text-slate-800 uppercase tracking-tighter">HOD Final Approval</h2>
                   <p className="text-[10px] font-black uppercase text-indigo-600 tracking-widest mt-1">Moderator: {selectedPaper.moderator?.name} • {selectedPaper.subject.code} • {selectedPaper.subject.name}</p>
                 </div>
-                <button onClick={() => setShowModal(false)} className="w-10 h-10 rounded-xl border border-black flex items-center justify-center hover:bg-rose-50 hover:text-rose-600 transition-all">
-                  <FiX />
-                </button>
+                <div className="flex items-center gap-3">
+                  {selectedPaper.moderationReport?.moderatorSection && (
+                    <button 
+                      onClick={() => generateReportPDF(selectedPaper, selectedPaper)}
+                      className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-slate-900 transition-all shadow-lg shadow-indigo-100"
+                    >
+                      <FiDownload size={12} /> Download Report
+                    </button>
+                  )}
+                  <button onClick={() => setShowModal(false)} className="w-10 h-10 rounded-xl border border-black flex items-center justify-center hover:bg-rose-50 hover:text-rose-600 transition-all">
+                    <FiX />
+                  </button>
+                </div>
               </div>
 
               <div className="overflow-y-auto flex-1">
                 <div className="p-8 bg-slate-50/50 border-b border-black">
-                  <div className="grid grid-cols-3 gap-4 mb-6">
-                    <div className="p-3 bg-white border border-black rounded-2xl shadow-sm">
-                      <p className="text-[8px] font-black uppercase text-slate-400 tracking-widest leading-none mb-1">Marks</p>
-                      <p className="text-sm font-black text-slate-700">{selectedPaper.totalMarks || '--'}</p>
-                    </div>
-                    <div className="p-3 bg-white border border-black rounded-2xl shadow-sm">
-                      <p className="text-[8px] font-black uppercase text-slate-400 tracking-widest leading-none mb-1">Duration</p>
-                      <p className="text-sm font-black text-slate-700">{selectedPaper.duration || '--'}</p>
-                    </div>
-                    <div className="p-3 bg-white border border-black rounded-2xl shadow-sm">
-                      <p className="text-[8px] font-black uppercase text-slate-400 tracking-widest leading-none mb-1">Type</p>
-                      <p className="text-sm font-black text-indigo-600">{selectedPaper.examType || 'Final'}</p>
-                    </div>
-                  </div>
+
 
 
                   {/* Moderator & HOD Feedback Context for HOD */}
@@ -295,12 +475,7 @@ const ExamApprovals = () => {
                     </div>
                   )}
 
-                  <div>
-                    <p className="text-[9px] font-black uppercase text-slate-400 tracking-widest mb-2">Paper Instructions</p>
-                    <p className="text-xs font-bold text-slate-600 italic bg-white p-4 rounded-2xl border border-dashed border-slate-300">
-                      {selectedPaper.instructions || 'No instructions provided.'}
-                    </p>
-                  </div>
+
 
                   {selectedPaper.moderationReport?.moderatorSection && (
                     <div className="mt-6 p-6 bg-indigo-50/50 border border-indigo-100 rounded-[2rem] space-y-4">
@@ -489,13 +664,21 @@ const ExamApprovals = () => {
               </div>
             </div>
 
-            <div className="p-6 bg-white border-t border-black">
+            <div className="p-6 bg-white border-t border-black flex gap-4">
               <button
                 onClick={() => handleDownload(selectedPaper.fileUrl, `${selectedPaper.subject.code}_v${selectedPaper.version}.pdf`)}
-                className="w-full py-4 bg-slate-900 text-white rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-black transition-all flex items-center justify-center gap-2 shadow-xl shadow-slate-200"
+                className="flex-1 py-4 bg-white border border-black text-slate-800 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-slate-50 transition-all flex items-center justify-center gap-2"
               >
-                <FiDownload /> Download Approved Version {selectedPaper.version}
+                <FiDownload /> Download Paper
               </button>
+              {selectedPaper.moderationReport?.moderatorSection && (
+                <button
+                  onClick={() => generateReportPDF(selectedPaper, selectedPaper)}
+                  className="flex-1 py-4 bg-slate-900 text-white rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-black transition-all flex items-center justify-center gap-2 shadow-xl shadow-slate-200"
+                >
+                  <FiFileText /> Download Report
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -533,7 +716,17 @@ const ExamApprovals = () => {
                 </div>
 
                 <div className="bg-white border border-black rounded-2xl p-6 shadow-sm">
-                  <p className="text-[10px] font-black text-slate-400 uppercase mb-3 tracking-widest">Latest Moderation Quality Report</p>
+                   <div className="flex justify-between items-center mb-4">
+                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Latest Moderation Quality Report</p>
+                     {selectedPaper.moderationReport?.moderatorSection && (
+                       <button 
+                         onClick={() => generateReportPDF(selectedPaper, selectedPaper)}
+                         className="flex items-center gap-1 text-[8px] font-black uppercase text-indigo-600 hover:text-indigo-800 transition-colors"
+                       >
+                         <FiDownload size={10} /> Download Report
+                       </button>
+                     )}
+                   </div>
                   {selectedPaper.moderationReport?.moderatorSection ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                       {[
@@ -591,12 +784,20 @@ const ExamApprovals = () => {
                               </div>
                             ))}
                           </div>
-                          <button
-                            onClick={() => handleDownload(hist.fileUrl, `${selectedPaper.subject.code}_v${hist.version}.pdf`)}
-                            className="text-[9px] font-black uppercase text-indigo-600 flex items-center gap-1 hover:underline"
-                          >
-                            <FiDownload size={10} /> Download v{hist.version} PDF
-                          </button>
+                          <div className="flex gap-4">
+                            <button
+                              onClick={() => handleDownload(hist.fileUrl, `${selectedPaper.subject.code}_v${hist.version}.pdf`)}
+                              className="text-[9px] font-black uppercase text-indigo-600 flex items-center gap-1 hover:underline"
+                            >
+                              <FiDownload size={10} /> Download v{hist.version} PDF
+                            </button>
+                            <button
+                              onClick={() => generateReportPDF(selectedPaper, hist)}
+                              className="text-[9px] font-black uppercase text-slate-600 flex items-center gap-1 hover:underline"
+                            >
+                              <FiFileText size={10} /> Download Report
+                            </button>
+                          </div>
                         </div>
                       ) : (
                         <p className="text-xs font-bold text-slate-400 italic">No report was filed for this version.</p>

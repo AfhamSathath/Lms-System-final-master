@@ -82,6 +82,22 @@ exports.getDepartments = async (req, res, next) => {
       }
 
       query.faculty = req.user.facultyManaged;
+    } else if (userRole === 'student') {
+      if (req.user.department) {
+        const resolved = resolveDepartmentIdentifier(req.user.department);
+        if (resolved) {
+          query = { ...query, ...resolved };
+        }
+      } else {
+        return res.status(200).json({
+          success: true,
+          count: 0,
+          total: 0,
+          page: 1,
+          pages: 0,
+          departments: []
+        });
+      }
     }
 
     // Apply filters
@@ -109,7 +125,7 @@ exports.getDepartments = async (req, res, next) => {
     // Get stats for each department
     const departmentsWithStats = await Promise.all(
       departments.map(async (dept) => {
-        const queryDept = { $in: [dept._id, dept._id.toString(), dept.name] };
+        const queryDept = { $in: [dept._id, dept._id.toString(), dept.name, dept.code] };
 
         const students = await User.countDocuments({
           department: queryDept,
@@ -131,9 +147,9 @@ exports.getDepartments = async (req, res, next) => {
         return {
           ...dept.toJSON(),
           stats: {
-            students,
-            lecturers,
-            courses
+            totalStudents: students,
+            totalLecturers: lecturers,
+            totalCourses: courses
           }
         };
       })

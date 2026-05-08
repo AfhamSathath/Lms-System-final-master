@@ -79,13 +79,11 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (userData) => {
     try {
-      const res = await api.post('/auth/register', userData);
-
-      localStorage.setItem('token', res.data.token);
-
+      const response = await api.post('/api/auth/register', userData);
+      localStorage.setItem('token', response.data.token);
       return {
         success: true,
-        role: res.data.user.role
+        role: response.data.user.role
       };
     } catch (error) {
       return {

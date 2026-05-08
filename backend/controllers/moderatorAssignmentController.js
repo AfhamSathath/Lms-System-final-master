@@ -7,7 +7,7 @@ const Subject = require('../models/course');
 // @access  Private (HOD)
 exports.assignModerator = async (req, res, next) => {
   try {
-    const { lecturerId, subjectId, moderatorId, academicYear, semester, batch } = req.body;
+    const { lecturerId, subjectId, moderatorId, academicYear, semester } = req.body;
 
     // Validate if moderator is also a lecturer
     const moderator = await User.findById(moderatorId);
@@ -22,7 +22,6 @@ exports.assignModerator = async (req, res, next) => {
       department: req.user.department,
       academicYear,
       semester,
-      batch,
       assignedBy: req.user.id
     });
 

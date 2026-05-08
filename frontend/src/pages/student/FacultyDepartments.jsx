@@ -3,10 +3,12 @@ import api from '../../services/api';
 import Loader from '../../components/common/loader';
 import { FiLayers, FiUsers, FiBook, FiHash, FiArrowRight } from 'react-icons/fi';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 
 const FacultyDepartments = () => {
   const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchDepts = async () => {
@@ -29,7 +31,9 @@ const FacultyDepartments = () => {
     <div className="p-6 bg-white min-h-screen">
       <div className="max-w-7xl mx-auto">
         <div className="mb-12">
-           <h1 className="text-4xl font-black text-slate-800 tracking-tighter uppercase leading-none mb-2">Faculty Departments</h1>
+           <h1 className="text-4xl font-black text-slate-800 tracking-tighter uppercase leading-none mb-2">
+             {departments.length === 1 ? 'My Department' : 'Faculty Departments'}
+           </h1>
            <p className="text-slate-400 font-bold uppercase tracking-[0.2em] text-xs">University organizational structure & departmental overview</p>
         </div>
 
@@ -80,7 +84,10 @@ const FacultyDepartments = () => {
                       </div>
                    </div>
 
-                   <button className="flex items-center gap-2 text-indigo-600 font-black uppercase tracking-widest text-xs group-hover:gap-4 transition-all">
+                   <button 
+                     onClick={() => navigate('/student/subjects')}
+                     className="flex items-center gap-2 text-indigo-600 font-black uppercase tracking-widest text-xs group-hover:gap-4 transition-all"
+                   >
                       Visit Department Page <FiArrowRight />
                    </button>
                  </div>

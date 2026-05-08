@@ -87,7 +87,7 @@ const AdminProfile = () => {
     setLoading(true);
     try {
       const userId = user?.id || user?._id;
-      await api.put(`/api/users/${userId}/update-password`, {
+      await api.put(`/users/${userId}/update-password`, {
         currentPassword: passwordData.currentPassword,
         newPassword: passwordData.newPassword,
       });

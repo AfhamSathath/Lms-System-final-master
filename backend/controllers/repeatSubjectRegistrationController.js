@@ -1258,6 +1258,14 @@ exports.getRepeatRegistrationById = async (req, res, next) => {
       });
     }
 
+    // Check permissions
+    if (req.user.role === 'student' && registration.student._id.toString() !== req.user.id) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied. You can only view your own registration.'
+      });
+    }
+
     res.status(200).json({
       success: true,
       data: registration

@@ -950,7 +950,25 @@ const ModerationTasks = () => {
 
                      <div className="bg-white border border-black rounded-[2rem] p-8 shadow-sm space-y-6">
                         <div>
-                           <p className="text-[10px] font-black text-slate-400 uppercase mb-4 tracking-[0.2em]">Quality Report Details</p>
+                           <div className="flex justify-between items-center mb-4">
+                              <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Quality Report Details</p>
+                              <div className="flex gap-2">
+                                 <button 
+                                    onClick={() => handleDownload(selectedPaper.fileUrl, `${selectedPaper.subject?.code}_v${selectedPaper.version}.pdf`)}
+                                    className="px-4 py-2 bg-indigo-600 text-white rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-slate-900 transition-all flex items-center gap-2"
+                                 >
+                                    <FiDownload size={12} /> Download Paper
+                                 </button>
+                                 {selectedPaper.moderationReport?.moderatorSection && (
+                                    <button 
+                                       onClick={() => generateReportPDF(selectedPaper, selectedPaper)}
+                                       className="px-4 py-2 bg-slate-900 text-white rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-indigo-600 transition-all flex items-center gap-2"
+                                    >
+                                       <FiDownload size={12} /> Download Report
+                                    </button>
+                                 )}
+                              </div>
+                           </div>
                            {selectedPaper.moderationReport?.moderatorSection ? (
                               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                  {[

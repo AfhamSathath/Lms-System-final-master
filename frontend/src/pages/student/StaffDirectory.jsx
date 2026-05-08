@@ -2,12 +2,28 @@ import React, { useState, useEffect } from 'react';
 import api from '../../services/api';
 import Loader from '../../components/common/loader';
 import { FiUsers, FiMail, FiPhone, FiBookOpen, FiSearch, FiMapPin } from 'react-icons/fi';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import Modal from '../../components/common/model';
+import { FiX, FiAward, FiBook } from 'react-icons/fi';
 
 const StaffDirectory = () => {
   const [staff, setStaff] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedMember, setSelectedMember] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+
+  const openProfile = (member) => {
+    setSelectedMember(member);
+    setShowModal(true);
+  };
+
+  const getImageUrl = (path) => {
+    if (!path) return null;
+    if (path.startsWith('http')) return path;
+    const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+    return `${baseUrl}${path.startsWith('/') ? '' : '/'}${path}`;
+  };
 
   useEffect(() => {
     const fetchStaff = async () => {
@@ -70,8 +86,14 @@ const StaffDirectory = () => {
                 className="bg-white rounded-[2rem] p-6 border border-black hover:shadow-xl hover:shadow-indigo-50 transition-all group"
               >
                 <div className="flex items-center gap-4 mb-6">
-                  <div className="w-16 h-16 rounded-2xl bg-indigo-50 flex items-center justify-center text-2xl text-indigo-600 font-black shadow-inner group-hover:bg-indigo-600 group-hover:text-white transition-colors duration-500">
-                    {member.name?.[0]}
+                  <div className="w-16 h-16 rounded-2xl bg-indigo-50 flex items-center justify-center text-2xl text-indigo-600 font-black shadow-inner group-hover:bg-indigo-600 group-hover:text-white transition-colors duration-500 overflow-hidden">
+                    {member.profilePicture ? (
+                      <img 
+                        src={getImageUrl(member.profilePicture)} 
+                        alt={member.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : member.name?.[0]}
                   </div>
                   <div>
                     <h3 className="font-black text-slate-800 uppercase tracking-tighter leading-tight">{member.name}</h3>
@@ -87,7 +109,10 @@ const StaffDirectory = () => {
                 </div>
 
                 <div className="mt-8 pt-6 border-t border-slate-50">
-                   <button className="w-full py-3 bg-slate-900 text-white rounded-xl font-black uppercase text-[10px] tracking-widest hover:bg-indigo-600 transition-colors shadow-lg active:scale-95 transform">
+                   <button 
+                     onClick={() => openProfile(member)}
+                     className="w-full py-3 bg-slate-900 text-white rounded-xl font-black uppercase text-[10px] tracking-widest hover:bg-indigo-600 transition-colors shadow-lg active:scale-95 transform"
+                   >
                      View Academic Profile
                    </button>
                 </div>
@@ -95,6 +120,80 @@ const StaffDirectory = () => {
             ))
           )}
         </div>
+
+        {/* Profile Modal */}
+        <Modal
+          isOpen={showModal}
+          onClose={() => setShowModal(false)}
+          title="Academic Profile"
+          size="lg"
+        >
+          {selectedMember && (
+            <div className="p-2">
+              <div className="flex flex-col md:flex-row gap-8 items-start mb-8">
+                <div className="w-32 h-32 rounded-3xl bg-indigo-50 flex items-center justify-center text-5xl text-indigo-600 font-black shadow-inner">
+                  {selectedMember.profilePicture ? (
+                     <img 
+                       src={getImageUrl(selectedMember.profilePicture)} 
+                       alt={selectedMember.name}
+                       className="w-full h-full object-cover rounded-3xl"
+                     />
+                  ) : selectedMember.name?.[0]}
+                </div>
+                <div className="flex-1">
+                  <h2 className="text-3xl font-black text-slate-800 uppercase tracking-tight mb-1">{selectedMember.name}</h2>
+                  <p className="text-indigo-600 font-black uppercase tracking-[0.2em] text-sm mb-4">{selectedMember.department}</p>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                       <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Employee ID</p>
+                       <p className="font-bold text-slate-700">{selectedMember.lecturerId || 'N/A'}</p>
+                    </div>
+                    <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                       <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Email Address</p>
+                       <p className="font-bold text-slate-700 truncate">{selectedMember.email}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-6">
+                <div>
+                  <h4 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] mb-4 flex items-center gap-2 italic">
+                    <FiAward className="text-indigo-500" /> Academic Qualifications
+                  </h4>
+                  <div className="bg-white p-6 rounded-[2rem] border border-black shadow-sm">
+                    <p className="text-slate-600 font-medium leading-relaxed">
+                      {selectedMember.qualifications || "Information about academic qualifications and certifications is currently being verified and will be updated shortly."}
+                    </p>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] mb-4 flex items-center gap-2 italic">
+                    <FiBook className="text-indigo-500" /> Research & Specialization
+                  </h4>
+                  <div className="bg-white p-6 rounded-[2rem] border border-black shadow-sm">
+                    <p className="text-slate-600 font-medium leading-relaxed">
+                      {selectedMember.specialization || "Research focus and areas of academic specialization are currently being updated."}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-6 pt-4">
+                   <div className="flex items-center gap-3 text-slate-500">
+                      <FiPhone className="text-indigo-400" />
+                      <span className="text-sm font-bold">{selectedMember.phone || 'Contact not provided'}</span>
+                   </div>
+                   <div className="flex items-center gap-3 text-slate-500">
+                      <FiMapPin className="text-indigo-400" />
+                      <span className="text-sm font-bold">{selectedMember.address || 'Main Campus'}</span>
+                   </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </Modal>
       </div>
     </div>
   );

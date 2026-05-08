@@ -46,6 +46,13 @@ exports.getAllFiles = async (req, res, next) => {
       ];
     }
 
+    // Students should NOT see internal/staff-only files
+    if (req.user && req.user.role === 'student') {
+      query.fileType = { 
+        $nin: ['exam_paper', 'moderation_document', 'curriculum', 'grading_rubric'] 
+      };
+    }
+
     const files = await SubjectFile.find(query)
       .populate('subject', 'name code')
       .populate('uploadedBy', 'name email')
@@ -154,6 +161,13 @@ exports.getSubjectFiles = async (req, res, next) => {
     if (academicYear) query.academicYear = academicYear;
     if (fileType) query.fileType = fileType;
     if (weekNumber) query.weekNumber = Number(weekNumber);
+    
+    // Students should NOT see internal/staff-only files
+    if (req.user && req.user.role === 'student') {
+      query.fileType = query.fileType || { 
+        $nin: ['exam_paper', 'moderation_document', 'curriculum', 'grading_rubric'] 
+      };
+    }
 
     const files = await SubjectFile.find(query)
       .populate('uploadedBy', 'name email')
@@ -182,6 +196,13 @@ exports.getDepartmentSubjectFiles = async (req, res, next) => {
     if (semester) query.semester = Number(semester);
     if (academicYear) query.academicYear = academicYear;
     if (fileType) query.fileType = fileType;
+
+    // Students should NOT see internal/staff-only files
+    if (req.user && req.user.role === 'student') {
+      query.fileType = query.fileType || { 
+        $nin: ['exam_paper', 'moderation_document', 'curriculum', 'grading_rubric'] 
+      };
+    }
 
     const files = await SubjectFile.find(query)
       .populate('subject', 'name code')

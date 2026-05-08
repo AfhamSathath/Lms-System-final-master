@@ -100,7 +100,7 @@ const RegistrarUsers = () => {
   });
 
   const academicYears = ['1', '2', '3', '4', '5'];
-  const semesters = [1, 2, 3, 4, 5, 6, 7, 8];
+  const semesters = [1, 2];
   const roles = [
     { value: 'student', label: 'Student', icon: '👨‍🎓', color: 'bg-white border border-black text-slate-800' },
     { value: 'lecturer', label: 'Lecturer', icon: '👨‍🏫', color: 'bg-white border border-black text-slate-800' },
@@ -1368,6 +1368,38 @@ const UserForm = ({
                   </select>
                 </div>
 
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Year of Study
+                  </label>
+                  <select
+                    name="yearOfStudy"
+                    value={formData.yearOfStudy}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  >
+                    <option value="">Select Year</option>
+                    {academicYears.map(y => (
+                      <option key={y} value={y}>Year {y}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Semester
+                  </label>
+                  <select
+                    name="semester"
+                    value={formData.semester}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  >
+                    <option value="">Select Semester</option>
+                    {semesters.map(s => (
+                      <option key={s} value={s}>Semester {s}</option>
+                    ))}
+                  </select>
+                </div>
               </>
             )}
             {['lecturer', 'hod', 'dean', 'registrar', 'bursar', 'exam_officer', 'librarian'].includes(formData.role) && (

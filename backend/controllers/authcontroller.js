@@ -333,8 +333,23 @@ exports.getAllUsers = async (req, res, next) => {
   try {
     const query = {};
 
+    // Role-based filtering for students (restrict to their own department)
+    if (req.user.role === 'student') {
+      const student = await User.findById(req.user.id);
+      if (student && student.department) {
+        // Find lecturers/staff in the same department
+        // We use $regex to match both full names and codes (e.g. "Computer Science" or "DCS")
+        query.department = { $regex: new RegExp(`^${student.department}$`, 'i') };
+      }
+    }
+
     if (req.query.role) {
       query.role = req.query.role;
+    }
+
+    if (req.query.department) {
+      // Use case-insensitive regex for flexible department matching
+      query.department = { $regex: new RegExp(`^${req.query.department}$`, 'i') };
     }
 
     if (req.query.status) {
@@ -413,6 +428,43 @@ exports.updateUser = async (req, res, next) => {
       emailService.sendProfileUpdateEmail(user, updatedSensitive).catch(err => console.error('Profile update email failed:', err));
     }
 
+    // Automatically update active enrollments if yearOfStudy or semester changed
+    if (user.role === 'student' && (updateData.yearOfStudy || updateData.semester)) {
+      try {
+        const Enrollment = require('../models/Enrollment');
+        const updateQuery = {};
+        
+        if (updateData.yearOfStudy) {
+          const yearMap = {
+            '1': '1st Year',
+            '2': '2nd Year',
+            '3': '3rd Year',
+            '4': '4th Year',
+            '5': '5th Year'
+          };
+          updateQuery.yearOfStudy = yearMap[updateData.yearOfStudy.toString()] || updateData.yearOfStudy;
+        }
+        
+        if (updateData.semester) {
+          updateQuery.semester = parseInt(updateData.semester);
+        }
+
+        if (Object.keys(updateQuery).length > 0) {
+          await Enrollment.updateMany(
+            { 
+              student: user._id,
+              enrollmentStatus: { $in: ['enrolled', 'waitlisted'] }
+            },
+            { $set: updateQuery }
+          );
+          console.log(`Synchronized enrollments for student ${user.name} with new academic level.`);
+        }
+      } catch (enrollErr) {
+        console.error('Failed to sync enrollments on user update:', enrollErr);
+        // We don't fail the whole request if sync fails, but we log it
+      }
+    }
+
     res.json({
       success: true,
       message: 'User updated successfully',
@@ -420,6 +472,47 @@ exports.updateUser = async (req, res, next) => {
     });
   } catch (error) {
     console.error('Update user error:', error);
+    next(error);
+  }
+};
+
+// @desc    Update profile (Self)
+// @route   PUT /api/auth/update-profile
+// @access  Private
+exports.updateProfile = async (req, res, next) => {
+  try {
+    const allowedFields = [
+      'phone',
+      'address',
+      'emergencyContact',
+      'profilePicture',
+      'signature',
+      'dateOfBirth',
+      'gender',
+      'qualifications',
+      'specialization'
+    ];
+
+    const updateData = {};
+    allowedFields.forEach(field => {
+      if (req.body[field] !== undefined) {
+        updateData[field] = req.body[field];
+      }
+    });
+
+    const user = await User.findByIdAndUpdate(
+      req.user.id,
+      updateData,
+      { new: true, runValidators: true }
+    ).select('-password');
+
+    res.json({
+      success: true,
+      message: 'Profile updated successfully',
+      user
+    });
+  } catch (error) {
+    console.error('Update profile error:', error);
     next(error);
   }
 };

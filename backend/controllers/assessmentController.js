@@ -156,7 +156,20 @@ exports.getAssessmentsBySubject = async (req, res, next) => {
       query.status = 'published';
     }
 
-    const assessments = await Assessment.find(query).populate('lecturer', 'name').sort('-createdAt');
+    let assessments = await Assessment.find(query).populate('lecturer', 'name').sort('-createdAt');
+
+    // If student, filter marks to only show their own
+    if (req.user.role === 'student') {
+      assessments = assessments.map(assessment => {
+        const assessmentObj = assessment.toObject();
+        if (assessmentObj.marks) {
+          assessmentObj.marks = assessmentObj.marks.filter(
+            m => m.student.toString() === req.user.id
+          );
+        }
+        return assessmentObj;
+      });
+    }
 
     res.json({
       success: true,

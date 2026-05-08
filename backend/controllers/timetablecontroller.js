@@ -2,6 +2,8 @@ const Timetable = require('../models/timetable');
 const Subject = require('../models/course');
 const User = require('../models/user');
 const Notification = require('../models/notification');
+const Department = require('../models/Department');
+const Hall = require('../models/Hall');
 const emailService = require('../utils/emailService');
 const csvHelper = require('../utils/csvHelper');
 const ModeratorAssignment = require('../models/ModeratorAssignment');
@@ -9,7 +11,7 @@ const ModeratorAssignment = require('../models/ModeratorAssignment');
 const getDepartmentsForFaculty = (facultyOrDept) => {
   if (!facultyOrDept) return [];
   const query = facultyOrDept.toUpperCase();
-  
+
   const CS_DEPTS = ['Computer Science', 'Physical Science', 'Applied Data Science'];
   const BIZ_DEPTS = ['Languages', 'Business Management', 'Business and Management Studies', 'Languages and Communication Studies'];
   const SIDDHA_DEPTS = ['Unit of Siddha Medicine', 'Siddha Medicine'];
@@ -17,7 +19,7 @@ const getDepartmentsForFaculty = (facultyOrDept) => {
   if (query.includes('APPLIED SCIENCE') || CS_DEPTS.some(d => d.toUpperCase() === query)) return CS_DEPTS;
   if (query.includes('COMMUNICATION') || query.includes('BUSINESS') || BIZ_DEPTS.some(d => d.toUpperCase() === query)) return BIZ_DEPTS;
   if (query.includes('SIDDHA') || SIDDHA_DEPTS.some(d => d.toUpperCase() === query)) return SIDDHA_DEPTS;
-  
+
   return [facultyOrDept]; // Fallback to exact match
 };
 
@@ -49,7 +51,7 @@ exports.getUpcomingTimetables = async (req, res, next) => {
       // Get subjects taught by this lecturer
       const taughtSubjects = await Subject.find({ lecturer: req.user._id }).select('_id');
       const taughtSubjectIds = taughtSubjects.map(s => s._id);
-      
+
       query.$or = [
         { status: 'published', department: req.user.department },
         { supervisors: req.user._id },
@@ -113,9 +115,9 @@ exports.getAllTimetables = async (req, res, next) => {
       query.status = { $in: ['draft', 'pending_hod', 'published'] };
       if (req.user.department) query.department = req.user.department;
     } else if (role === 'lecturer') {
-       // Get subjects taught by this lecturer
-       const taughtSubjects = await Subject.find({ lecturer: req.user._id }).select('_id');
-       const taughtSubjectIds = taughtSubjects.map(s => s._id);
+      // Get subjects taught by this lecturer
+      const taughtSubjects = await Subject.find({ lecturer: req.user._id }).select('_id');
+      const taughtSubjectIds = taughtSubjects.map(s => s._id);
 
       query.$or = [
         { status: 'published', department: req.user.department },
@@ -189,7 +191,7 @@ exports.createTimetable = async (req, res, next) => {
     if (req.user.role !== 'exam_officer') {
       return res.status(403).json({ success: false, message: 'Only Exam Officers can create timetables' });
     }
-    const { subject, examType, department, year, semester, date, startTime, endTime, venue } = req.body;
+    const { subject, examType, department, year, semester, date, startTime, endTime, venue, studentCount } = req.body;
 
 
     if (!subject || !department || !date || !startTime || !endTime || !venue) {
@@ -205,7 +207,8 @@ exports.createTimetable = async (req, res, next) => {
       date,
       startTime,
       endTime,
-      venue
+      venue,
+      studentCount: studentCount || 0
     });
 
     await timetable.save(); // year & semester autofill via pre('save') hook
@@ -229,17 +232,29 @@ exports.updateTimetable = async (req, res, next) => {
       return res.status(404).json({ success: false, message: 'Timetable not found' });
     }
 
-    const canUpdate = req.user.role === 'exam_officer';
-    if (!canUpdate) {
-      return res.status(403).json({ success: false, message: 'Only Exam Officers can modify timetable details' });
+    const allowedRoles = ['exam_officer', 'hod', 'admin'];
+    if (!allowedRoles.includes(req.user.role)) {
+      return res.status(403).json({ success: false, message: 'Not authorized to update timetable' });
     }
 
+    let fieldsToUpdate = [];
 
-    let fieldsToUpdate = ['subject', 'examType', 'department', 'year', 'semester', 'date', 'startTime', 'endTime', 'venue', 'status', 'supervisors', 'batch'];
-    
-    // Strict restriction for HOD role
-    if (req.user.role === 'hod') {
-      fieldsToUpdate = ['batch', 'status', 'supervisors'];
+    if (req.user.role === 'exam_officer' || req.user.role === 'admin') {
+      // Exam Officer can update everything EXCEPT supervisors
+      fieldsToUpdate = ['subject', 'examType', 'department', 'year', 'semester', 'date', 'startTime', 'endTime', 'venue', 'status', 'batch', 'studentCount'];
+    }
+
+    if (req.user.role === 'hod' || req.user.role === 'admin') {
+      // HOD can update supervisors (and maybe status/batch for their dept)
+      const hodFields = ['supervisors', 'status', 'batch'];
+      hodFields.forEach(f => {
+        if (!fieldsToUpdate.includes(f)) fieldsToUpdate.push(f);
+      });
+
+      // Verify HOD is from the same department
+      if (req.user.role === 'hod' && timetable.department !== req.user.department) {
+        return res.status(403).json({ success: false, message: 'HODs can only modify timetables for their own department' });
+      }
     }
 
     fieldsToUpdate.forEach(field => {
@@ -320,6 +335,8 @@ exports.bulkCreateTimetables = async (req, res, next) => {
           endTime: entry.endTime,
           venue: entry.venue,
           batch: entry.batch,
+          studentCount: entry.studentCount || 0,
+          supervisors: entry.supervisors || [],
           status: entry.status || 'draft'
         });
         await timetable.save();
@@ -331,10 +348,10 @@ exports.bulkCreateTimetables = async (req, res, next) => {
     }
 
     if (errors.length > 0 && createdTimetables.length === 0) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Failed to create any timetable entries', 
-        errors 
+      return res.status(400).json({
+        success: false,
+        message: 'Failed to create any timetable entries',
+        errors
       });
     }
 
@@ -356,7 +373,7 @@ exports.bulkCreateTimetables = async (req, res, next) => {
 exports.bulkUpdateTimetableStatus = async (req, res, next) => {
   try {
     const { timetableIds, status, batch } = req.body;
-    
+
     if (!timetableIds || !Array.isArray(timetableIds)) {
       return res.status(400).json({ success: false, message: 'Invalid timetable IDs' });
     }
@@ -368,7 +385,7 @@ exports.bulkUpdateTimetableStatus = async (req, res, next) => {
       }
       updateData.status = status;
     }
-    
+
     if (batch) {
       updateData.batch = batch;
     }
@@ -377,22 +394,22 @@ exports.bulkUpdateTimetableStatus = async (req, res, next) => {
     const role = req.user.role;
     if (status) {
       if (status === 'pending_dean' && role !== 'exam_officer') {
-         return res.status(403).json({ success: false, message: 'Only Exam Officers can send for Dean approval' });
+        return res.status(403).json({ success: false, message: 'Only Exam Officers can send for Dean approval' });
       }
       if (status === 'pending_hod' && role !== 'dean') {
-         return res.status(403).json({ success: false, message: 'Only Deans can approve and send to HOD' });
+        return res.status(403).json({ success: false, message: 'Only Deans can approve and send to HOD' });
       }
       if (status === 'published' && role !== 'hod') {
-         return res.status(403).json({ success: false, message: 'Only HODs can publish timetables' });
+        return res.status(403).json({ success: false, message: 'Only HODs can publish timetables' });
       }
       if (status === 'finished' && role !== 'hod') {
-         return res.status(403).json({ success: false, message: 'Only HODs can mark exams as finished' });
+        return res.status(403).json({ success: false, message: 'Only HODs can mark exams as finished' });
       }
       if (status === 'problem' && role !== 'hod') {
-         return res.status(403).json({ success: false, message: 'Only HODs can report problems' });
+        return res.status(403).json({ success: false, message: 'Only HODs can report problems' });
       }
       if (status === 'draft' && !['dean', 'hod', 'exam_officer'].includes(role)) {
-         return res.status(403).json({ success: false, message: 'Unauthorized to revert status' });
+        return res.status(403).json({ success: false, message: 'Unauthorized to revert status' });
       }
     }
 
@@ -432,7 +449,7 @@ exports.bulkUpdateTimetableStatus = async (req, res, next) => {
     try {
       if (status === 'pending_dean') {
         const deans = await User.find({ role: 'dean' });
-        
+
         // Group by department to send consolidated PDFs (one PDF per department)
         const groups = {};
         updatedTimetables.forEach(t => {
@@ -443,7 +460,7 @@ exports.bulkUpdateTimetableStatus = async (req, res, next) => {
 
         for (const dept in groups) {
           const groupTimetables = groups[dept];
-          
+
           // Determine if it's a single year/semester or mixed
           const years = [...new Set(groupTimetables.map(t => t.year))];
           const semesters = [...new Set(groupTimetables.map(t => t.semester))];
@@ -456,14 +473,14 @@ exports.bulkUpdateTimetableStatus = async (req, res, next) => {
           };
 
           const facultyName = emailService.getFacultyName(dept);
-          
+
           // Route exclusively to the Dean of the associated faculty
           const targetDeans = deans.filter(dean => {
             const deanFaculty = (dean.faculty || '').trim().toUpperCase();
             const deanDept = (dean.department || '').trim().toUpperCase();
-            return deanFaculty === facultyName.toUpperCase() || 
-                   deanDept === dept.toUpperCase() || 
-                   (!dean.faculty && !dean.department); // Fallback to all deans if none assigned
+            return deanFaculty === facultyName.toUpperCase() ||
+              deanDept === dept.toUpperCase() ||
+              (!dean.faculty && !dean.department); // Fallback to all deans if none assigned
           });
 
           for (const dean of targetDeans.length > 0 ? targetDeans : deans) {
@@ -481,7 +498,7 @@ exports.bulkUpdateTimetableStatus = async (req, res, next) => {
 
         for (const dept in groups) {
           const groupTimetables = groups[dept];
-          
+
           const years = [...new Set(groupTimetables.map(t => t.year))];
           const semesters = [...new Set(groupTimetables.map(t => t.semester))];
 
@@ -524,19 +541,19 @@ exports.bulkUpdateTimetableStatus = async (req, res, next) => {
           const targetDeans = deans.filter(dean => {
             const deanFaculty = (dean.faculty || '').trim().toUpperCase();
             const deanDept = (dean.department || '').trim().toUpperCase();
-            return deanFaculty === facultyName.toUpperCase() || 
-                   deanDept === dept.toUpperCase() || 
-                   (!dean.faculty && !dean.department);
+            return deanFaculty === facultyName.toUpperCase() ||
+              deanDept === dept.toUpperCase() ||
+              (!dean.faculty && !dean.department);
           });
 
           // Fetch all departmental stakeholders + administrative staff
-          const departmentalUsers = await User.find({ 
-             $or: [
-                { department: dept }, // Students, Lecturers, HODs in this dept
-                { role: { $in: ['exam_officer', 'registrar', 'admin'] } } // System admins
-             ]
+          const departmentalUsers = await User.find({
+            $or: [
+              { department: dept }, // Students, Lecturers, HODs in this dept
+              { role: { $in: ['exam_officer', 'registrar', 'admin'] } } // System admins
+            ]
           });
-          
+
           const allRecipients = [...departmentalUsers, ...targetDeans];
           const recipientEmails = [...new Set(allRecipients.map(u => u.email).filter(Boolean))];
 
@@ -556,7 +573,7 @@ exports.bulkUpdateTimetableStatus = async (req, res, next) => {
         // High Red Alert Notifications for Exam Officers
         const examOfficers = await User.find({ role: { $in: ['exam_officer', 'admin'] } });
         const { problemComments } = req.body;
-        
+
         for (const t of updatedTimetables) {
           for (const officer of examOfficers) {
             // Create in-app high priority notification
@@ -587,7 +604,7 @@ exports.bulkUpdateTimetableStatus = async (req, res, next) => {
 
     res.json({
       success: true,
-      message: status 
+      message: status
         ? `Successfully updated ${timetableIds.length} timetables to ${status.replace('_', ' ').toUpperCase()}`
         : `Successfully updated ${timetableIds.length} timetables`
     });
@@ -634,10 +651,10 @@ exports.bulkAssignSupervisors = async (req, res, next) => {
       return res.status(400).json({ success: false, message: 'Invalid or empty timetable IDs' });
     }
 
-    // Role check - usually HODs or Exam Officers manage supervisors
-    const canManage = ['hod', 'exam_officer', 'admin'].includes(req.user.role);
+    // Role check - only HODs and Admins can manage supervisors
+    const canManage = ['hod', 'admin'].includes(req.user.role);
     if (!canManage) {
-      return res.status(403).json({ success: false, message: 'Not authorized to manage supervisors' });
+      return res.status(403).json({ success: false, message: 'Only HODs and Admins can assign supervisors' });
     }
 
     const supervisorsArray = Array.isArray(supervisorIds) ? supervisorIds : [];
@@ -661,8 +678,11 @@ exports.bulkAssignSupervisors = async (req, res, next) => {
 // @access  Private (HOD)
 exports.assignSupervisor = async (req, res, next) => {
   try {
+    if (!['hod', 'admin'].includes(req.user.role)) {
+      return res.status(403).json({ success: false, message: 'Only HODs and Admins can assign supervisors' });
+    }
     const { supervisorIds } = req.body;
-    
+
     // Convert single string back to array if sent sequentially instead of an array
     const supervisorsArray = Array.isArray(supervisorIds) ? supervisorIds : [supervisorIds].filter(Boolean);
 
@@ -701,11 +721,11 @@ exports.generateTimetable = async (req, res, next) => {
       return res.status(403).json({ success: false, message: 'Only Exam Officers can automatically generate timetables' });
     }
 
-    const { 
-      startDate: startDateStr, 
-      year, 
-      semester, 
-      department, 
+    const {
+      startDate: startDateStr,
+      year,
+      semester,
+      department,
       examType = 'final',
       slots = [
         { startTime: '08:30', endTime: '11:30' },
@@ -729,9 +749,9 @@ exports.generateTimetable = async (req, res, next) => {
       if (!isNaN(sNum)) subjectQuery.semester = sNum;
       else subjectQuery.semester = semester;
     }
-    
+
     const subjects = await Subject.find(subjectQuery).populate('lecturer', 'name').lean();
-    
+
     if (!subjects.length) {
       return res.status(404).json({ success: false, message: 'No subjects found for the selected criteria.' });
     }
@@ -740,7 +760,7 @@ exports.generateTimetable = async (req, res, next) => {
     const existingTimetablesAll = await Timetable.find({}).lean();
     const subjectIds = subjects.map(s => s._id);
     const moderators = await ModeratorAssignment.find({ subject: { $in: subjectIds } }).populate('moderator', 'name').lean();
-    
+
     // Sanitize venues to ensure they are strings for filtering
     const safeVenues = (Array.isArray(venues) ? venues : [])
       .filter(v => v && typeof v === 'string')
@@ -748,8 +768,8 @@ exports.generateTimetable = async (req, res, next) => {
 
     // Filter out subjects already scheduled for this specific exam type
     const subjectsToSchedule = subjects.filter(s => {
-      return !existingTimetablesAll.some(t => 
-        t.subject.toString() === s._id.toString() && 
+      return !existingTimetablesAll.some(t =>
+        t.subject.toString() === s._id.toString() &&
         t.examType === examType
       );
     });
@@ -759,12 +779,43 @@ exports.generateTimetable = async (req, res, next) => {
     }
 
     // 2. Prepare reference data for clashes (only if avoidance is on)
-    const clashTimetables = avoidConflicts ? await Timetable.find({ 
+    const clashTimetables = avoidConflicts ? await Timetable.find({
       date: { $gte: new Date(startDateStr) },
       status: { $ne: 'finished' }
     }).lean() : [];
 
-    // 3. Algorithm
+    // 2. Fetch all halls for capacity checks
+    const hallsData = await Hall.find({ isActive: true }).lean();
+    const venueCapacities = {};
+    hallsData.forEach(hall => {
+      venueCapacities[hall.name] = hall.capacity || 0;
+    });
+
+    // 3. Prepare subjects with student counts
+    const subjectsWithCounts = [];
+    const yearMap = { '1st Year': 1, '2nd Year': 2, '3rd Year': 3, '4th Year': 4, '5th Year': 5 };
+
+    for (const s of subjectsToSchedule) {
+      const studyYear = yearMap[s.year] || 1;
+      const semesterNumber = (studyYear - 1) * 2 + s.semester;
+      
+      const studentQuery = {
+        role: 'student',
+        department: s.department,
+        yearOfStudy: studyYear,
+        semester: semesterNumber
+      };
+      if (req.body.batch) studentQuery.batch = req.body.batch;
+
+      const studentCount = await User.countDocuments(studentQuery);
+
+      subjectsWithCounts.push({
+        ...s,
+        studentCount: studentCount || 0
+      });
+    }
+
+    // 4. Algorithm
     const generatedEntries = [];
     const batchLastDate = {};
     const startDate = new Date(startDateStr);
@@ -774,18 +825,17 @@ exports.generateTimetable = async (req, res, next) => {
     let daysTried = 0;
     const maxDays = 90;
 
-    // We keep trying until all subjects are scheduled or we hit maxDays
-    const remainingSubjects = [...subjectsToSchedule];
+    const remainingSubjects = [...subjectsWithCounts];
+    const allLecturers = await User.find({ role: 'lecturer', isActive: true }).select('name department').lean();
 
     while (remainingSubjects.length > 0 && daysTried < maxDays) {
       const day = currentDate.getDay();
-      if (skipWeekends && (day === 0 || day === 6)) { // Skip Sat/Sun
+      if (skipWeekends && (day === 0 || day === 6)) {
         currentDate.setDate(currentDate.getDate() + 1);
         daysTried++;
         continue;
       }
 
-      // Try each subject for today
       for (let i = 0; i < remainingSubjects.length; i++) {
         const subject = remainingSubjects[i];
         const batchKey = `${subject.department}-${subject.year}-${subject.semester}`;
@@ -793,63 +843,27 @@ exports.generateTimetable = async (req, res, next) => {
         // 2-day gap rule (Batch specific)
         if (batchLastDate[batchKey]) {
           const diffDays = Math.ceil(Math.abs(currentDate - batchLastDate[batchKey]) / (1000 * 60 * 60 * 24));
-          if (diffDays < 3) continue; // Need at least 2 days in between
+          if (diffDays < 3) continue;
         }
 
-        // Try to find a slot and venue today
-        let foundSlot = false;
+        let scheduledToday = false;
         for (const slot of slots) {
-          // Intelligent Venue Selection: Prioritize Labs for Practicals
+          // Venue Selection with Splitting Support
           let prioritizedVenues = [...safeVenues];
           const subName = (subject.name || '').toLowerCase();
           const subCat = subject.category || '';
-          
-          const isPractical = 
-            ['Practical', 'Clinical', 'Project'].includes(subCat) || 
-            subName.includes('practical') || 
-            subName.includes('lab') ||
-            subName.includes('internship') ||
-            subName.includes('clinical') ||
-            subName.includes('practical work');
+          const isPractical = ['Practical', 'Clinical', 'Project'].includes(subCat) || subName.includes('lab');
 
           if (isPractical) {
-            const isClinical = subCat === 'Clinical' || subName.includes('clinical');
-            // Try to find a matching specialized venue first
-            let matchedVenues = [];
-            if (isClinical) {
-              matchedVenues = safeVenues.filter(v => 
-                v.toLowerCase().includes('clinic') || 
-                v.toLowerCase().includes('hospital') || 
-                v.toLowerCase().includes('ward')
-              );
-            }
-            
-            // Fallback to labs for any practical/clinical work if no specific clinic found
-            if (matchedVenues.length === 0) {
-              matchedVenues = safeVenues.filter(v => 
-                v.toLowerCase().includes('lab') || 
-                v.toLowerCase().includes('computer')
-              );
-            }
-
-            if (matchedVenues.length > 0) {
-              prioritizedVenues = matchedVenues;
-            } else {
-              // Strict fallback: force a practical environment
-              prioritizedVenues = isClinical ? ['Clinical Ward'] : ['Computer Laboratory'];
-            }
+            prioritizedVenues = safeVenues.filter(v => v.toLowerCase().includes('lab') || v.toLowerCase().includes('computer') || v.toLowerCase().includes('clinic'));
           } else {
-            // For lectures/other (Theory, General, Management), avoid labs if there are halls available
-            const halls = safeVenues.filter(v => 
-              !v.toLowerCase().includes('lab') && 
-              !v.toLowerCase().includes('computer') &&
-              !v.toLowerCase().includes('clinic')
-            );
-            if (halls.length > 0) prioritizedVenues = halls;
+            prioritizedVenues = safeVenues.filter(v => !v.toLowerCase().includes('lab') && !v.toLowerCase().includes('clinic'));
           }
 
-          for (const v of prioritizedVenues) {
-            // Check clash with DB or already generated
+          if (prioritizedVenues.length === 0) prioritizedVenues = [...safeVenues];
+
+          // Check availability of each venue for this slot
+          const availableVenues = prioritizedVenues.filter(v => {
             const hasClash = avoidConflicts && (clashTimetables.some(t => {
               const tDateStr = new Date(t.date).toISOString().split('T')[0];
               const currDateStr = currentDate.toISOString().split('T')[0];
@@ -859,46 +873,71 @@ exports.generateTimetable = async (req, res, next) => {
               const currDateStr = currentDate.toISOString().split('T')[0];
               return tDateStr === currDateStr && t.startTime === slot.startTime && t.venue === v;
             }));
+            return !hasClash;
+          }).map(name => ({ name, capacity: venueCapacities[name] || 0 }))
+            .sort((a, b) => b.capacity - a.capacity); // Use larger halls first to reduce splitting
 
-            if (!hasClash) {
-              const modAssign = moderators.find(m => m.subject.toString() === subject._id.toString());
+          // Try to fit the subject
+          let neededCapacity = subject.studentCount;
+          let assignedVenues = [];
+          let currentCapacity = 0;
+
+          for (const venue of availableVenues) {
+            assignedVenues.push(venue);
+            currentCapacity += venue.capacity;
+            if (currentCapacity >= neededCapacity) break;
+          }
+
+          if (currentCapacity >= neededCapacity && assignedVenues.length > 0) {
+            // Create entries (one per venue if split)
+            assignedVenues.forEach(venue => {
               generatedEntries.push({
                 subject: subject._id,
-                subjectCode: subject.code,
                 subjectName: subject.name,
+                courseCode: subject.courseCode,
+                department: subject.department,
                 year: subject.year,
                 semester: subject.semester,
-                department: subject.department,
-                lecturerName: subject.lecturer?.name || 'Not Assigned',
-                moderatorName: modAssign?.moderator?.name || 'Not Assigned',
-                examType,
                 date: new Date(currentDate),
                 startTime: slot.startTime,
                 endTime: slot.endTime,
-                venue: v,
+                venue: venue.name,
+                venueCapacity: venue.capacity,
+                studentCount: subject.studentCount,
+                supervisors: [], // Supervisors will be assigned by HOD later
+                moderator: moderators.find(m => m.subject.toString() === subject._id.toString())?.moderator?.name || 'N/A',
                 status: 'draft'
               });
-              batchLastDate[batchKey] = new Date(currentDate);
-              remainingSubjects.splice(i, 1);
-              i--; // Adjust index due to splice
-              foundSlot = true;
-              break;
-            }
+            });
+
+            batchLastDate[batchKey] = new Date(currentDate);
+            remainingSubjects.splice(i, 1);
+            scheduledToday = true;
+            break;
           }
-          if (foundSlot) break;
+        }
+        if (scheduledToday) {
+          i--; // Adjust index because we removed an item
         }
       }
 
-      // Move to next day
       currentDate.setDate(currentDate.getDate() + 1);
       daysTried++;
     }
 
+    const unscheduled = remainingSubjects.map(s => ({
+      name: s.name,
+      code: s.courseCode,
+      students: s.studentCount
+    }));
+
     res.json({
       success: true,
-      count: generatedEntries.length,
       timetables: generatedEntries,
-      unscheduledCount: remainingSubjects.length
+      unscheduled,
+      message: remainingSubjects.length === 0 
+        ? 'Successfully generated timetable for all subjects.' 
+        : `Generated with ${remainingSubjects.length} subjects unscheduled due to constraints.`
     });
   } catch (error) {
     next(error);
@@ -1006,7 +1045,7 @@ exports.getOldTimetablesSummary = async (req, res, next) => {
     } else if (role === 'lecturer') {
       const taughtSubjects = await Subject.find({ lecturer: req.user._id }).select('_id');
       const taughtSubjectIds = taughtSubjects.map(s => s._id);
-      
+
       const roleQuery = {
         $or: [
           { status: 'published', department: req.user.department },
@@ -1064,22 +1103,22 @@ exports.exportTimetableCSVHistory = async (req, res, next) => {
   try {
     const fs = require('fs');
     const path = require('path');
-    
+
     const { department, year, semester, batch } = req.query;
-    
+
     const dirPath = path.join(__dirname, '..', 'data', 'history');
     if (!fs.existsSync(dirPath)) {
       return res.status(404).json({ success: false, message: 'No historical records found' });
     }
 
     const files = fs.readdirSync(dirPath).filter(f => f.endsWith('.csv'));
-    
+
     if (files.length === 0) {
       return res.status(404).json({ success: false, message: 'No historical records found' });
     }
 
     let combinedCsv = 'Subject Name,Subject Code,Department,Year,Semester,Date,Start Time,End Time,Venue,Batch,Supervisors,Completed At,Exam Officer Signature,Dean Signature,HOD Signature\n';
-    
+
     for (const file of files) {
       // Basic filename filtering to optimize
       if (year && year !== 'all') {
@@ -1096,7 +1135,7 @@ exports.exportTimetableCSVHistory = async (req, res, next) => {
 
       const filePath = path.join(dirPath, file);
       const content = fs.readFileSync(filePath, 'utf-8');
-      
+
       const lines = content.split('\n');
       if (lines.length < 2) continue;
 
@@ -1107,7 +1146,7 @@ exports.exportTimetableCSVHistory = async (req, res, next) => {
       // Skip header and append data lines
       for (let i = 1; i < lines.length; i++) {
         if (!lines[i].trim()) continue;
-        
+
         // If batch filter is applied, check the dynamic batch column
         if (batch && batch !== 'all' && batchIdx !== -1) {
           // A simple CSV parse to get the column
@@ -1115,7 +1154,7 @@ exports.exportTimetableCSVHistory = async (req, res, next) => {
           const rowBatch = cols[batchIdx] ? cols[batchIdx].replace(/"/g, '') : '';
           if (rowBatch !== batch) continue;
         }
-        
+
         combinedCsv += lines[i] + '\n';
       }
     }
@@ -1135,22 +1174,22 @@ exports.exportTimetablePDFHistory = async (req, res, next) => {
   try {
     const fs = require('fs');
     const path = require('path');
-    
+
     const { department, year, semester, batch } = req.query;
-    
+
     const dirPath = path.join(__dirname, '..', 'data', 'history');
     if (!fs.existsSync(dirPath)) {
       return res.status(404).json({ success: false, message: 'No historical records found' });
     }
 
     const files = fs.readdirSync(dirPath).filter(f => f.endsWith('.csv'));
-    
+
     if (files.length === 0) {
       return res.status(404).json({ success: false, message: 'No historical records found' });
     }
 
     const timetables = [];
-    
+
     for (const file of files) {
       if (year && year !== 'all') {
         const safeYear = year.replace(/\s+/g, '_');
@@ -1166,15 +1205,15 @@ exports.exportTimetablePDFHistory = async (req, res, next) => {
 
       const filePath = path.join(dirPath, file);
       const content = fs.readFileSync(filePath, 'utf-8');
-      
+
       const lines = content.split('\n');
       if (lines.length < 2) continue;
 
       const fileHeader = lines[0].split(',').map(c => c.trim().toLowerCase());
-      
+
       for (let i = 1; i < lines.length; i++) {
         if (!lines[i].trim()) continue;
-        
+
         const cols = lines[i].match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || [];
         const getVal = (colName) => {
           const idx = fileHeader.indexOf(colName);
@@ -1183,7 +1222,7 @@ exports.exportTimetablePDFHistory = async (req, res, next) => {
 
         const rowBatch = getVal('batch');
         if (batch && batch !== 'all' && rowBatch !== batch) continue;
-        
+
         const dateStr = getVal('date');
         let parsedDate = null;
         if (dateStr) {
@@ -1219,9 +1258,9 @@ exports.exportTimetablePDFHistory = async (req, res, next) => {
 
     // Sort by date
     timetables.sort((a, b) => {
-       const da = a.date ? a.date.getTime() : 0;
-       const db = b.date ? b.date.getTime() : 0;
-       return da - db;
+      const da = a.date ? a.date.getTime() : 0;
+      const db = b.date ? b.date.getTime() : 0;
+      return da - db;
     });
 
     const emailService = require('../utils/emailService');

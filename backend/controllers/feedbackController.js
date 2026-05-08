@@ -113,11 +113,31 @@ exports.getCourseFeedback = async (req, res, next) => {
 exports.getMyFeedbackHistory = async (req, res, next) => {
   try {
     const feedbacks = await Feedback.find({ student: req.user.id })
-      .populate('course', 'courseName courseCode')
+      .populate('course', 'name code')
       .sort('-createdAt');
 
     res.json({
       success: true,
+      feedbacks
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Get All Feedback (Admin/HOD)
+// @route   GET /api/feedback
+// @access  Private (Admin, HOD)
+exports.getAllFeedback = async (req, res, next) => {
+  try {
+    const feedbacks = await Feedback.find({})
+      .populate('course', 'name code')
+      .populate('lecturer', 'name')
+      .sort('-createdAt');
+
+    res.json({
+      success: true,
+      count: feedbacks.length,
       feedbacks
     });
   } catch (error) {

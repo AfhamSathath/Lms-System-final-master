@@ -199,6 +199,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
               { name: 'Result Management', path: 'results', icon: FiAward },
               { name: 'Attendance Mgmt', path: 'attendance', icon: FiCheckSquare },
               { name: 'Timetable Mgmt', path: 'timetables', icon: FiCalendar },
+              { name: 'Hall Management', path: 'halls', icon: FiLayers },
             ]
           },
           {
@@ -286,6 +287,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         { name: 'Curriculum', path: 'curriculum', icon: FiBook },
         { name: 'Transcripts', path: 'transcripts', icon: FiFile },
         { name: 'Timetable Mgmt', path: 'timetables', icon: FiCalendar },
+        { name: 'Hall Management', path: 'halls', icon: FiLayers },
         { name: 'My Profile', path: 'profile', icon: FiUser }
         ];
       case 'bursar':

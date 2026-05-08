@@ -19,6 +19,12 @@ const subjectSchema = new mongoose.Schema({
     min: [0, 'Credits must be at least 0'],
     max: [8, 'Credits cannot exceed 8'],
   },
+  lectureHours: {
+    type: Number,
+    default: function() {
+      return (this.credits || 0) * 15;
+    }
+  },
   year: {
     type: String,
     required: [true, 'Academic year is required'],
@@ -83,6 +89,25 @@ const subjectSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+});
+
+// Extract credits from code (3rd digit) and set lecture hours
+subjectSchema.pre('save', function (next) {
+  if (this.code) {
+    const digits = this.code.match(/\d/g);
+    if (digits && digits.length >= 3) {
+      // 3rd digit is credit
+      const derivedCredits = parseInt(digits[2]);
+      if (!isNaN(derivedCredits)) {
+        this.credits = derivedCredits;
+        this.lectureHours = derivedCredits * 15;
+      }
+    } else if (this.credits) {
+      // Fallback if not enough digits but credits are provided
+      this.lectureHours = this.credits * 15;
+    }
+  }
+  next();
 });
 
 // Helper function to get semester number (1-8)

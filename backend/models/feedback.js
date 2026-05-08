@@ -8,7 +8,7 @@ const feedbackSchema = new mongoose.Schema({
   },
   course: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'subject',
+    ref: 'Subject',
     required: true
   },
   lecturer: {

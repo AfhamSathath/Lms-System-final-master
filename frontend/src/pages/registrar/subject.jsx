@@ -15,26 +15,26 @@ const subjectOptions = {
   'Computer Science': {
     '1st Year': {
       1: [
-        { code: 'CO1121', name: 'Basic Mathematics for Computing', credits: 3, category: 'Lecture' },
-        { code: 'CO1122', name: 'Basic Computer Programming', credits: 3, category: 'Lecture', hasPractical: true, practicalCode: 'CO1112' },
+        { code: 'CO1121', name: 'Basic Mathematics for Computing', credits: 2, category: 'Lecture' },
+        { code: 'CO1122', name: 'Basic Computer Programming', credits: 2, category: 'Lecture', hasPractical: true, practicalCode: 'CO1112' },
         { code: 'CO1112', name: 'Practical work on CO1122', credits: 1, category: 'Practical' },
-        { code: 'CO1123', name: 'Formal Methods for Problem Solving', credits: 3, category: 'Lecture' },
-        { code: 'CO1124', name: 'Computer Systems & PC Applications', credits: 3, category: 'Lecture', hasPractical: true, practicalCode: 'CO1114' },
+        { code: 'CO1123', name: 'Formal Methods for Problem Solving', credits: 2, category: 'Lecture' },
+        { code: 'CO1124', name: 'Computer Systems & PC Applications', credits: 2, category: 'Lecture', hasPractical: true, practicalCode: 'CO1114' },
         { code: 'CO1114', name: 'Practical work on CO1124', credits: 1, category: 'Practical' },
-        { code: 'CO1125', name: 'Statistics for Science and Technology', credits: 3, category: 'Lecture', hasPractical: true, practicalCode: 'CO1115' },
+        { code: 'CO1125', name: 'Statistics for Science and Technology', credits: 2, category: 'Lecture', hasPractical: true, practicalCode: 'CO1115' },
         { code: 'CO1115', name: 'Practical work on CO1125', credits: 1, category: 'Practical' },
-        { code: 'CO1126', name: 'Management Information System', credits: 3, category: 'Management' },
+        { code: 'CO1126', name: 'Management Information System', credits: 2, category: 'Management' },
         { code: 'GEP-I', name: 'General English Proficiency - I', credits: 2, category: 'General' },
       ],
       2: [
-        { code: 'CO1221', name: 'Systems Analysis & Design', credits: 3, category: 'Lecture' },
-        { code: 'CO1222', name: 'Data Structures & Algorithms', credits: 3, category: 'Lecture', hasPractical: true, practicalCode: 'CO1212' },
+        { code: 'CO1221', name: 'Systems Analysis & Design', credits: 2, category: 'Lecture' },
+        { code: 'CO1222', name: 'Data Structures & Algorithms', credits: 2, category: 'Lecture', hasPractical: true, practicalCode: 'CO1212' },
         { code: 'CO1212', name: 'Practical work on CO1222', credits: 1, category: 'Practical' },
-        { code: 'CO1223', name: 'Data Base Management Systems', credits: 3, category: 'Lecture', hasPractical: true, practicalCode: 'CO1213' },
+        { code: 'CO1223', name: 'Data Base Management Systems', credits: 2, category: 'Lecture', hasPractical: true, practicalCode: 'CO1213' },
         { code: 'CO1213', name: 'Practical work on CO1223', credits: 1, category: 'Practical' },
-        { code: 'CO1224', name: 'MultiMedia & HyperMedia Development', credits: 3, category: 'Lecture', hasPractical: true, practicalCode: 'CO1214' },
+        { code: 'CO1224', name: 'MultiMedia & HyperMedia Development', credits: 2, category: 'Lecture', hasPractical: true, practicalCode: 'CO1214' },
         { code: 'CO1214', name: 'Practical work on CO1224', credits: 1, category: 'Practical' },
-        { code: 'CO1225', name: 'Computer Architecture', credits: 3, category: 'Lecture' },
+        { code: 'CO1225', name: 'Computer Architecture', credits: 2, category: 'Lecture' },
         { code: 'CO1226', name: 'Social Harmony', credits: 2, category: 'General' },
       ]
     },
@@ -52,15 +52,15 @@ const subjectOptions = {
         { code: 'GEP-III', name: 'General English Proficiency - III', credits: 2, category: 'General' },
       ],
       2: [
-        { code: 'CO2221', name: 'Data Communication Systems', credits: 3, category: 'Lecture' },
-        { code: 'CO2222', name: 'Visual System Development Tools', credits: 3, category: 'Lecture', hasPractical: true, practicalCode: 'CO2212' },
+        { code: 'CO2221', name: 'Data Communication Systems', credits: 2, category: 'Lecture' },
+        { code: 'CO2222', name: 'Visual System Development Tools', credits: 2, category: 'Lecture', hasPractical: true, practicalCode: 'CO2212' },
         { code: 'CO2212', name: 'Practical work on CO2222', credits: 1, category: 'Practical' },
-        { code: 'CO2223', name: 'Computer Graphics', credits: 3, category: 'Lecture', hasPractical: true, practicalCode: 'CO2213' },
+        { code: 'CO2223', name: 'Computer Graphics', credits: 2, category: 'Lecture', hasPractical: true, practicalCode: 'CO2213' },
         { code: 'CO2213', name: 'Practical work on CO2223', credits: 1, category: 'Practical' },
-        { code: 'CO2224', name: 'Human Computer Interaction', credits: 3, category: 'Lecture', hasPractical: true, practicalCode: 'CO2214' },
+        { code: 'CO2224', name: 'Human Computer Interaction', credits: 2, category: 'Lecture', hasPractical: true, practicalCode: 'CO2214' },
         { code: 'CO2214', name: 'Practical work on CO2224', credits: 1, category: 'Practical' },
-        { code: 'CO2225', name: 'Software Management Techniques', credits: 3, category: 'Management' },
-        { code: 'CO2226', name: 'Automata Theory', credits: 3, category: 'Lecture' },
+        { code: 'CO2225', name: 'Software Management Techniques', credits: 2, category: 'Management' },
+        { code: 'CO2226', name: 'Automata Theory', credits: 2, category: 'Lecture' },
       ]
     },
     '3rd Year': {
@@ -263,6 +263,7 @@ const RegistrarSubjects = () => {
     practicalCode: '',
     lecturer: '',
     description: '',
+    lectureHours: 0,
     department: user.department || 'Computer Science'
   });
   const [departmentLocked, setDepartmentLocked] = useState(false);
@@ -364,10 +365,30 @@ const RegistrarSubjects = () => {
     const { name, value, type, checked } = e.target;
     // unlock department if user manually changes it
     if (name === 'department') setDepartmentLocked(false);
-    setFormData({
+
+    let updatedFormData = {
       ...formData,
       [name]: type === 'checkbox' ? checked : value
-    });
+    };
+
+    // Auto-calculate credits and lecture hours from code
+    if (name === 'code' && value) {
+      const digits = value.match(/\d/g);
+      if (digits && digits.length >= 3) {
+        const derivedCredits = parseInt(digits[2]);
+        if (!isNaN(derivedCredits)) {
+          updatedFormData.credits = derivedCredits;
+          updatedFormData.lectureHours = derivedCredits * 15;
+        }
+      }
+    }
+
+    // Auto-calculate lecture hours from credits
+    if (name === 'credits') {
+      updatedFormData.lectureHours = parseInt(value) * 15;
+    }
+
+    setFormData(updatedFormData);
   };
 
   // Handle subject selection from dropdown
@@ -383,6 +404,7 @@ const RegistrarSubjects = () => {
         name: selected.name,
         code: selected.code,
         credits: selected.credits,
+        lectureHours: selected.credits * 15,
         category: selected.category,
         hasPractical: selected.hasPractical || false,
         practicalCode: selected.practicalCode || '',
@@ -407,6 +429,7 @@ const RegistrarSubjects = () => {
       practicalCode: '',
       lecturer: '',
       description: '',
+      lectureHours: 0,
     });
     setDepartmentLocked(false);
   };
@@ -444,7 +467,8 @@ const RegistrarSubjects = () => {
       hasPractical: subject.hasPractical || false,
       practicalCode: subject.practicalCode || '',
       lecturer: subject.lecturer?._id || '',
-      description: subject.description || ''
+      description: subject.description || '',
+      lectureHours: subject.lectureHours || (subject.credits * 15)
     });
     setShowEditModal(true);
   };
@@ -737,6 +761,7 @@ const RegistrarSubjects = () => {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subject</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Code</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Credits</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lec. Hours</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Year</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Semester</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
@@ -774,6 +799,7 @@ const RegistrarSubjects = () => {
                     )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{s.credits}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-blue-600 font-semibold">{s.lectureHours || s.credits * 15}h</td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`px-2 py-1 text-xs font-semibold rounded-full ${getYearColor(s.year)}`}>
                       {s.year}
@@ -945,11 +971,23 @@ const RegistrarSubjects = () => {
                 value={formData.credits}
                 onChange={handleInputChange}
                 min="1"
-                max="5"
+                max="8"
                 required
                 placeholder="3"
                 className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
               />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Lecture Hours</label>
+              <input
+                type="number"
+                name="lectureHours"
+                value={formData.lectureHours}
+                onChange={handleInputChange}
+                readOnly
+                className="w-full px-4 py-2 bg-gray-50 border border-black rounded-lg text-gray-500 cursor-not-allowed"
+              />
+              <p className="text-xs text-gray-500 mt-1">Calculated: {formData.credits || 0} credits × 15h</p>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Category *</label>
@@ -1122,10 +1160,22 @@ const RegistrarSubjects = () => {
                 value={formData.credits}
                 onChange={handleInputChange}
                 min="1"
-                max="5"
+                max="8"
                 required
                 className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
               />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Lecture Hours</label>
+              <input
+                type="number"
+                name="lectureHours"
+                value={formData.lectureHours}
+                onChange={handleInputChange}
+                readOnly
+                className="w-full px-4 py-2 bg-gray-50 border border-black rounded-lg text-gray-500 cursor-not-allowed"
+              />
+              <p className="text-xs text-gray-500 mt-1">Calculated: {formData.credits || 0} credits × 15h</p>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Category *</label>
@@ -1355,7 +1405,7 @@ const RegistrarSubjects = () => {
                             </span>
                           </div>
                           <div className="mt-2 flex justify-between items-center text-sm">
-                            <span className="text-gray-600">Credits: {sub.credits}</span>
+                            <span className="text-gray-600">Credits: {sub.credits} ({sub.lectureHours || sub.credits * 15}h)</span>
                             {sub.lecturer ? (
                               <span className="text-xs text-gray-500">{sub.lecturer.name}</span>
                             ) : (
@@ -1391,7 +1441,7 @@ const RegistrarSubjects = () => {
                             </span>
                           </div>
                           <div className="mt-2 flex justify-between items-center text-sm">
-                            <span className="text-gray-600">Credits: {sub.credits}</span>
+                            <span className="text-gray-600">Credits: {sub.credits} ({sub.lectureHours || sub.credits * 15}h)</span>
                             {sub.lecturer ? (
                               <span className="text-xs text-gray-500">{sub.lecturer.name}</span>
                             ) : (

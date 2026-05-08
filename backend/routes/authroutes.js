@@ -36,6 +36,7 @@ router.use(protect);
 
 // User profile routes
 router.get('/me', authController.getMe);
+router.put('/update-profile', authController.updateProfile);
 
 // Admin, HOD, Dean, Registrar, Lecturer, and Student routes
 router.get('/users', authorize('admin', 'hod', 'dean', 'registrar', 'lecturer', 'student'), authController.getAllUsers);

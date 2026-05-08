@@ -354,6 +354,43 @@ exports.updateUser = async (req, res, next) => {
     }
 
     const user = await User.findByIdAndUpdate(req.params.id, updateData, { new: true, runValidators: true }).select('-password');
+
+    // Automatically update active enrollments if yearOfStudy or semester changed
+    if (user.role === 'student' && (updateData.yearOfStudy || updateData.semester)) {
+      try {
+        const Enrollment = require('../models/Enrollment');
+        const updateQuery = {};
+        
+        if (updateData.yearOfStudy) {
+          const yearMap = {
+            '1': '1st Year',
+            '2': '2nd Year',
+            '3': '3rd Year',
+            '4': '4th Year',
+            '5': '5th Year'
+          };
+          updateQuery.yearOfStudy = yearMap[updateData.yearOfStudy.toString()] || updateData.yearOfStudy;
+        }
+        
+        if (updateData.semester) {
+          updateQuery.semester = parseInt(updateData.semester);
+        }
+
+        if (Object.keys(updateQuery).length > 0) {
+          await Enrollment.updateMany(
+            { 
+              student: user._id,
+              enrollmentStatus: { $in: ['enrolled', 'waitlisted'] }
+            },
+            { $set: updateQuery }
+          );
+          console.log(`Synchronized enrollments for student ${user.name} with new academic level.`);
+        }
+      } catch (enrollErr) {
+        console.error('Failed to sync enrollments on user update:', enrollErr);
+      }
+    }
+
     res.json({ success: true, user });
   } catch (error) { next(error); }
 };

@@ -108,34 +108,42 @@ exports.getEnrollments = async (req, res, next) => {
     if (userRole === 'student') {
       query.student = userId;
     } else if (userRole === 'lecturer') {
-      // Lecturers can see enrollments for courses they teach
-      const teachingCourses = await Course.find({
-        lecturer: userId
-      }).select('_id');
-      const assignments = await LecturerAssignment.find({
-        lecturer: userId,
-        isActive: true
-      }).select('subject');
+      // Lecturers can see enrollments for courses they teach (primary) or are assigned to (LecturerAssignment)
+      const [primaryCourses, assignments] = await Promise.all([
+        Course.find({ lecturer: userId }).select('_id'),
+        LecturerAssignment.find({ lecturer: userId, isActive: true }).select('subject')
+      ]);
 
-      const courseIds = teachingCourses.map(c => c._id);
-      const assignmentCourseIds = assignments.map(a => a.subject);
-      const combinedCourseIds = [...new Set([...courseIds, ...assignmentCourseIds.map(id => id.toString())])];
+      const allowedIds = [
+        ...primaryCourses.map(c => c._id.toString()),
+        ...assignments.map(a => a.subject.toString())
+      ];
 
-      if (combinedCourseIds.length > 0) {
-        query.course = { $in: combinedCourseIds };
-      } else {
-        console.log('[getEnrollments] Lecturer has no assigned courses - returning empty result');
+      const uniqueAllowedIds = [...new Set(allowedIds)];
+
+      if (uniqueAllowedIds.length === 0) {
         return res.json({
           success: true,
           count: 0,
-          total: 0,
-          page: parseInt(page),
-          pages: 0,
           enrollments: [],
-          message: 'You have no assigned courses'
+          message: 'No assigned courses found'
         });
       }
-    } else if (userRole === 'hod') {
+
+      // If a specific course is requested, verify it's one of the allowed ones
+      if (course) {
+        if (!uniqueAllowedIds.includes(course.toString())) {
+          return res.status(403).json({
+            success: false,
+            message: 'You are not authorized to view enrollments for this course'
+          });
+        }
+        query.course = course;
+      } else {
+        query.course = { $in: uniqueAllowedIds };
+      }
+    }
+ else if (userRole === 'hod') {
       // HOD can see enrollments in their department
       const departmentCourses = await Course.find({
         department: req.user.department
@@ -195,17 +203,25 @@ exports.getEnrollments = async (req, res, next) => {
     
     console.log(`[getEnrollments] Query:`, query);
 
-    const enrollments = await Enrollment.find(query)
+    let enrollments = await Enrollment.find(query)
       .populate('student', 'name studentId registrationNumber email department')
-      .populate('course', 'code name credits level')
+      .populate('course', 'code name credits level isActive')
       .populate('gradedBy', 'name')
       .populate('attendance.markedBy', 'name')
-      .populate('attendance.updatedByHOD', 'name')
-      .sort(sortBy)
-      .skip(skip)
-      .limit(parseInt(limit));
+      .populate('attendance.updatedByHOD', 'name');
 
-    const total = await Enrollment.countDocuments(query);
+    // Filter out orphaned or inactive courses
+    enrollments = enrollments.filter(e => e.course && e.course.isActive !== false);
+
+    // Apply pagination and sorting in memory for the filtered results
+    const total = enrollments.length;
+    enrollments = enrollments
+      .sort((a, b) => {
+        const field = sortBy.startsWith('-') ? sortBy.substring(1) : sortBy;
+        const multiplier = sortBy.startsWith('-') ? -1 : 1;
+        return a[field] > b[field] ? multiplier : -multiplier;
+      })
+      .slice(skip, skip + parseInt(limit));
     
     console.log(`[getEnrollments] Found ${enrollments.length} enrollments, Total: ${total}`);
 
@@ -623,15 +639,22 @@ exports.enrollBatchStudents = async (req, res, next) => {
 
     // Find all active students in the same department and year level
     // We map the course's year string (e.g., "1st Year") to the user's yearOfStudy number
-    const yearMap = { '1st Year': 1, '2nd Year': 2, '3rd Year': 3, '4th Year': 4 };
+    const yearMap = { '1st Year': 1, '2nd Year': 2, '3rd Year': 3, '4th Year': 4, '5th Year': 5 };
     const yearNum = yearMap[course.year];
 
-    const batchStudents = await User.find({
+    const userQuery = {
       role: 'student',
-      department: course.department,
-      yearOfStudy: yearNum,
+      department: { $regex: new RegExp(`^${course.department}$`, 'i') },
       isActive: true
-    });
+    };
+
+    if (req.body.batch) {
+      userQuery.batch = req.body.batch;
+    } else {
+      userQuery.yearOfStudy = yearNum;
+    }
+
+    const batchStudents = await User.find(userQuery);
 
     if (batchStudents.length === 0) {
       return res.status(400).json({ success: false, message: 'No students found matching this subject\'s batch criteria' });
@@ -652,12 +675,18 @@ exports.enrollBatchStudents = async (req, res, next) => {
 
         if (existing) continue;
 
+        const getYearString = (num) => {
+          if (!num) return req.body.yearOfStudy || academicYear || course.year;
+          const map = { 1: '1st Year', 2: '2nd Year', 3: '3rd Year', 4: '4th Year', 5: '5th Year' };
+          return map[num] || req.body.yearOfStudy || academicYear || course.year;
+        };
+
         const enrollment = await Enrollment.create({
           student: student._id,
           course: courseId,
           academicYear: academicYear || course.year,
           semester: semester || course.semester,
-          yearOfStudy: `${student.yearOfStudy}${student.yearOfStudy === 1 ? 'st' : student.yearOfStudy === 2 ? 'nd' : student.yearOfStudy === 3 ? 'rd' : 'th'} Year`,
+          yearOfStudy: getYearString(student.yearOfStudy),
           createdBy: req.user.id,
           enrollmentDate: new Date()
         });
@@ -677,6 +706,7 @@ exports.enrollBatchStudents = async (req, res, next) => {
         }).catch(console.error);
 
       } catch (err) {
+        console.error(`Failed to enroll ${student.name}:`, err.message);
         results.failed.push({ student: student.name, reason: err.message });
       }
     }
@@ -943,14 +973,17 @@ exports.getStudentEnrollments = async (req, res, next) => {
 
     console.log('[getStudentEnrollments] Query:', query);
 
-    const enrollments = await Enrollment.find(query)
-      .populate('course', 'code name credits year')
+    let enrollments = await Enrollment.find(query)
+      .populate('course', 'code name credits year isActive')
       .populate('gradedBy', 'name')
       .populate('attendance.markedBy', 'name')
       .populate('attendance.updatedByHOD', 'name')
       .sort('-academicYear -semester');
 
-    console.log(`[getStudentEnrollments] Found ${enrollments.length} enrollments`);
+    // Filter out enrollments where the course no longer exists or is inactive
+    enrollments = enrollments.filter(e => e.course && e.course.isActive !== false);
+
+    console.log(`[getStudentEnrollments] Found ${enrollments.length} valid enrollments`);
     if (enrollments.length > 0) {
       console.log('[getStudentEnrollments] Sample enrollment course:', enrollments[0].course);
     }

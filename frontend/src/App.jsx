@@ -82,6 +82,7 @@ import RegistrarLecturerManagement from './pages/registrar/lecturerManagement';
 import RegistrarRepeatApprovals from './pages/registrar/repeatApprovals';
 import RegistrarAttendanceDetails from './pages/registrar/attendanceDetails';
 import RegistrarMedicalApprovals from './pages/registrar/MedicalApprovals';
+import HallManagement from './pages/admin/HallManagement';
 
 // HOD Pages
 import HodDashboard from './pages/hod/dashboard';
@@ -249,6 +250,7 @@ function MainRoutes() {
         <Route path="attendance" element={<RegistrarAttendanceDetails />} />
         <Route path="medical" element={<RegistrarMedicalApprovals />} />
         <Route path="profile" element={<RegistrarProfile />} />
+        <Route path="halls" element={<HallManagement />} />
       </Route>
 
       {/* HOD Routes */}

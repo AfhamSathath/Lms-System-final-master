@@ -434,6 +434,11 @@ const LecturerManagement = () => {
                       <button
                         onClick={() => {
                           setSelectedAssignment(assignment);
+                          // Recalculate lectures from code to fix errors
+                          const digits = assignment.subject?.code?.match(/\d/g);
+                          const derivedCredits = (digits && digits.length >= 3) ? parseInt(digits[2]) : (assignment.subject?.credits || 2);
+                          const correctedLectures = derivedCredits * 15;
+
                           setFormData({
                             lecturerId: assignment.lecturer?._id || '',
                             subjectId: assignment.subject?._id || '',
@@ -442,7 +447,7 @@ const LecturerManagement = () => {
                             semester: assignment.semester?.toString() || '',
                             startDate: assignment.startDate ? new Date(assignment.startDate).toISOString().split('T')[0] : '',
                             endDate: assignment.endDate ? new Date(assignment.endDate).toISOString().split('T')[0] : '',
-                            totalLectures: assignment.curriculum?.totalLectures || 30,
+                            totalLectures: correctedLectures,
                             notes: assignment.notes || ''
                           });
                           toggleModal('edit', true);
@@ -624,21 +629,31 @@ const AssignModal = ({ isOpen, onClose, formData, setFormData, onSubmit, lecture
                     // Use DB match name if found, otherwise use the identifier from the subject directly
                     const resolvedDeptName = dbMatch ? dbMatch.name : deptIdentifier;
 
+                    // Extract credits from code to fix potential credit errors
+                    const digits = selectedSubject.code.match(/\d/g);
+                    const derivedCredits = (digits && digits.length >= 3) ? parseInt(digits[2]) : selectedSubject.credits;
+                    const calculatedLectures = derivedCredits ? derivedCredits * 15 : p.totalLectures;
+
                     setFormData(p => ({
                       ...p,
                       subjectId: subjId,
                       departmentId: resolvedDeptName,
                       academicYear: selectedSubject?.year || p.academicYear,
                       semester: selectedSubject?.semester ? selectedSubject.semester.toString() : p.semester,
-                      totalLectures: selectedSubject?.credits ? selectedSubject.credits * 15 : p.totalLectures
+                      totalLectures: calculatedLectures
                     }));
                   } else {
+                    // Extract credits from code to fix potential credit errors
+                    const digits = selectedSubject?.code?.match(/\d/g);
+                    const derivedCredits = (digits && digits.length >= 3) ? parseInt(digits[2]) : selectedSubject?.credits;
+                    const calculatedLectures = derivedCredits ? derivedCredits * 15 : p.totalLectures;
+
                     setFormData(p => ({
                       ...p,
                       subjectId: subjId,
                       academicYear: selectedSubject?.year || p.academicYear,
                       semester: selectedSubject?.semester ? selectedSubject.semester.toString() : p.semester,
-                      totalLectures: selectedSubject?.credits ? selectedSubject.credits * 15 : p.totalLectures
+                      totalLectures: calculatedLectures
                     }));
                   }
                 }}

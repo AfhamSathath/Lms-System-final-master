@@ -16,6 +16,7 @@ import {
   FiCamera
 } from 'react-icons/fi';
 import ProfilePictureUpload from '../../components/common/ProfilePictureUpload';
+import Modal from '../../components/common/model';
 
 const StudentProfile = () => {
   const { user, updateUser } = useAuth();
@@ -26,6 +27,14 @@ const StudentProfile = () => {
     phone: user?.phone || '',
     address: user?.address || '',
     competitions: user?.competitions || []
+  });
+
+  const [isParticipationModalOpen, setIsParticipationModalOpen] = useState(false);
+  const [participationForm, setParticipationForm] = useState({
+    name: '',
+    role: '',
+    achievement: '',
+    date: new Date().toISOString().split('T')[0]
   });
 
   const handleChange = (e) => {
@@ -49,6 +58,25 @@ const StudentProfile = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleParticipationAdd = (e) => {
+    e.preventDefault();
+    if (!participationForm.name || !participationForm.role) {
+      toast.error('Name and Role are required');
+      return;
+    }
+
+    const updatedComps = [...(formData.competitions || []), { ...participationForm }];
+    setFormData({ ...formData, competitions: updatedComps });
+    setIsParticipationModalOpen(false);
+    setParticipationForm({
+      name: '',
+      role: '',
+      achievement: '',
+      date: new Date().toISOString().split('T')[0]
+    });
+    toast.success('Added to list. Click "Save Profile" to finalize.');
   };
 
   const handleCancel = () => {
@@ -249,24 +277,82 @@ const StudentProfile = () => {
               <p className="text-sm text-gray-500">Record your achievements and event roles</p>
             </div>
             <button 
-              onClick={() => {
-                const name = prompt('Competition/Event Name:');
-                const role = prompt('Your Role (e.g. Participant, Lead, Organizer):');
-                const achievement = prompt('Achievement (optional):');
-                if (name && role) {
-                  const newComp = { name, role, achievement, date: new Date() };
-                  const updatedComps = [...(formData.competitions || []), newComp];
-                  setFormData({ ...formData, competitions: updatedComps });
-                  // Trigger a silent update or wait for profile save
-                  toast.success('Added to list. Click "Save Profile" to finalize.');
-                }
-              }}
+              onClick={() => setIsParticipationModalOpen(true)}
               className="px-4 py-2 bg-indigo-600 text-white rounded-xl font-bold uppercase text-[10px] tracking-widest hover:bg-indigo-700 transition-all"
             >
               + Add Participation
             </button>
           </div>
 
+          {/* Participation Modal */}
+          <Modal
+            isOpen={isParticipationModalOpen}
+            onClose={() => setIsParticipationModalOpen(false)}
+            title="Add Event Participation"
+          >
+            <form onSubmit={handleParticipationAdd} className="space-y-4">
+              <div>
+                <label className="block text-xs font-black text-slate-500 uppercase mb-1">Competition / Event Name</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Inter-University Hackathon"
+                  className="w-full px-4 py-2 border border-black rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none font-bold text-sm"
+                  value={participationForm.name}
+                  onChange={(e) => setParticipationForm({...participationForm, name: e.target.value})}
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-black text-slate-500 uppercase mb-1">Your Role</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Lead Developer"
+                    className="w-full px-4 py-2 border border-black rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none font-bold text-sm"
+                    value={participationForm.role}
+                    onChange={(e) => setParticipationForm({...participationForm, role: e.target.value})}
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-black text-slate-500 uppercase mb-1">Date</label>
+                  <input
+                    type="date"
+                    required
+                    className="w-full px-4 py-2 border border-black rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none font-bold text-sm"
+                    value={participationForm.date}
+                    onChange={(e) => setParticipationForm({...participationForm, date: e.target.value})}
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-black text-slate-500 uppercase mb-1">Achievement (Optional)</label>
+                <input
+                  type="text"
+                  placeholder="e.g. 1st Place Winners"
+                  className="w-full px-4 py-2 border border-black rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none font-bold text-sm"
+                  value={participationForm.achievement}
+                  onChange={(e) => setParticipationForm({...participationForm, achievement: e.target.value})}
+                />
+              </div>
+              <div className="flex justify-end space-x-2 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setIsParticipationModalOpen(false)}
+                  className="px-4 py-2 bg-white border border-black text-slate-600 rounded-xl font-bold uppercase text-[10px] tracking-widest hover:bg-slate-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-6 py-2 bg-indigo-600 text-white rounded-xl font-bold uppercase text-[10px] tracking-widest hover:bg-indigo-700"
+                >
+                  Add Record
+                </button>
+              </div>
+            </form>
+          </Modal>
+          
           <div className="space-y-4">
             {formData.competitions?.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

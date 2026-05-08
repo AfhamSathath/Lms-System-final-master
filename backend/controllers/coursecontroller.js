@@ -228,11 +228,14 @@ exports.createSubject = async (req, res, next) => {
 // @access  Private/Admin
 exports.updateSubject = async (req, res, next) => {
   try {
-    const subject = await Subject.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true, runValidators: true }
-    ).populate('lecturer', 'name email lecturerId');
+    let subject = await Subject.findById(req.params.id);
+    if (!subject) {
+      return res.status(404).json({ message: 'Subject not found' });
+    }
+
+    Object.assign(subject, req.body);
+    await subject.save();
+    await subject.populate('lecturer', 'name email lecturerId');
 
     if (!subject) {
       return res.status(404).json({ message: 'Subject not found' });
@@ -464,7 +467,7 @@ exports.assignLecturer = async (req, res, next) => {
           startDate: new Date(),
           endDate: new Date(new Date().setMonth(new Date().getMonth() + 4)),
           curriculum: {
-            totalLectures: subject.credits ? subject.credits * 15 : 30,
+            totalLectures: subject.lectureHours || (subject.credits ? subject.credits * 15 : 30),
             totalPracticals: subject.category === 'Practical' ? 15 : 0,
             totalAssignments: 5
           },
@@ -595,21 +598,20 @@ exports.seedSubjects = async (req, res, next) => {
     for (const subjectData of subjectsToSeed) {
       try {
         // Update or create subject
-        const subject = await Subject.findOneAndUpdate(
-          {
-            code: subjectData.code,
-            year: subjectData.year,
-            semester: subjectData.semester,
-            department: subjectData.department
-          },
-          {
-            $set: {
-              ...subjectData,
-              isActive: true
-            }
-          },
-          { upsert: true, new: true }
-        );
+        let subject = await Subject.findOne({
+          code: subjectData.code,
+          year: subjectData.year,
+          semester: subjectData.semester,
+          department: subjectData.department
+        });
+
+        if (subject) {
+          Object.assign(subject, subjectData, { isActive: true });
+          await subject.save();
+        } else {
+          subject = new Subject({ ...subjectData, isActive: true });
+          await subject.save();
+        }
         results.push(subject);
       } catch (error) {
         errors.push(error.message);
@@ -764,7 +766,8 @@ exports.bulkUploadSubjects = async (req, res, next) => {
                 hasPractical: row.hasPractical === 'true' || row.hasPractical === true
               };
 
-              const subject = await Subject.create(subjectData);
+              const subject = new Subject(subjectData);
+              await subject.save();
               importedCount++;
             } catch (err) {
               failedCount++;
